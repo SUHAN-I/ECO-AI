@@ -9,6 +9,17 @@
 # pip install faiss-cpu sentence-transformers pypdf pandas openpyxl
 # ============================================================
 
+PDF_FILES = [
+    {"path": "data/pdfs/RECYCLING KNOWLEDGE .pdf",                              "label": "recycling_knowledge"},
+    {"path": "data/pdfs/Recycling_Knowledge_Dataset_PKR.pdf",                   "label": "recycling_knowledge"},
+    {"path": "data/pdfs/The World Bank Artical - PLASTIC WASTE:.pdf",           "label": "plastic_waste_research"},
+    {"path": "data/pdfs/National Hazardous Waste Management Policy 2022.pdf",   "label": "waste_policy"},
+]
+XLSX_FILES = [{"path": "data/xlsx/RECYCLING KNOWLEDGE.xlsx", "label": "recycling_knowledge"}]
+CSV_FILES  = [{"path": "data/csv/Scrap_Price .csv",          "label": "market_rates"}]
+
+
+
 import os
 import pickle
 import numpy as np
