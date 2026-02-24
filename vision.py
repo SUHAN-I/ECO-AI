@@ -1,12 +1,12 @@
 # ============================================================
 # FILE: vision.py
-# PURPOSE: Waste image classification using YOLO11n
-# MODEL: YOLO11n (Ultralytics pretrained, auto-downloads 5.6MB)
-# MAPS: 80 COCO classes → waste categories (Urdu + English)
-# USAGE: from vision import classify_waste, load_vision_model
+# PURPOSE: Waste image classification using Llama 4 Scout Vision
+# API: Groq (free, fast, accurate)
+# MODEL: meta-llama/llama-4-scout-17b-16e-instruct
+# USAGE: from vision import classify_waste, load_vision_client
 # ============================================================
 # INSTALL:
-# pip install ultralytics Pillow
+# pip install groq Pillow
 # ============================================================
 
 # ╔══════════════════════════════════════════════════════════╗
@@ -16,17 +16,17 @@
 
 # ── COLAB CELL 1: Install ────────────────────────────────────
 """
-!pip install ultralytics Pillow
+!pip install groq Pillow -q
 """
 
-# ── COLAB CELL 2: Load Model ─────────────────────────────────
+# ── COLAB CELL 2: Load Client ────────────────────────────────
 """
-import importlib, sys
-# If vision.py is uploaded to Colab, load it
 exec(open('vision.py').read())
 
-model = load_vision_model()
-print(f"✅ Model ready! Classes: {len(model.names)}")
+GROQ_API_KEY = "gsk_your_key_here"   # ← your Groq key
+
+client = load_vision_client(GROQ_API_KEY)
+print(f"✅ Vision client ready!")
 """
 
 # ── COLAB CELL 3: Test With Waste Image ──────────────────────
@@ -34,9 +34,9 @@ print(f"✅ Model ready! Classes: {len(model.names)}")
 from google.colab import files
 print("📸 Upload a waste image...")
 uploaded = files.upload()
-image_filename = list(uploaded.keys())[0]
+filename = list(uploaded.keys())[0]
 
-result = test_vision(model, image_filename)
+result = test_vision(client, filename)
 """
 
 # ── COLAB CELL 4: Test Multiple Images ───────────────────────
@@ -47,25 +47,16 @@ uploaded = files.upload()
 
 for filename in uploaded.keys():
     print(f"\n{'='*52}")
-    print(f"📸 Image: {filename}")
-    test_vision(model, filename)
+    print(f"📸 Testing: {filename}")
+    test_vision(client, filename)
 """
 
-# ── COLAB CELL 5: Test Mapping Logic (No Image Needed) ───────
+# ── COLAB CELL 5: Test Demo Fallback ─────────────────────────
 """
-print("🧪 Testing COCO → Waste Mapping Logic:")
-print("=" * 60)
-test_labels = [
-    ("bottle", 0.85), ("wine glass", 0.72), ("car", 0.91),
-    ("cell phone", 0.88), ("book", 0.76), ("banana", 0.93),
-    ("tie", 0.65), ("sports ball", 0.80), ("remote", 0.71),
-    ("scissors", 0.69), ("cup", 0.77), ("laptop", 0.82),
-    ("pizza", 0.90), ("backpack", 0.75), ("knife", 0.68),
-]
-for label, conf in test_labels:
-    r = map_to_waste(label, conf)
-    print(f"  {r['emoji']} {label:15s} → {r['label_en']:28s} | "
-          f"{'♻️ Recyclable' if r['recyclable'] else '🗑️ Non-Recyclable'}")
+# Test that demo mode works (when API is unavailable)
+result = mock_vision_response()
+print(f"Demo result: {result['emoji']} {result['waste_type']}")
+print(f"Demo Mode  : {result['is_demo']}")
 """
 
 
@@ -74,316 +65,208 @@ for label, conf in test_labels:
 # ============================================================
 
 import io
-import os
+import base64
+import json
 from PIL import Image
 
 
 # ── CONFIGURATION ────────────────────────────────────────────
-MODEL_NAME           = "yolo11n.pt"
-CONFIDENCE_THRESHOLD = 0.10   # Low = catches more waste objects
+VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
+MAX_TOKENS   = 400
+TEMPERATURE  = 0.1    # Low = consistent JSON output
+IMAGE_SIZE   = 512    # Max image dimension (saves API bandwidth)
+IMAGE_QUALITY= 85     # JPEG compression quality
 
 
-# ── COCO → WASTE MAPPING ─────────────────────────────────────
-# Format: "coco_label": ("waste_category", "urdu_label", recyclable)
-# Covers all 80 COCO classes with smart waste categorization
-
-WASTE_MAPPING = {
-
-    # ── PLASTIC WASTE ♻️ ─────────────────────────────────────
-    "bottle"         : ("plastic",  "پلاسٹک بوتل",          True),
-    "cup"            : ("plastic",  "پلاسٹک کپ",            True),
-    "bowl"           : ("plastic",  "پلاسٹک باؤل",          True),
-    "frisbee"        : ("plastic",  "پلاسٹک فضلہ",          True),
-    "skateboard"     : ("plastic",  "پلاسٹک / لکڑی فضلہ",  True),
-    "surfboard"      : ("plastic",  "پلاسٹک فضلہ",          True),
-    "toothbrush"     : ("plastic",  "پلاسٹک برش",           True),
-    "suitcase"       : ("plastic",  "پلاسٹک بیگ",           True),
-    "umbrella"       : ("plastic",  "پلاسٹک چھتری",         True),
-    "kite"           : ("plastic",  "پلاسٹک پتنگ",          True),
-    "snowboard"      : ("plastic",  "پلاسٹک فضلہ",          True),
-
-    # ── GLASS WASTE ♻️ ───────────────────────────────────────
-    "wine glass"     : ("glass",    "شیشے کا گلاس",         True),
-    "vase"           : ("glass",    "شیشے کا برتن",         True),
-
-    # ── METAL / SCRAP WASTE ♻️ ───────────────────────────────
-    "scissors"       : ("metal",    "دھاتی قینچی",          True),
-    "knife"          : ("metal",    "دھاتی چاقو",           True),
-    "spoon"          : ("metal",    "دھاتی چمچ",            True),
-    "fork"           : ("metal",    "دھاتی کانٹا",          True),
-    "car"            : ("metal",    "گاڑی دھاتی فضلہ",      True),
-    "truck"          : ("metal",    "ٹرک دھاتی فضلہ",       True),
-    "bus"            : ("metal",    "بس دھاتی فضلہ",        True),
-    "bicycle"        : ("metal",    "سائیکل دھات",          True),
-    "motorbike"      : ("metal",    "موٹر سائیکل دھات",     True),
-    "airplane"       : ("metal",    "دھاتی فضلہ",           True),
-    "train"          : ("metal",    "دھاتی فضلہ",           True),
-    "boat"           : ("metal",    "دھاتی فضلہ",           True),
-    "fire hydrant"   : ("metal",    "دھاتی پائپ",           True),
-    "stop sign"      : ("metal",    "دھاتی سائن",           True),
-    "parking meter"  : ("metal",    "دھاتی مشین",           True),
-    "bench"          : ("metal",    "دھات / لکڑی فضلہ",    True),
-    "chair"          : ("metal",    "دھات / پلاسٹک فضلہ",  True),
-    "tennis racket"  : ("metal",    "دھات / پلاسٹک",        True),
-    "baseball bat"   : ("metal",    "پلاسٹک / لکڑی",       True),
-    "skis"           : ("metal",    "دھات / پلاسٹک فضلہ",  True),
-    "couch"          : ("metal",    "فرنیچر فضلہ",          False),
-    "bed"            : ("metal",    "فرنیچر فضلہ",          False),
-    "dining table"   : ("metal",    "فرنیچر فضلہ",          False),
-
-    # ── E-WASTE ♻️ ───────────────────────────────────────────
-    "cell phone"     : ("e-waste",  "موبائل فون فضلہ",      True),
-    "laptop"         : ("e-waste",  "لیپ ٹاپ فضلہ",        True),
-    "tv"             : ("e-waste",  "ٹی وی فضلہ",           True),
-    "remote"         : ("e-waste",  "ریموٹ الیکٹرانک فضلہ", True),
-    "keyboard"       : ("e-waste",  "کی بورڈ فضلہ",         True),
-    "mouse"          : ("e-waste",  "ماؤس فضلہ",            True),
-    "microwave"      : ("e-waste",  "مائیکرو ویو فضلہ",    True),
-    "toaster"        : ("e-waste",  "ٹوسٹر فضلہ",           True),
-    "refrigerator"   : ("e-waste",  "فریج فضلہ",            True),
-    "oven"           : ("e-waste",  "اوون فضلہ",            True),
-    "hair drier"     : ("e-waste",  "ہیئر ڈرائر فضلہ",     True),
-    "clock"          : ("e-waste",  "گھڑی فضلہ",            True),
-    "traffic light"  : ("e-waste",  "الیکٹرانک فضلہ",       True),
-    "sink"           : ("e-waste",  "دھاتی / پلاسٹک فضلہ", True),
-    "toilet"         : ("trash",    "باتھ روم فضلہ",        False),
-
-    # ── PAPER / CARDBOARD ♻️ ─────────────────────────────────
-    "book"           : ("paper",    "کاغذ / کتاب فضلہ",    True),
-
-    # ── TEXTILE / CLOTHING ♻️ ────────────────────────────────
-    "tie"            : ("textile",  "کپڑے کا فضلہ",         True),
-    "handbag"        : ("textile",  "ہینڈ بیگ فضلہ",        True),
-    "backpack"       : ("textile",  "بیگ فضلہ",             True),
-    "baseball glove" : ("textile",  "دستانہ فضلہ",          True),
-
-    # ── RUBBER WASTE ♻️ ──────────────────────────────────────
-    "sports ball"    : ("rubber",   "ربڑ فضلہ",             True),
-
-    # ── ORGANIC / FOOD WASTE 🗑️ ──────────────────────────────
-    "banana"         : ("organic",  "نامیاتی فضلہ",         False),
-    "apple"          : ("organic",  "نامیاتی فضلہ",         False),
-    "orange"         : ("organic",  "نامیاتی فضلہ",         False),
-    "broccoli"       : ("organic",  "سبزی فضلہ",            False),
-    "carrot"         : ("organic",  "سبزی فضلہ",            False),
-    "hot dog"        : ("organic",  "کھانے کا فضلہ",        False),
-    "pizza"          : ("organic",  "کھانے کا فضلہ",        False),
-    "cake"           : ("organic",  "کھانے کا فضلہ",        False),
-    "sandwich"       : ("organic",  "کھانے کا فضلہ",        False),
-    "donut"          : ("organic",  "کھانے کا فضلہ",        False),
-    "potted plant"   : ("organic",  "نامیاتی فضلہ",         False),
-
-    # ── ANIMALS (not waste) ──────────────────────────────────
-    "bird"           : ("unknown",  "جانور — فضلہ نہیں",    False),
-    "cat"            : ("unknown",  "جانور — فضلہ نہیں",    False),
-    "dog"            : ("unknown",  "جانور — فضلہ نہیں",    False),
-    "horse"          : ("unknown",  "جانور — فضلہ نہیں",    False),
-    "sheep"          : ("unknown",  "جانور — فضلہ نہیں",    False),
-    "cow"            : ("unknown",  "جانور — فضلہ نہیں",    False),
-    "elephant"       : ("unknown",  "جانور — فضلہ نہیں",    False),
-    "bear"           : ("unknown",  "جانور — فضلہ نہیں",    False),
-    "zebra"          : ("unknown",  "جانور — فضلہ نہیں",    False),
-    "giraffe"        : ("unknown",  "جانور — فضلہ نہیں",    False),
-
-    # ── PERSON (not waste) ───────────────────────────────────
-    "person"         : ("unknown",  "انسان — فضلہ نہیں",    False),
-}
-
-
-# ── WASTE CATEGORY DETAILS ───────────────────────────────────
-# Used by RAG engine to build smarter search queries
-WASTE_CATEGORY_INFO = {
+# ── WASTE CATEGORY INFO ──────────────────────────────────────
+# Used to enrich classification result with metadata
+CATEGORY_INFO = {
     "plastic"  : {
-        "en"           : "Plastic Waste",
-        "pk"           : "پلاسٹک فضلہ",
-        "market_search": "plastic PET HDPE scrap rate PKR recycling Pakistan",
+        "label_en"     : "Plastic Waste",
+        "emoji"        : "♻️",
         "recyclable"   : True,
-        "emoji"        : "♻️"
+        "market_search": "plastic PET HDPE LDPE scrap rate PKR recycling Pakistan",
+        "color"        : "#2196F3"
     },
     "glass"    : {
-        "en"           : "Glass Waste",
-        "pk"           : "شیشے کا فضلہ",
-        "market_search": "glass scrap rate PKR recycling Pakistan",
+        "label_en"     : "Glass Waste",
+        "emoji"        : "♻️",
         "recyclable"   : True,
-        "emoji"        : "♻️"
+        "market_search": "glass bottle scrap rate PKR recycling Pakistan",
+        "color"        : "#00BCD4"
     },
     "metal"    : {
-        "en"           : "Metal / Scrap Waste",
-        "pk"           : "دھاتی / سکریپ فضلہ",
-        "market_search": "metal iron steel scrap rate PKR Misri Shah Pakistan",
+        "label_en"     : "Metal / Scrap Waste",
+        "emoji"        : "♻️",
         "recyclable"   : True,
-        "emoji"        : "♻️"
+        "market_search": "metal iron steel aluminium scrap rate PKR Misri Shah Pakistan",
+        "color"        : "#9E9E9E"
     },
     "paper"    : {
-        "en"           : "Paper / Cardboard Waste",
-        "pk"           : "کاغذ / گتہ فضلہ",
-        "market_search": "paper cardboard scrap rate PKR Pakistan recycling",
+        "label_en"     : "Paper Waste",
+        "emoji"        : "♻️",
         "recyclable"   : True,
-        "emoji"        : "♻️"
+        "market_search": "paper newspaper scrap rate PKR Pakistan recycling",
+        "color"        : "#FF9800"
+    },
+    "cardboard": {
+        "label_en"     : "Cardboard Waste",
+        "emoji"        : "♻️",
+        "recyclable"   : True,
+        "market_search": "cardboard box scrap rate PKR Pakistan recycling",
+        "color"        : "#795548"
     },
     "e-waste"  : {
-        "en"           : "Electronic Waste (E-Waste)",
-        "pk"           : "الیکٹرانک فضلہ",
-        "market_search": "e-waste electronic scrap rate PKR Pakistan circuit board",
+        "label_en"     : "Electronic Waste (E-Waste)",
+        "emoji"        : "♻️",
         "recyclable"   : True,
-        "emoji"        : "♻️"
+        "market_search": "e-waste electronic circuit board scrap rate PKR Pakistan",
+        "color"        : "#673AB7"
     },
     "textile"  : {
-        "en"           : "Textile / Clothing Waste",
-        "pk"           : "کپڑے کا فضلہ",
-        "market_search": "textile cloth scrap rate PKR recycling Pakistan",
+        "label_en"     : "Textile / Clothing Waste",
+        "emoji"        : "♻️",
         "recyclable"   : True,
-        "emoji"        : "♻️"
+        "market_search": "textile cloth fabric scrap rate PKR recycling Pakistan",
+        "color"        : "#E91E63"
     },
     "rubber"   : {
-        "en"           : "Rubber Waste",
-        "pk"           : "ربڑ فضلہ",
-        "market_search": "rubber tyre scrap rate PKR pyrolysis Pakistan",
+        "label_en"     : "Rubber Waste",
+        "emoji"        : "♻️",
         "recyclable"   : True,
-        "emoji"        : "♻️"
+        "market_search": "rubber tyre scrap rate PKR pyrolysis Pakistan",
+        "color"        : "#607D8B"
     },
     "organic"  : {
-        "en"           : "Organic / Food Waste",
-        "pk"           : "نامیاتی / کھانے کا فضلہ",
-        "market_search": "organic waste composting biogas fertilizer Pakistan",
+        "label_en"     : "Organic / Food Waste",
+        "emoji"        : "🌱",
         "recyclable"   : False,
-        "emoji"        : "🌱"
+        "market_search": "organic waste composting biogas fertilizer Pakistan",
+        "color"        : "#4CAF50"
+    },
+    "hazardous": {
+        "label_en"     : "Hazardous Waste",
+        "emoji"        : "☢️",
+        "recyclable"   : False,
+        "market_search": "hazardous waste disposal policy Pakistan Basel Convention",
+        "color"        : "#F44336"
     },
     "trash"    : {
-        "en"           : "General Non-Recyclable Trash",
-        "pk"           : "غیر قابل ری سائیکل کوڑا",
-        "market_search": "waste disposal management Pakistan",
+        "label_en"     : "General Non-Recyclable Trash",
+        "emoji"        : "🗑️",
         "recyclable"   : False,
-        "emoji"        : "🗑️"
+        "market_search": "waste disposal management Pakistan",
+        "color"        : "#757575"
     },
     "unknown"  : {
-        "en"           : "Unknown / Not Waste",
-        "pk"           : "نامعلوم چیز",
-        "market_search": "waste recycling Pakistan",
+        "label_en"     : "Unknown Waste",
+        "emoji"        : "❓",
         "recyclable"   : False,
-        "emoji"        : "❓"
+        "market_search": "waste recycling management Pakistan",
+        "color"        : "#BDBDBD"
     },
 }
 
-# Skip these when prioritizing waste detections
-NON_WASTE_LABELS = [
-    "person", "bird", "cat", "dog", "horse",
-    "sheep", "cow", "elephant", "bear", "zebra", "giraffe"
-]
+# ── CLASSIFICATION PROMPT ─────────────────────────────────────
+CLASSIFICATION_PROMPT = """You are a waste classification expert for Pakistan's circular economy app.
+Your job is to identify waste/trash objects in images and classify them accurately.
+
+Analyze the image carefully and respond ONLY with a valid JSON object.
+No extra text, no markdown, no explanation outside the JSON.
+
+Required JSON format:
+{
+  "waste_type": "specific name of the waste object visible in the image",
+  "category": "one of: plastic / glass / metal / paper / cardboard / e-waste / textile / rubber / organic / hazardous / trash",
+  "recyclable": true or false,
+  "harmful_level": "one of: low / medium / high / very high",
+  "urdu_label": "waste type written in Urdu script",
+  "confidence": "one of: low / medium / high",
+  "reasoning": "one clear sentence explaining your classification"
+}
+
+Classification guide:
+- Plastic bottle / bag / wrapper / container / pipe  → plastic,   recyclable: true,  harmful: medium
+- Glass bottle / jar / window glass                  → glass,     recyclable: true,  harmful: medium
+- Metal can / tin / iron scrap / copper wire / steel → metal,     recyclable: true,  harmful: low
+- Newspaper / book / office paper                    → paper,     recyclable: true,  harmful: low
+- Cardboard box / packaging                          → cardboard, recyclable: true,  harmful: low
+- Phone / laptop / TV / PCB / battery / charger      → e-waste,   recyclable: true,  harmful: very high
+- Clothes / fabric / shoes / bags                    → textile,   recyclable: true,  harmful: low
+- Tyre / rubber pipe / rubber mat                    → rubber,    recyclable: true,  harmful: medium
+- Food scraps / fruit / vegetables / peels           → organic,   recyclable: false, harmful: low
+- Medicine / syringe / chemical / pesticide          → hazardous, recyclable: false, harmful: very high
+- Mixed unidentifiable waste                         → trash,     recyclable: false, harmful: medium
+
+Urdu labels guide:
+- plastic      → پلاسٹک فضلہ
+- glass        → شیشے کا فضلہ
+- metal can    → دھاتی ڈبہ
+- aluminium can→ ایلومینیم ڈب
+- paper        → کاغذ کا فضلہ
+- cardboard    → گتے کا فضلہ
+- e-waste      → الیکٹرانک فضلہ
+- textile      → کپڑے کا فضلہ
+- rubber/tyre  → ربڑ / ٹائر
+- organic      → نامیاتی فضلہ
+- hazardous    → خطرناک فضلہ
+- trash        → کوڑا کرکٹ"""
 
 
 # ════════════════════════════════════════════════════════════
-# FUNCTION 1: Load Model Once
+# FUNCTION 1: Load Groq Client (once at startup)
 # ════════════════════════════════════════════════════════════
-def load_vision_model():
+def load_vision_client(groq_api_key):
     """
-    Loads YOLO11n from Ultralytics.
-    Auto-downloads 5.6MB on first run, cached after that.
+    Creates and returns a Groq API client.
+    Call this ONCE at app startup.
 
-    In Streamlit app.py use:
+    In Streamlit app.py:
         @st.cache_resource
-        def get_vision_model():
-            return load_vision_model()
+        def get_vision_client():
+            return load_vision_client(st.secrets["GROQ_API_KEY"])
 
-    Returns: YOLO model or None if failed
+    Args:
+        groq_api_key : your Groq API key (starts with gsk_)
+
+    Returns:
+        Groq client object or None if failed
     """
     try:
-        from ultralytics import YOLO
-        print("⏳ Loading YOLO11n model...")
-        model = YOLO(MODEL_NAME)
-        print(f"✅ YOLO11n ready! {len(model.names)} object classes.")
-        return model
+        import groq
+        client = groq.Groq(api_key=groq_api_key)
+
+        # Quick connection test
+        test = client.chat.completions.create(
+            model      = VISION_MODEL,
+            messages   = [{"role": "user", "content": "Hi"}],
+            max_tokens = 5
+        )
+        print(f"✅ Groq Vision client loaded!")
+        print(f"   Model: {VISION_MODEL}")
+        return client
+
     except Exception as e:
-        print(f"❌ Failed to load YOLO11n: {e}")
-        print("   Run: pip install ultralytics")
+        print(f"❌ Failed to load Groq client: {e}")
+        print("   Check your GROQ_API_KEY and internet connection.")
         return None
 
 
 # ════════════════════════════════════════════════════════════
-# FUNCTION 2: Map COCO Label to Waste Category
+# FUNCTION 2: Convert Image to Base64
 # ════════════════════════════════════════════════════════════
-def map_to_waste(coco_label, confidence):
+def image_to_base64(image_input):
     """
-    Converts COCO object label to waste category.
+    Converts any image input to base64 JPEG string for API.
 
     Args:
-        coco_label : e.g. "bottle", "car", "cell phone"
-        confidence : e.g. 0.85
-
-    Returns: dict with label, urdu_label, recyclable, emoji etc.
-    """
-    label_lower = coco_label.lower()
-
-    if label_lower in WASTE_MAPPING:
-        category, urdu, recyclable = WASTE_MAPPING[label_lower]
-    else:
-        category, urdu, recyclable = "trash", "کوڑا کرکٹ", False
-
-    cat = WASTE_CATEGORY_INFO.get(category, WASTE_CATEGORY_INFO["trash"])
-
-    return {
-        "label"         : category,
-        "label_en"      : cat["en"],
-        "urdu_label"    : urdu,
-        "detected_obj"  : coco_label,
-        "confidence"    : round(confidence, 3),
-        "recyclable"    : recyclable,
-        "emoji"         : cat["emoji"],
-        "market_search" : cat["market_search"],
-        "all_results"   : [],
-        "is_demo"       : False
-    }
-
-
-# ════════════════════════════════════════════════════════════
-# FUNCTION 3: Demo Fallback
-# ════════════════════════════════════════════════════════════
-def mock_response():
-    """Demo response — keeps app alive during presentations."""
-    print("   🔄 Using DEMO response")
-    return {
-        "label"         : "plastic",
-        "label_en"      : "Plastic Waste",
-        "urdu_label"    : "پلاسٹک بوتل",
-        "detected_obj"  : "bottle",
-        "confidence"    : 0.91,
-        "recyclable"    : True,
-        "emoji"         : "♻️",
-        "market_search" : "plastic PET HDPE scrap rate PKR recycling Pakistan",
-        "all_results"   : [{"label": "bottle", "confidence": 0.91}],
-        "is_demo"       : True
-    }
-
-
-# ════════════════════════════════════════════════════════════
-# FUNCTION 4: Main Classification
-# ════════════════════════════════════════════════════════════
-def classify_waste(model, image_input, confidence_threshold=CONFIDENCE_THRESHOLD):
-    """
-    Classifies waste in an image using YOLO11n + mapping.
-
-    Prioritization (in order):
-    1. Highest-confidence MAPPED waste item (not animal/person)
-    2. Any mapped item
-    3. Highest confidence detection (fallback)
-    4. Demo response (if model fails)
-
-    Args:
-        model              : YOLO model from load_vision_model()
-        image_input        : str (path), PIL Image, or bytes
-        confidence_threshold: float, default 0.10
+        image_input : file path (str), PIL Image, bytes,
+                      or Streamlit UploadedFile
 
     Returns:
-        dict with full waste classification result
+        base64 encoded string
     """
-    print("\n🔍 Classifying waste image...")
-
-    if model is None:
-        print("   ❌ Model not loaded — using demo.")
-        return mock_response()
-
     try:
-        # ── Prepare Image ─────────────────────────────────────
         if isinstance(image_input, str):
             img = Image.open(image_input).convert("RGB")
         elif isinstance(image_input, Image.Image):
@@ -391,135 +274,245 @@ def classify_waste(model, image_input, confidence_threshold=CONFIDENCE_THRESHOLD
         elif isinstance(image_input, bytes):
             img = Image.open(io.BytesIO(image_input)).convert("RGB")
         else:
+            # Streamlit UploadedFile or file-like object
             img = Image.open(io.BytesIO(image_input.read())).convert("RGB")
 
-        img.thumbnail((640, 640))
-        print(f"   ✅ Image prepared: {img.size}")
+        # Resize to save API bandwidth
+        img.thumbnail((IMAGE_SIZE, IMAGE_SIZE))
 
-        # ── YOLO11n Detection ─────────────────────────────────
-        results = model.predict(
-            source  = img,
-            conf    = confidence_threshold,
-            verbose = False
-        )
-
-        result = results[0]
-        boxes  = result.boxes
-
-        if boxes is None or len(boxes) == 0:
-            print("   ⚠️  No objects detected.")
-            print("   💡 Try a clearer/closer image of the waste object.")
-            return mock_response()
-
-        # ── Collect All Detections ────────────────────────────
-        all_detections = []
-        for i in range(len(boxes)):
-            cls  = int(boxes.cls[i])
-            conf = float(boxes.conf[i])
-            name = model.names[cls]
-            all_detections.append((name, conf))
-
-        all_detections.sort(key=lambda x: x[1], reverse=True)
-        print(f"   📦 Detections: "
-              f"{[(n, f'{c*100:.0f}%') for n, c in all_detections]}")
-
-        # ── Smart Priority Selection ──────────────────────────
-        best = None
-
-        # Pass 1: mapped waste (exclude animals/people)
-        for name, conf in all_detections:
-            lname = name.lower()
-            if lname in WASTE_MAPPING and lname not in NON_WASTE_LABELS:
-                if WASTE_MAPPING[lname][0] != "unknown":
-                    best = (name, conf)
-                    break
-
-        # Pass 2: any mapped item
-        if best is None:
-            for name, conf in all_detections:
-                if name.lower() in WASTE_MAPPING:
-                    best = (name, conf)
-                    break
-
-        # Pass 3: top detection
-        if best is None:
-            best = all_detections[0]
-
-        # ── Build Result ──────────────────────────────────────
-        name, conf  = best
-        result_dict = map_to_waste(name, conf)
-        result_dict["all_results"] = [
-            {"label": n, "confidence": round(c, 3)}
-            for n, c in all_detections
-        ]
-
-        print(f"   ✅ {result_dict['emoji']} {result_dict['label_en']} "
-              f"← '{name}' ({conf*100:.1f}%)")
-        return result_dict
+        # Convert to JPEG bytes
+        buffer = io.BytesIO()
+        img.save(buffer, format="JPEG", quality=IMAGE_QUALITY)
+        return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
     except Exception as e:
-        print(f"   ❌ Error: {e}")
-        return mock_response()
+        print(f"   ❌ Image conversion error: {e}")
+        return None
 
 
 # ════════════════════════════════════════════════════════════
-# FUNCTION 5: Test Helper (Colab)
+# FUNCTION 3: Mock Response (demo fallback)
 # ════════════════════════════════════════════════════════════
-def test_vision(model, image_path):
+def mock_vision_response():
     """
-    Runs classification and prints formatted result.
+    Returns a demo result when API is unavailable.
+    Keeps the app running during presentations / API downtime.
+    """
+    print("   🔄 Using DEMO response")
+    cat = CATEGORY_INFO["plastic"]
+    return {
+        "waste_type"   : "Plastic Bottle",
+        "label"        : "plastic",
+        "label_en"     : cat["label_en"],
+        "urdu_label"   : "پلاسٹک بوتل",
+        "detected_obj" : "plastic bottle",
+        "recyclable"   : True,
+        "harmful_level": "medium",
+        "confidence"   : "high",
+        "reasoning"    : "Demo response — API not available",
+        "emoji"        : cat["emoji"],
+        "color"        : cat["color"],
+        "market_search": cat["market_search"],
+        "is_demo"      : True
+    }
+
+
+# ════════════════════════════════════════════════════════════
+# FUNCTION 4: Main Classification
+# ════════════════════════════════════════════════════════════
+def classify_waste(client, image_input):
+    """
+    Classifies waste in an image using Llama 4 Scout Vision.
+
+    The model sees the actual image and identifies:
+    - Exact waste type (e.g. "aluminium can", "plastic bag")
+    - Category (metal, plastic, organic etc.)
+    - Recyclable or not
+    - Harm level
+    - Urdu label
+    - Confidence level
+    - Reasoning
+
+    Args:
+        client      : Groq client from load_vision_client()
+        image_input : file path, PIL Image, bytes, or UploadedFile
+
+    Returns:
+        dict with complete waste classification result
+    """
+    print("\n🦙 Classifying waste with Llama 4 Scout Vision...")
+
+    # Check client
+    if client is None:
+        print("   ❌ No Groq client — using demo.")
+        return mock_vision_response()
+
+    # Convert image to base64
+    img_b64 = image_to_base64(image_input)
+    if img_b64 is None:
+        print("   ❌ Image conversion failed — using demo.")
+        return mock_vision_response()
+
+    print(f"   ✅ Image ready ({IMAGE_SIZE}px max)")
+
+    try:
+        # ── Call Groq API ─────────────────────────────────────
+        response = client.chat.completions.create(
+            model    = VISION_MODEL,
+            messages = [
+                {
+                    "role"   : "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": CLASSIFICATION_PROMPT
+                        },
+                        {
+                            "type"     : "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{img_b64}"
+                            }
+                        }
+                    ]
+                }
+            ],
+            max_tokens  = MAX_TOKENS,
+            temperature = TEMPERATURE
+        )
+
+        content = response.choices[0].message.content.strip()
+        print(f"   📝 Raw response: {content}")
+
+        # ── Clean & Parse JSON ────────────────────────────────
+        if "```json" in content:
+            content = content.split("```json")[1].split("```")[0].strip()
+        elif "```" in content:
+            content = content.split("```")[1].split("```")[0].strip()
+
+        data = json.loads(content)
+
+        # ── Build Result ──────────────────────────────────────
+        category   = data.get("category", "trash").lower().strip()
+        recyclable = data.get("recyclable", False)
+
+        # Get category metadata
+        cat_info = CATEGORY_INFO.get(category, CATEGORY_INFO["unknown"])
+
+        result = {
+            "waste_type"   : data.get("waste_type", "Unknown Waste"),
+            "label"        : category,
+            "label_en"     : cat_info["label_en"],
+            "urdu_label"   : data.get("urdu_label", "نامعلوم فضلہ"),
+            "detected_obj" : data.get("waste_type", "unknown"),
+            "recyclable"   : recyclable,
+            "harmful_level": data.get("harmful_level", "medium"),
+            "confidence"   : data.get("confidence", "medium"),
+            "reasoning"    : data.get("reasoning", ""),
+            "emoji"        : cat_info["emoji"],
+            "color"        : cat_info["color"],
+            "market_search": cat_info["market_search"],
+            "is_demo"      : False
+        }
+
+        status = "Recyclable ♻️" if recyclable else "Non-Recyclable 🗑️"
+        print(f"   ✅ {result['emoji']} {result['waste_type']} "
+              f"→ {result['label_en']} ({status})")
+
+        return result
+
+    except json.JSONDecodeError as e:
+        print(f"   ❌ JSON parse error: {e}")
+        print(f"   Raw content was: {content}")
+        return mock_vision_response()
+
+    except Exception as e:
+        print(f"   ❌ API error: {e}")
+        return mock_vision_response()
+
+
+# ════════════════════════════════════════════════════════════
+# FUNCTION 5: Test Helper (for Colab)
+# ════════════════════════════════════════════════════════════
+def test_vision(client, image_path):
+    """
+    Runs classification and prints a formatted result table.
     Use this in Colab testing cells.
-    """
-    result = classify_waste(model, image_path)
 
-    print("\n" + "=" * 52)
-    print("  🧪 VISION MODULE RESULT")
-    print("=" * 52)
-    print(f"  {result['emoji']}  Waste Type   : {result['label_en']}")
-    print(f"  🔍  Detected    : {result['detected_obj']}")
+    Args:
+        client     : Groq client
+        image_path : path to image file
+
+    Returns:
+        classification result dict
+    """
+    result = classify_waste(client, image_path)
+
+    print("\n" + "=" * 55)
+    print("  🦙 LLAMA 4 SCOUT VISION RESULT")
+    print("=" * 55)
+    print(f"  {result['emoji']}  Waste Type   : {result['waste_type']}")
+    print(f"  📂  Category    : {result['label_en']}")
     print(f"  🇵🇰  اردو        : {result['urdu_label']}")
-    print(f"  📊  Confidence  : {result['confidence']*100:.1f}%")
     print(f"  ♻️   Recyclable  : {'YES ✅' if result['recyclable'] else 'NO ❌'}")
+    print(f"  ☣️   Harm Level  : {result['harmful_level'].upper()}")
+    print(f"  📊  Confidence  : {result['confidence'].upper()}")
+    print(f"  💬  Reasoning   : {result['reasoning']}")
     print(f"  🔎  RAG Query   : {result['market_search']}")
     print(f"  🔄  Demo Mode   : {'YES ⚠️' if result['is_demo'] else 'NO ✅'}")
-    print("=" * 52)
-
-    if len(result.get("all_results", [])) > 1:
-        print("\n  📋 All detections:")
-        for r in result["all_results"]:
-            print(f"     {r['label']:20s} → {r['confidence']*100:.1f}%")
+    print("=" * 55)
 
     return result
+
+
+# ════════════════════════════════════════════════════════════
+# STREAMLIT USAGE (in app.py)
+# ════════════════════════════════════════════════════════════
+"""
+import streamlit as st
+from vision import load_vision_client, classify_waste
+
+@st.cache_resource
+def get_vision_client():
+    return load_vision_client(st.secrets["GROQ_API_KEY"])
+
+client = get_vision_client()
+
+uploaded = st.camera_input("📸 Take photo of waste")
+if uploaded:
+    result = classify_waste(client, uploaded.getvalue())
+
+    st.write(f"{result['emoji']} **{result['waste_type']}**")
+    st.write(f"Category  : {result['label_en']}")
+    st.write(f"اردو      : {result['urdu_label']}")
+    st.write(f"Recyclable: {'YES ✅' if result['recyclable'] else 'NO ❌'}")
+    st.write(f"Harm Level: {result['harmful_level']}")
+"""
 
 
 # ════════════════════════════════════════════════════════════
 # STANDALONE TEST (python vision.py)
 # ════════════════════════════════════════════════════════════
 if __name__ == "__main__":
-    print("=" * 52)
+    import os
+
+    print("=" * 55)
     print("  VISION MODULE — STANDALONE TEST")
-    print("=" * 52)
+    print("=" * 55)
 
-    model = load_vision_model()
+    # Get API key from environment or prompt
+    api_key = os.getenv("GROQ_API_KEY", "")
+    if not api_key:
+        api_key = input("Enter your Groq API key (gsk_...): ").strip()
 
-    if model:
-        print("\n🧪 Testing COCO → Waste Mapping:")
-        print("-" * 52)
-        test_cases = [
-            ("bottle", 0.85),     ("wine glass", 0.72),
-            ("car", 0.91),        ("cell phone", 0.88),
-            ("book", 0.76),       ("banana", 0.93),
-            ("tie", 0.65),        ("sports ball", 0.80),
-            ("remote", 0.71),     ("scissors", 0.69),
-            ("cup", 0.77),        ("laptop", 0.82),
-            ("pizza", 0.90),      ("backpack", 0.75),
-            ("knife", 0.68),      ("fork", 0.55),
-        ]
-        for label, conf in test_cases:
-            r = map_to_waste(label, conf)
-            print(f"  {r['emoji']} {label:15s} → "
-                  f"{r['label_en']:28s} | "
-                  f"{'♻️ Recyclable' if r['recyclable'] else '🗑️ Non-Recyclable'}")
+    # Load client
+    client = load_vision_client(api_key)
 
-        print(f"\n✅ All {len(test_cases)} mappings tested!")
-        print("   Use test_vision(model, 'image.jpg') for image testing.")
+    if client:
+        # Test with image if provided
+        image_path = input("\nEnter image path to test (or press Enter to skip): ").strip()
+        if image_path and os.path.exists(image_path):
+            test_vision(client, image_path)
+        else:
+            print("\n✅ Client loaded successfully!")
+            print("   Use test_vision(client, 'image.jpg') to test.")
+            print("   Use classify_waste(client, image) in your app.")
