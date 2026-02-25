@@ -23,12 +23,18 @@ google-auth>=2.28.0
 
 # ── Database — Qdrant GPS ────────────────────────────────────
 qdrant-client>=1.8.0
+streamlit-js-eval
 
 # ── Database — Cloudinary Images ─────────────────────────────
 cloudinary>=1.39.0
 
 # ── Image Processing ─────────────────────────────────────────
 Pillow>=10.0.0
+
+# ── Voice Processing ─────────────────────────────────────────
+openai-whisper
+gtts
+streamlit-tts
 
 # ── Utilities ────────────────────────────────────────────────
 numpy>=1.24.0
