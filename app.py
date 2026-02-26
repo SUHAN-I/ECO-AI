@@ -612,16 +612,18 @@ TEAM = [
      "academic":"DAE Software Student",
      "linkedin":"https://www.linkedin.com/in/suhan-i/",
      "github":"https://github.com/SUHAN-I",
-     "contact":"https://wa.me/923359997679"},
+     "contact":"suhanirazzaq@gmail.com"},
     {"name":"Muhammad Haroon ul Hasnain","initials":"H","role":"Team Member",
      "academic":"MPhil BA & DA",
      "linkedin":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain",
      "github":"https://github.com/hasnain1669",
-     "contact":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain"},
+     "contact":"haroon.hasnain669@gmail.com"},
     # ── Add new members below — links optional, use "" if not yet available ──
-    # {"name":"Ali Raza","initials":"A","role":"Team Member","academic":"BS CS",
-    #  "linkedin":"","github":"","contact":""},
-    None, None, None,   # placeholders — replace None with a member dict when ready
+    {"name":"Daniya khadija Anwar","initials":"D","role":"Team Member","academic":"BS CS",
+    "linkedin":"www.linkedin.com/in/daniya-anwar",
+    "github":"https://github.com/daniyakhadija-0814",
+    "contact":"daniyakhadija@gmail.com"},
+    None, None,   # placeholders — replace None with a member dict when ready
 ]
 # Grid auto-adjusts: just append more member dicts above and remove a None.
 
