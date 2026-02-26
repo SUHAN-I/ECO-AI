@@ -74,30 +74,50 @@ code {
     font-size     : 0.85em !important;
 }
 
-/* ── Sidebar — collapsible with visible arrow ── */
+/* ── Sidebar — FIX: Force collapse/expand button to always be visible ── */
 [data-testid="stSidebar"] {
     background    : var(--white) !important;
     border-right  : 1px solid var(--border) !important;
 }
-/* Make collapse arrow always visible and styled */
-[data-testid="collapsedControl"] {
+
+/* Force the sidebar toggle button to always show */
+[data-testid="collapsedControl"],
+button[kind="header"],
+[data-testid="stSidebarCollapsedControl"] {
     display          : flex !important;
     visibility       : visible !important;
+    opacity          : 1 !important;
     background       : var(--green) !important;
     border-radius    : 0 8px 8px 0 !important;
     color            : white !important;
-    width            : 24px !important;
+    width            : 28px !important;
+    min-width        : 28px !important;
     align-items      : center !important;
     justify-content  : center !important;
-    box-shadow       : 2px 0 8px rgba(0,0,0,0.12) !important;
+    box-shadow       : 2px 0 8px rgba(0,0,0,0.2) !important;
+    z-index          : 9999 !important;
+    border           : none !important;
+    cursor           : pointer !important;
+    position         : fixed !important;
     top              : 50% !important;
-    z-index          : 999 !important;
+    transform        : translateY(-50%) !important;
 }
-[data-testid="collapsedControl"]:hover {
+[data-testid="collapsedControl"]:hover,
+[data-testid="stSidebarCollapsedControl"]:hover {
     background: #14532d !important;
 }
-[data-testid="collapsedControl"] svg {
-    fill: white !important;
+[data-testid="collapsedControl"] svg,
+[data-testid="stSidebarCollapsedControl"] svg,
+button[kind="header"] svg {
+    fill   : white !important;
+    stroke : white !important;
+    color  : white !important;
+}
+
+/* Also style the sidebar's own close/open arrow */
+[data-testid="stSidebar"] [data-testid="collapsedControl"] {
+    left: auto !important;
+    right: -28px !important;
 }
 
 /* ── Streamlit overrides ── */
@@ -107,6 +127,7 @@ code {
     border-radius : var(--r-sm) !important;
     font-size     : 0.88rem !important;
     transition    : all 0.15s !important;
+    color         : var(--text-1) !important;
 }
 .stButton > button[kind="primary"] {
     background : var(--green) !important;
@@ -115,6 +136,7 @@ code {
 }
 .stButton > button[kind="primary"]:hover {
     background : #14532d !important;
+    color      : #ffffff !important;
 }
 .stButton > button[kind="secondary"] {
     background : var(--white) !important;
@@ -123,6 +145,16 @@ code {
 }
 .stButton > button[kind="secondary"]:hover {
     background : var(--green-bg) !important;
+    color      : var(--green) !important;
+}
+/* Fix ALL button text visibility — no invisible text ever */
+.stButton > button * {
+    color : inherit !important;
+}
+.stButton > button p,
+.stButton > button span,
+.stButton > button div {
+    color : inherit !important;
 }
 .stTextInput > div > div > input,
 .stTextArea  > div > div > textarea,
@@ -175,6 +207,112 @@ label, .stRadio label, .stCheckbox label {
 }
 .stAlert { border-radius: var(--r-sm) !important; }
 #MainMenu, footer, header { visibility: hidden !important; }
+
+/* ════════════════════════════════════════════════════════
+   DIALOG / MODAL FIXES
+   Fix: button text invisible, remove X close button
+════════════════════════════════════════════════════════ */
+
+/* Remove the X close button from ALL dialogs */
+[data-testid="stModal"] [data-testid="stBaseButton-header"],
+[data-testid="stModal"] button[aria-label="Close"],
+[data-testid="stModal"] button[kind="header"],
+[data-testid="stModal"] .st-emotion-cache-close-button,
+div[role="dialog"] button[aria-label="Close"],
+div[role="dialog"] [data-testid="stBaseButton-header"] {
+    display : none !important;
+    opacity : 0 !important;
+    pointer-events : none !important;
+}
+
+/* Make dialog look clean and light */
+[data-testid="stModal"],
+div[role="dialog"] {
+    background    : #ffffff !important;
+    border-radius : var(--r-xl) !important;
+    box-shadow    : 0 20px 60px rgba(0,0,0,0.18) !important;
+}
+[data-testid="stModal"] > div,
+div[role="dialog"] > div {
+    background : #ffffff !important;
+}
+
+/* ALL text inside dialogs must be dark and visible */
+[data-testid="stModal"] p,
+[data-testid="stModal"] div,
+[data-testid="stModal"] span,
+[data-testid="stModal"] label,
+[data-testid="stModal"] h1,
+[data-testid="stModal"] h2,
+[data-testid="stModal"] h3,
+[data-testid="stModal"] h4,
+div[role="dialog"] p,
+div[role="dialog"] div,
+div[role="dialog"] span,
+div[role="dialog"] label,
+div[role="dialog"] h1,
+div[role="dialog"] h2,
+div[role="dialog"] h3,
+div[role="dialog"] h4 {
+    color : var(--text-1) !important;
+}
+
+/* Dialog buttons — MUST always show text clearly */
+[data-testid="stModal"] .stButton > button,
+div[role="dialog"] .stButton > button {
+    color : var(--text-1) !important;
+    font-weight : 600 !important;
+}
+[data-testid="stModal"] .stButton > button[kind="primary"],
+div[role="dialog"] .stButton > button[kind="primary"] {
+    background : var(--green) !important;
+    color      : #ffffff !important;
+    border     : none !important;
+}
+[data-testid="stModal"] .stButton > button[kind="primary"]:hover,
+div[role="dialog"] .stButton > button[kind="primary"]:hover {
+    background : #14532d !important;
+    color      : #ffffff !important;
+}
+[data-testid="stModal"] .stButton > button[kind="secondary"],
+div[role="dialog"] .stButton > button[kind="secondary"] {
+    background : var(--white) !important;
+    border     : 1.5px solid var(--green) !important;
+    color      : var(--green) !important;
+}
+[data-testid="stModal"] .stButton > button[kind="secondary"]:hover,
+div[role="dialog"] .stButton > button[kind="secondary"]:hover {
+    background : var(--green-bg) !important;
+    color      : var(--green) !important;
+}
+/* Force ALL button children text to inherit colour */
+[data-testid="stModal"] .stButton > button *,
+div[role="dialog"] .stButton > button * {
+    color : inherit !important;
+}
+
+/* Dialog input fields — text must be visible */
+[data-testid="stModal"] input,
+[data-testid="stModal"] textarea,
+div[role="dialog"] input,
+div[role="dialog"] textarea {
+    color      : var(--text-1) !important;
+    background : var(--white) !important;
+}
+
+/* Radio buttons in dialog */
+[data-testid="stModal"] .stRadio label,
+div[role="dialog"] .stRadio label {
+    color : var(--text-2) !important;
+}
+
+/* Caption / small text in dialog */
+[data-testid="stModal"] small,
+[data-testid="stModal"] .stMarkdown p,
+div[role="dialog"] small,
+div[role="dialog"] .stMarkdown p {
+    color : var(--text-3) !important;
+}
 
 /* ── Header banner ── */
 .eco-header {
@@ -394,26 +532,15 @@ label, .stRadio label, .stCheckbox label {
    MOBILE — max-width 768px
 ══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-    /* Header */
     .eco-header { padding:1.2rem 1rem; border-radius:var(--r-md); }
     .eco-header h1 { font-size:1.25rem !important; }
     .eco-header::after { display:none; }
-
-    /* Cards & boxes */
     .card, .ai-box, .review-box { padding:1rem; }
     .ai-box { font-size:0.88rem; }
-
-    /* Team grid: 2 columns on mobile */
     .team-card { padding:1.1rem 0.8rem; }
     .t-avatar  { width:58px; height:58px; font-size:1.4rem; }
-
-    /* Metrics stack better */
     [data-testid="column"] { padding:0.15rem !important; }
-
-    /* Tabs: compact text */
     .stTabs [data-baseweb="tab"] { font-size:0.78rem !important; padding:0.4rem 0.5rem !important; }
-
-    /* Market table */
     .mkt-row { font-size:0.82rem; }
 }
 
@@ -428,7 +555,6 @@ label, .stRadio label, .stCheckbox label {
     .team-card     { padding: 2rem 1.4rem; }
     .t-avatar      { width: 80px; height: 80px; font-size: 2rem; }
     .stButton > button { font-size: 0.9rem !important; }
-    /* Wider content area on large screens */
     .block-container { max-width: 1200px !important; padding: 1.5rem 2rem !important; }
 }
 
@@ -454,23 +580,39 @@ label, .stRadio label, .stCheckbox label {
 # ════════════════════════════════════════════════════════════
 # CONSTANTS
 # ════════════════════════════════════════════════════════════
+
+# FIX: Use only reliable image URLs, fallback to emoji if image fails to load
 DEMO_IMAGES = [
-    {"label":"Plastic","emoji":"🧴","category":"plastic",
-     "url":"https://img.freepik.com/premium-photo/plastic-waste-garbage-plastic-bottle-background-texture_32511-13.jpg","hint":"Recyclable · Low"},
+    {"label":"Plastic Bottles","emoji":"🧴","category":"plastic",
+     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Plastic_Bottles.jpg/640px-Plastic_Bottles.jpg",
+     "hint":"Recyclable · Low"},
     {"label":"Cardboard","emoji":"📦","category":"cardboard",
-     "url":"https://img.freepik.com/premium-photo/recyclable-materials-assorted-paper-waste-cardboard-materials-marked-recycle-sign-eco-green_955712-39950.jpg","hint":"Recyclable · Low"},
-    {"label":"Glass","emoji":"🍾","category":"glass",
-     "url":"https://img.freepik.com/premium-photo/up-close-view-large-heap-glass-waste-with-focus-tangled-mass-broken-bottles_361816-16244.jpg","hint":"Recyclable · Med"},
+     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Cardboard_box_with_recycle_symbol.jpg/640px-Cardboard_box_with_recycle_symbol.jpg",
+     "hint":"Recyclable · Low"},
+    {"label":"Glass Bottles","emoji":"🍾","category":"glass",
+     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Glass_bottles_for_recycling.jpg/640px-Glass_bottles_for_recycling.jpg",
+     "hint":"Recyclable · Med"},
     {"label":"Rubber Tyre","emoji":"⚫","category":"rubber",
-     "url":"https://img.freepik.com/premium-photo/landfill-with-old-tires-tyres-recycling-reuse-waste-rubber-tyres-disposal-waste-tires-worn-out-wheels-recycling-tyre-dump-burning-plant-regenerated-tire-rubber-produced_140282-1356.jpg","hint":"Recyclable · Med"},
+     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Waste_tires.jpg/640px-Waste_tires.jpg",
+     "hint":"Recyclable · Med"},
     {"label":"Organic Waste","emoji":"🍌","category":"organic",
-     "url":"https://img.freepik.com/premium-photo/waste-vegetables-fruits-compost-heap-as-fertilizer-garden_317169-1266.jpg","hint":"Compost · Low"},
-    {"label":"Matel","emoji":"⚙️","category":"plastic",
-     "url":"https://img.freepik.com/free-photo/dirty-dumped-objects-arrangement_23-2148996942.jpg","hint":"Recyclable · Med"},
-    {"label":"Mix Matel","emoji":"🔩","category":"cardboard",
-     "url":"https://img.freepik.com/premium-photo/scrap-metal-yard_798657-22963.jpg","hint":"Recyclable · Med"},
-    {"label":"Mix Waste","emoji":"🗑","category":"glass",
-     "url":"https://img.freepik.com/free-photo/old-rusty-junk-garbage-steel-rubber_1150-10991.jpg","hint":"Recyclable · Low"},
+     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Compost_heap_with_vegetable_waste.jpg/640px-Compost_heap_with_vegetable_waste.jpg",
+     "hint":"Compost · Low"},
+    {"label":"Metal Scrap","emoji":"⚙️","category":"metal",
+     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Scrap_metal_at_a_scrapyard.jpg/640px-Scrap_metal_at_a_scrapyard.jpg",
+     "hint":"Recyclable · Med"},
+    {"label":"Mixed Metal","emoji":"🔩","category":"metal",
+     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Metal_scrap_yard.jpg/640px-Metal_scrap_yard.jpg",
+     "hint":"Recyclable · Med"},
+    {"label":"Mixed Waste","emoji":"🗑","category":"trash",
+     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Mixed_municipal_solid_waste.jpg/640px-Mixed_municipal_solid_waste.jpg",
+     "hint":"Recyclable · Low"},
+    {"label":"E-Waste","emoji":"💻","category":"e-waste",
+     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Electronic_waste_in_Agbogbloshie%2C_Ghana.jpg/640px-Electronic_waste_in_Agbogbloshie%2C_Ghana.jpg",
+     "hint":"Special Disposal · High"},
+    {"label":"Paper Waste","emoji":"📄","category":"paper",
+     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Wastepaper.jpg/640px-Wastepaper.jpg",
+     "hint":"Recyclable · Low"},
 ]
 
 TEAM = [
@@ -660,15 +802,10 @@ def save_chat(db, role, message, waste_type=""):
 # ════════════════════════════════════════════════════════════
 # USER MODAL
 # ════════════════════════════════════════════════════════════
-# ════════════════════════════════════════════════════════════
-# DIALOGS  (Streamlit ≥ 1.35 native modal — buttons render
-#            inside the dialog automatically, no CSS hacks)
-# ════════════════════════════════════════════════════════════
-
 @st.dialog("♻️ Welcome to Eco AI!")
 def _dialog_save_pref():
     st.markdown(
-        "<p style='text-align:center;color:#cccdcf;font-size:0.9rem;margin:0 0 1.2rem'>"
+        "<p style='text-align:center;color:#334155;font-size:0.9rem;margin:0 0 1.2rem'>"
         "Would you like to save your scans and chat history for future visits?</p>",
         unsafe_allow_html=True)
     if st.button("✅  Yes — Save My Data", type="primary",
@@ -1217,6 +1354,8 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
 
 # ════════════════════════════════════════════════════════════
 # TAB: JUDGE DEMO
+# FIX: Images now display in a scrollable grid (5 per row)
+#      with safe fallback if an image URL fails to load.
 # ════════════════════════════════════════════════════════════
 def render_demo_tab(lang, vclient, components):
     st.markdown(f"""<div style="background:linear-gradient(135deg,#14532d,#16a34a);
@@ -1241,27 +1380,62 @@ def render_demo_tab(lang, vclient, components):
         return
 
     st.markdown(f"**{t('demo_try',lang)}**")
+    st.info(f"📸 {len(DEMO_IMAGES)} demo images available — select one to analyse")
     st.markdown("---")
-    cols   = st.columns(5)
-    sel    = None
-    for i,demo in enumerate(DEMO_IMAGES):
-        with cols[i]:
-            try: st.image(demo["url"], use_container_width=True)
-            except: st.markdown(f"<div style='text-align:center;font-size:3rem'>{demo['emoji']}</div>",unsafe_allow_html=True)
-            st.markdown(f"""<div style="text-align:center;padding:0.3rem 0">
-                <div style="font-weight:700;font-size:0.82rem;color:#0f172a">{demo['emoji']} {demo['label']}</div>
-                <div style="color:#94a3b8;font-size:0.72rem">{demo['hint']}</div>
-            </div>""", unsafe_allow_html=True)
-            if st.button("Test", key=f"d_{i}", use_container_width=True): sel = demo
+
+    # Render 5 images per row, handle any number of images
+    COLS_PER_ROW = 5
+    sel = None
+
+    for row_start in range(0, len(DEMO_IMAGES), COLS_PER_ROW):
+        row_items = DEMO_IMAGES[row_start : row_start + COLS_PER_ROW]
+        cols = st.columns(COLS_PER_ROW)
+
+        for i, demo in enumerate(row_items):
+            global_idx = row_start + i
+            with cols[i]:
+                # Safe image display — show emoji box if URL fails
+                try:
+                    import requests as _req
+                    resp = _req.head(demo["url"], timeout=4, allow_redirects=True)
+                    if resp.status_code == 200:
+                        st.image(demo["url"], use_container_width=True)
+                    else:
+                        raise ValueError("bad status")
+                except Exception:
+                    st.markdown(
+                        f"<div style='background:#f0fdf4;border:2px dashed #bbf7d0;"
+                        f"border-radius:10px;padding:1.5rem 0;text-align:center;"
+                        f"font-size:2.5rem'>{demo['emoji']}</div>",
+                        unsafe_allow_html=True)
+
+                st.markdown(
+                    f"<div style='text-align:center;padding:0.3rem 0'>"
+                    f"<div style='font-weight:700;font-size:0.82rem;color:#0f172a'>"
+                    f"{demo['emoji']} {demo['label']}</div>"
+                    f"<div style='color:#94a3b8;font-size:0.72rem'>{demo['hint']}</div>"
+                    f"</div>",
+                    unsafe_allow_html=True)
+
+                if st.button("▶ Test", key=f"d_{global_idx}", use_container_width=True):
+                    sel = demo
+
+        # Empty spacer columns for incomplete last row
+        for j in range(len(row_items), COLS_PER_ROW):
+            with cols[j]:
+                st.empty()
 
     if sel:
         import requests
         st.markdown("---")
-        st.info(f"🔍 Testing: **{sel['label']}**")
-        try:
-            r = requests.get(sel["url"], timeout=10)
-            run_analysis("english","Demo",0,0,None,vclient,components,image_bytes=r.content)
-        except Exception as e: st.error(f"Demo error: {e}")
+        st.info(f"🔍 Testing: **{sel['emoji']} {sel['label']}**")
+        with st.spinner("Downloading image…"):
+            try:
+                r = requests.get(sel["url"], timeout=15)
+                r.raise_for_status()
+                run_analysis("english","Demo",0,0,None,vclient,components,image_bytes=r.content)
+            except Exception as e:
+                st.error(f"Could not load demo image: {e}\n\nTip: Try a different demo image.")
 
 
 # ════════════════════════════════════════════════════════════
@@ -1276,28 +1450,33 @@ def render_team_tab(lang):
                     border-radius:2px;margin:0.75rem auto 1.5rem"></div>
     </div>""", unsafe_allow_html=True)
 
-    cols = st.columns(5)
-    for i,member in enumerate(TEAM):
-        with cols[i]:
-            if member:
-                li = member.get("linkedin",""); gh = member.get("github","")
-                ac = member.get("academic","")
-                links = ""
-                if li: links += f'<a href="{li}" target="_blank" class="t-link" title="LinkedIn">in LinkedIn</a>'
-                if gh: links += f'<a href="{gh}" target="_blank" class="t-link" title="GitHub">⌥ GitHub</a>'
-                st.markdown(f"""<div class="team-card">
-                    <div class="t-avatar">{member['initials']}</div>
-                    <div class="t-name">{member['name']}</div>
-                    <div class="t-role">{member['role']}</div>
-                    {"<div class='t-acad'>"+ac+"</div>" if ac else ""}
-                    <div class="t-links">{links}</div>
-                </div>""", unsafe_allow_html=True)
-            else:
-                st.markdown(f"""<div class="t-ph">
-                    <div style="font-size:1.8rem;margin-bottom:0.4rem">👤</div>
-                    <div style="font-weight:600;font-size:0.85rem">{t('coming',lang)}</div>
-                    <div style="font-size:0.75rem;margin-top:0.2rem;color:#cbd5e1">Member {i+1}</div>
-                </div>""", unsafe_allow_html=True)
+    # Render team members — 5 per row, handles any number
+    COLS_PER_ROW = 5
+    for row_start in range(0, len(TEAM), COLS_PER_ROW):
+        row_members = TEAM[row_start : row_start + COLS_PER_ROW]
+        cols = st.columns(COLS_PER_ROW)
+
+        for i, member in enumerate(row_members):
+            with cols[i]:
+                if member:
+                    li = member.get("linkedin",""); gh = member.get("github","")
+                    ac = member.get("academic","")
+                    links = ""
+                    if li: links += f'<a href="{li}" target="_blank" class="t-link" title="LinkedIn">in LinkedIn</a>'
+                    if gh: links += f'<a href="{gh}" target="_blank" class="t-link" title="GitHub">⌥ GitHub</a>'
+                    st.markdown(f"""<div class="team-card">
+                        <div class="t-avatar">{member['initials']}</div>
+                        <div class="t-name">{member['name']}</div>
+                        <div class="t-role">{member['role']}</div>
+                        {"<div class='t-acad'>"+ac+"</div>" if ac else ""}
+                        {"<div class='t-acad' style='color:#94a3b8;font-style:italic'>Links coming soon</div>" if not li and not gh else ""}
+                        <div class="t-links">{links}</div>
+                    </div>""", unsafe_allow_html=True)
+
+        # Empty spacer columns for incomplete last row
+        for j in range(len(row_members), COLS_PER_ROW):
+            with cols[j]:
+                st.empty()
 
     st.markdown("---")
     st.markdown("""<div style="background:linear-gradient(135deg,#14532d,#166534);
@@ -1422,3 +1601,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
