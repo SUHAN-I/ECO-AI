@@ -643,158 +643,143 @@ def save_chat(db, role, message, waste_type=""):
 # ════════════════════════════════════════════════════════════
 # USER MODAL
 # ════════════════════════════════════════════════════════════
-def render_user_modal(db):
-    if st.session_state.get("current_user"): return
+# ════════════════════════════════════════════════════════════
+# DIALOGS  (Streamlit ≥ 1.35 native modal — buttons render
+#            inside the dialog automatically, no CSS hacks)
+# ════════════════════════════════════════════════════════════
 
-    overlay = """<div style="position:fixed;top:0;left:0;right:0;bottom:0;
-        background:rgba(15,23,42,0.55);z-index:9990;backdrop-filter:blur(3px)"></div>"""
+@st.dialog("♻️ Welcome to Eco AI!")
+def _dialog_save_pref():
+    st.markdown(
+        "<p style='text-align:center;color:#64748b;font-size:0.9rem;margin:0 0 1.2rem'>"
+        "Would you like to save your scans and chat history for future visits?</p>",
+        unsafe_allow_html=True)
+    if st.button("✅  Yes — Save My Data", type="primary",
+                 use_container_width=True, key="sp_yes"):
+        st.session_state["save_preference"] = True
+        st.rerun()
+    st.markdown("<div style='height:0.3rem'></div>", unsafe_allow_html=True)
+    if st.button("⏭️  Continue as Guest", type="secondary",
+                 use_container_width=True, key="sp_no"):
+        st.session_state["save_preference"] = False
+        st.session_state["current_user"] = {
+            "user_id":"GUEST","name":"Guest","city":"—","is_new":False}
+        st.rerun()
 
-    # Step 1 — save preference
-    if st.session_state["save_preference"] is None:
-        st.markdown(overlay, unsafe_allow_html=True)
-        st.markdown("""<div style="background:white;border-radius:24px;padding:2rem 2rem 1.6rem;
-            max-width:420px;margin:3rem auto;position:relative;z-index:9999;
-            box-shadow:0 24px 64px rgba(0,0,0,0.22);text-align:center">
-            <div style="font-size:3rem;margin-bottom:0.5rem">♻️</div>
-            <h3 style="font-family:Syne,sans-serif;color:#0f172a;margin:0 0 0.4rem">Welcome to Eco AI!</h3>
-            <p style="color:#64748b;font-size:0.88rem;margin-bottom:1.5rem">
-                Would you like to save your scans and chat history for future visits?
-            </p>
-        </div>""", unsafe_allow_html=True)
-        c1,c2,c3 = st.columns([1,3,1])
-        with c2:
-            if st.button("✅ Yes — Save My Data", type="primary", use_container_width=True, key="sp_yes"):
-                st.session_state["save_preference"] = True; st.rerun()
-            st.markdown("<div style='height:0.35rem'></div>", unsafe_allow_html=True)
-            if st.button("⏭️ Continue as Guest", type="secondary", use_container_width=True, key="sp_no"):
-                st.session_state["save_preference"] = False
-                st.session_state["current_user"] = {"user_id":"GUEST","name":"Guest","city":"—","is_new":False}
-                st.rerun()
-        return
 
-    # Step 2 — new / returning
-    if st.session_state["save_preference"] and not st.session_state.get("current_user"):
-        st.markdown(overlay, unsafe_allow_html=True)
+@st.dialog("👤 Create your account")
+def _dialog_register(db):
+    st.caption("Your data is private and only used to save your history.")
+    st.divider()
 
-        # ── Header + X close button ───────────────────────────
-        hcol1, hcol2 = st.columns([6,1])
-        with hcol1:
-            st.markdown("""<div style="background:white;border-radius:24px 24px 0 0;
-                padding:1.6rem 2rem 0.5rem;max-width:480px;margin:1.5rem auto 0;
-                position:relative;z-index:9999;box-shadow:0 24px 64px rgba(0,0,0,0.22)">
-                <h3 style="font-family:Syne,sans-serif;color:#0f172a;text-align:center;margin:0 0 0.2rem">
-                    👤 Create your account</h3>
-                <p style="color:#64748b;font-size:0.82rem;text-align:center;margin:0">
-                    Your data stays private and is only used to save your history.</p>
-            </div>""", unsafe_allow_html=True)
-        with hcol2:
-            st.markdown("<div style='margin-top:1.5rem'>", unsafe_allow_html=True)
-            if st.button("✕", key="close_modal2", help="Close — continue as guest"):
-                st.session_state["save_preference"] = False
-                st.session_state["current_user"] = {
-                    "user_id":"GUEST","name":"Guest","city":"—","is_new":False}
-                st.rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
+    is_new = st.radio("", ["new", "returning"],
+        format_func=lambda x: "🌱 New User" if x == "new" else "👋 Returning User",
+        horizontal=True, label_visibility="collapsed", key="u_type")
 
-        c1,c2,c3 = st.columns([1,4,1])
-        with c2:
-            is_new = st.radio("Type",["new","returning"],
-                format_func=lambda x:"🌱 New User" if x=="new" else "👋 Returning User",
-                horizontal=True, key="u_type")
-            st.markdown("<hr style='margin:0.7rem 0;border-color:#f1f5f9'>", unsafe_allow_html=True)
+    st.markdown("<div style='height:0.3rem'></div>", unsafe_allow_html=True)
 
-            if is_new == "new":
-                nm = st.text_input("Your Name *", placeholder="e.g. Ahmed, Sara…", key="new_nm")
-                ct = st.text_input("Your City *", placeholder="e.g. Lahore, Karachi…", key="new_ct")
+    # ── NEW USER ──────────────────────────────────────────────
+    if is_new == "new":
+        nm = st.text_input("Your Name *", placeholder="e.g. Ahmed, Sara…", key="new_nm")
+        ct = st.text_input("Your City *", placeholder="e.g. Lahore, Karachi…", key="new_ct")
+        st.caption("📞 **Contact Number** *(optional — used to generate your ID)*")
+        ph_col, skip_col = st.columns([3, 2])
+        with ph_col:
+            ph = st.text_input("Phone", placeholder="+923xx-xxxxxxx",
+                               label_visibility="collapsed", key="new_ph")
+        with skip_col:
+            skip_ph = st.checkbox("Skip / don't share", key="skip_ph_cb")
+        contact = "" if skip_ph else ph.strip()
 
-                # Contact — optional, used for ID generation
-                st.markdown("**Contact Number** *(optional — used to generate your ID)*")
-                ph_col, skip_col = st.columns([3,2])
-                with ph_col:
-                    ph = st.text_input("Phone", placeholder="+923xx-xxxxxxx",
-                                       label_visibility="collapsed", key="new_ph")
-                with skip_col:
-                    skip_ph = st.checkbox("Skip — don't share", key="skip_ph_cb")
-                contact = "" if skip_ph else ph.strip()
-
-                if st.button("🚀 Register & Continue", type="primary",
-                             use_container_width=True, key="reg_btn"):
-                    if nm.strip() and ct.strip():
-                        with st.spinner("Creating account…"):
-                            from user_manager import register_new_user
-                            user = register_new_user(db, nm.strip(), ct.strip(),
-                                                     contact=contact)
-                        if user:
-                            st.session_state["current_user"] = user
-                            st.session_state["show_id_popup"] = True
-                            st.rerun()
-                        else: st.error("Registration failed. Try again.")
-                    else: st.warning("Please fill in name and city.")
-
+        st.markdown("<div style='height:0.2rem'></div>", unsafe_allow_html=True)
+        if st.button("🚀  Register & Continue", type="primary",
+                     use_container_width=True, key="reg_btn"):
+            if nm.strip() and ct.strip():
+                with st.spinner("Creating account…"):
+                    from user_manager import register_new_user
+                    user = register_new_user(db, nm.strip(), ct.strip(), contact=contact)
+                if user:
+                    st.session_state["current_user"] = user
+                    st.session_state["show_id_popup"] = True
+                    st.rerun()
+                else:
+                    st.error("Registration failed. Try again.")
             else:
-                rn = st.text_input("Your Name *", placeholder="Your name", key="ret_nm")
-                ri = st.text_input("Your Unique ID",
-                                   placeholder="e.g. eco-7679  (leave blank to find by name)",
-                                   key="ret_id")
-                if st.button("🔑 Login", type="primary",
-                             use_container_width=True, key="login_btn"):
-                    if rn.strip():
-                        with st.spinner("Finding account…"):
-                            from user_manager import find_user
-                            user = find_user(db, user_id=ri.strip() or None, name=rn.strip())
-                        if user:
-                            st.session_state["current_user"] = user; st.rerun()
-                        else: st.error(f"User '{rn}' not found. Check your ID or register.")
-                    else: st.warning("Please enter your name.")
-                with st.expander("🤔 Forgot your ID?"):
-                    st.markdown("""
-Your ID format depends on how you registered:
-- **With contact:** `eco-` + last 4 digits → e.g. `eco-7679`
-- **Without contact:** `eco-` + first letter + its alphabet number + last letter → e.g. `eco-s19i`
+                st.warning("Please fill in name and city.")
 
-You can also just type your **name** (leave ID blank) and we'll find you by name.
-                    """)
+    # ── RETURNING USER ────────────────────────────────────────
+    else:
+        rn = st.text_input("Your Name *", placeholder="Your registered name", key="ret_nm")
+        ri = st.text_input("Your Unique ID",
+                           placeholder="e.g. eco-7679  (leave blank → search by name)",
+                           key="ret_id")
+        if st.button("🔑  Login", type="primary",
+                     use_container_width=True, key="login_btn"):
+            if rn.strip():
+                with st.spinner("Finding account…"):
+                    from user_manager import find_user
+                    user = find_user(db, user_id=ri.strip() or None, name=rn.strip())
+                if user:
+                    st.session_state["current_user"] = user
+                    st.rerun()
+                else:
+                    st.error(f"'{rn}' not found. Check ID or register as new.")
+            else:
+                st.warning("Please enter your name.")
+        with st.expander("🤔 Forgot your ID?"):
+            st.markdown("""
+- **With contact:** `eco-` + last 4 digits → `eco-7679`
+- **Without contact:** `eco-` + first letter + position + last letter → `eco-s19i`
+- Leave ID blank, enter only your name — we'll find you automatically.
+            """)
 
-            st.markdown("<div style='height:0.4rem'></div>", unsafe_allow_html=True)
-            if st.button("✕ Close — continue as guest", key="skip_m",
-                         use_container_width=True):
-                st.session_state["save_preference"] = False
-                st.session_state["current_user"] = {
-                    "user_id":"GUEST","name":"Guest","city":"—","is_new":False}
-                st.rerun()
+    st.divider()
+    if st.button("✕  Close — continue as guest", key="skip_m",
+                 use_container_width=True):
+        st.session_state["save_preference"] = False
+        st.session_state["current_user"] = {
+            "user_id":"GUEST","name":"Guest","city":"—","is_new":False}
+        st.rerun()
+
+
+@st.dialog("🎉 Account Created!")
+def _dialog_id_popup():
+    user = st.session_state.get("current_user", {})
+    uid  = user.get("user_id", "")
+    name = user.get("name", "")
+    st.markdown(
+        f"<p style='text-align:center;color:#334155;font-size:0.95rem;margin:0 0 0.5rem'>"
+        f"Welcome, <strong>{name}</strong>! Your account is ready.</p>",
+        unsafe_allow_html=True)
+    st.markdown(f"""
+    <div style="background:linear-gradient(135deg,#14532d,#22c55e);
+                border-radius:14px;padding:1rem 1.5rem;
+                text-align:center;margin-bottom:0.8rem">
+        <div style="color:rgba(255,255,255,0.75);font-size:0.68rem;
+                    text-transform:uppercase;letter-spacing:1.5px">Your Unique ID</div>
+        <div style="color:white;font-family:Syne,sans-serif;font-size:1.7rem;
+                    font-weight:800;letter-spacing:4px;margin-top:0.2rem">{uid}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.warning("📝 **Save this ID!** You'll need it to log back in on future visits.")
+    if st.button("✅  Got It — Let's Start!", type="primary",
+                 use_container_width=True, key="close_popup"):
+        st.session_state["show_id_popup"] = False
+        st.rerun()
+
+
+def render_user_modal(db):
+    """Opens the correct native dialog based on session state."""
+    if st.session_state.get("current_user"): return
+    if st.session_state["save_preference"] is None:
+        _dialog_save_pref()
+    elif st.session_state["save_preference"] and not st.session_state.get("current_user"):
+        _dialog_register(db)
 
 
 def render_id_popup():
-    if not st.session_state.get("show_id_popup"): return
-    user = st.session_state.get("current_user",{})
-    uid  = user.get("user_id","")
-    name = user.get("name","")
-    st.markdown("""<div style="position:fixed;top:0;left:0;right:0;bottom:0;
-        background:rgba(15,23,42,0.6);z-index:9990;backdrop-filter:blur(4px)"></div>""",
-        unsafe_allow_html=True)
-    st.markdown(f"""<div style="background:white;border-radius:24px;padding:2rem 2rem 1.6rem;
-        max-width:400px;margin:3rem auto;position:relative;z-index:9999;
-        box-shadow:0 24px 64px rgba(0,0,0,0.25);text-align:center">
-        <div style="font-size:2.5rem;margin-bottom:0.5rem">🎉</div>
-        <h3 style="font-family:Syne,sans-serif;color:#0f172a;margin:0 0 0.3rem">Welcome, {name}!</h3>
-        <p style="color:#64748b;font-size:0.87rem;margin-bottom:1rem">Your account is ready. Save your unique ID:</p>
-        <div style="background:linear-gradient(135deg,#14532d,#22c55e);border-radius:14px;
-                    padding:1rem 1.5rem;margin:0.8rem 0 1rem">
-            <div style="color:rgba(255,255,255,0.7);font-size:0.7rem;text-transform:uppercase;letter-spacing:1px">
-                Your Unique ID</div>
-            <div style="color:white;font-family:Syne,sans-serif;font-size:1.55rem;
-                        font-weight:800;letter-spacing:2px;margin-top:0.2rem">{uid}</div>
-        </div>
-        <div style="background:#fffbeb;border-radius:10px;padding:0.75rem 1rem;
-                    color:#92400e;font-size:0.83rem;text-align:left">
-            📝 <strong>Remember this ID!</strong> You'll need it to access your
-            conversation history in future visits.
-        </div>
-    </div>""", unsafe_allow_html=True)
-    c1,c2,c3 = st.columns([1,2,1])
-    with c2:
-        if st.button("✅ Got It — Let's Start!", type="primary", use_container_width=True, key="close_popup"):
-            st.session_state["show_id_popup"] = False; st.rerun()
+    if st.session_state.get("show_id_popup"):
+        _dialog_id_popup()
 
 
 def render_user_bar(lang):
