@@ -455,16 +455,22 @@ label, .stRadio label, .stCheckbox label {
 # CONSTANTS
 # ════════════════════════════════════════════════════════════
 DEMO_IMAGES = [
-    {"label":"Plastic Bottle","emoji":"🧴","category":"plastic",
+    {"label":"Plastic","emoji":"🧴","category":"plastic",
      "url":"https://img.freepik.com/premium-photo/plastic-waste-garbage-plastic-bottle-background-texture_32511-13.jpg","hint":"Recyclable · Low"},
     {"label":"Cardboard","emoji":"📦","category":"cardboard",
-     "url":"https://images.unsplash.com/photo-1607166452427-7e4477079cb9?w=400&q=80","hint":"Recyclable · Low"},
-    {"label":"Glass Bottle","emoji":"🍾","category":"glass",
-     "url":"https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=400&q=80","hint":"Recyclable · Med"},
+     "url":"https://img.freepik.com/premium-photo/recyclable-materials-assorted-paper-waste-cardboard-materials-marked-recycle-sign-eco-green_955712-39950.jpg","hint":"Recyclable · Low"},
+    {"label":"Glass","emoji":"🍾","category":"glass",
+     "url":"https://img.freepik.com/premium-photo/up-close-view-large-heap-glass-waste-with-focus-tangled-mass-broken-bottles_361816-16244.jpg","hint":"Recyclable · Med"},
     {"label":"Rubber Tyre","emoji":"⚫","category":"rubber",
-     "url":"https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400&q=80","hint":"Recyclable · Med"},
+     "url":"https://img.freepik.com/premium-photo/landfill-with-old-tires-tyres-recycling-reuse-waste-rubber-tyres-disposal-waste-tires-worn-out-wheels-recycling-tyre-dump-burning-plant-regenerated-tire-rubber-produced_140282-1356.jpg","hint":"Recyclable · Med"},
     {"label":"Organic Waste","emoji":"🍌","category":"organic",
-     "url":"https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400&q=80","hint":"Compost · Low"},
+     "url":"https://img.freepik.com/premium-photo/waste-vegetables-fruits-compost-heap-as-fertilizer-garden_317169-1266.jpg","hint":"Compost · Low"},
+    {"label":"Matel","emoji":"⚙️","category":"plastic",
+     "url":"https://img.freepik.com/free-photo/dirty-dumped-objects-arrangement_23-2148996942.jpg","hint":"Recyclable · Med"},
+    {"label":"Mix Matel","emoji":"🔩","category":"cardboard",
+     "url":"https://img.freepik.com/premium-photo/scrap-metal-yard_798657-22963.jpg","hint":"Recyclable · Med"},
+    {"label":"Mix Waste","emoji":"🗑","category":"glass",
+     "url":"https://img.freepik.com/free-photo/old-rusty-junk-garbage-steel-rubber_1150-10991.jpg","hint":"Recyclable · Low"},
 ]
 
 TEAM = [
@@ -476,7 +482,18 @@ TEAM = [
      "academic":"MPhil BA & DA",
      "linkedin":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain",
      "github":"https://github.com/hasnain1669"},
-    None, None, None,
+    {"name":"Yashfa Arooj Gill","initials":"Y","role":"Team Member",
+     "academic":"",
+     "linkedin":"",
+     "github":""},
+    {"name":"Daniya Khadija Anwar","initials":"D","role":"Team Member",
+     "academic":"",
+     "linkedin":"",
+     "github":""},
+    {"name":"Hasnain Ahmad","initials":"H","role":"Team Member",
+     "academic":"",
+     "linkedin":"",
+     "github":""},
 ]
 
 MARKET = {
