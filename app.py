@@ -62,7 +62,8 @@ h1,h2,h3,h4,h5 {
     color       : var(--text-1) !important;
     line-height : 1.2 !important;
 }
-p, li, div { color: var(--text-2); }
+/* Base text — exclude button children so button text CSS wins */
+p:not(button p), li { color: var(--text-2); }
 small, caption, .caption { color: var(--text-3) !important; }
 strong, b { color: var(--text-1) !important; font-weight: 600 !important; }
 a { color: var(--green-mid) !important; }
@@ -81,57 +82,53 @@ code {
     min-width     : 260px !important;
 }
 
-/* ── Sidebar open: collapse button (inside sidebar) ── */
-[data-testid="stSidebarCollapseButton"] button,
-[data-testid="stSidebar"] [data-testid="baseButton-header"] {
+/* ── Sidebar: open/close button INSIDE the sidebar ── */
+[data-testid="stSidebar"] button[kind="header"],
+[data-testid="stSidebarCollapseButton"] button {
     background    : var(--green) !important;
-    color         : white !important;
-    border-radius : 50% !important;
-    width         : 32px !important;
-    height        : 32px !important;
     border        : none !important;
-    cursor        : pointer !important;
+    border-radius : 50% !important;
+    color         : #fff !important;
 }
-[data-testid="stSidebarCollapseButton"] button:hover,
-[data-testid="stSidebar"] [data-testid="baseButton-header"]:hover {
-    background    : #14532d !important;
-}
-[data-testid="stSidebarCollapseButton"] svg,
-[data-testid="stSidebar"] [data-testid="baseButton-header"] svg {
-    fill  : white !important;
-    color : white !important;
+[data-testid="stSidebar"] button[kind="header"] svg,
+[data-testid="stSidebarCollapseButton"] button svg {
+    fill  : #fff !important;
+    color : #fff !important;
 }
 
-/* ── Sidebar closed: expand button (floating tab) ── */
+/* ── Sidebar EXPAND tab — visible green pull-tab when sidebar is closed ──
+   Targets every testid Streamlit has ever used for this element           */
 [data-testid="collapsedControl"],
-[data-testid="stSidebarCollapsedControl"] {
+[data-testid="stSidebarCollapsedControl"],
+section[data-testid="stSidebar"][aria-expanded="false"] ~ div button,
+div[data-testid="collapsedControl"] {
     display          : flex !important;
     visibility       : visible !important;
     opacity          : 1 !important;
     background       : var(--green) !important;
     border-radius    : 0 10px 10px 0 !important;
-    width            : 28px !important;
-    min-height       : 56px !important;
+    width            : 32px !important;
+    min-height       : 60px !important;
+    padding          : 0 !important;
     align-items      : center !important;
     justify-content  : center !important;
-    box-shadow       : 2px 2px 10px rgba(22,101,52,0.25) !important;
+    box-shadow       : 3px 0 10px rgba(22,101,52,0.3) !important;
     cursor           : pointer !important;
     transition       : background 0.15s !important;
-    position         : fixed !important;
-    left             : 0 !important;
-    top              : 50% !important;
-    transform        : translateY(-50%) !important;
-    z-index          : 999 !important;
+    border           : none !important;
+    z-index          : 9998 !important;
 }
 [data-testid="collapsedControl"]:hover,
 [data-testid="stSidebarCollapsedControl"]:hover {
-    background       : #14532d !important;
+    background : #14532d !important;
 }
 [data-testid="collapsedControl"] svg,
-[data-testid="stSidebarCollapsedControl"] svg {
-    fill  : white !important;
-    color : white !important;
-    width : 16px !important;
+[data-testid="stSidebarCollapsedControl"] svg,
+[data-testid="collapsedControl"] button svg {
+    fill  : #fff !important;
+    color : #fff !important;
+    width : 18px !important;
+    height: 18px !important;
 }
 
 /* ── Remove X close button from dialogs/modals ── */
@@ -151,21 +148,40 @@ button[aria-label="Close"],
     font-size     : 0.88rem !important;
     transition    : all 0.15s !important;
 }
+/* Primary button — white text, must target inner elements too */
 .stButton > button[kind="primary"] {
     background : var(--green) !important;
     border     : none !important;
     color      : #ffffff !important;
 }
-.stButton > button[kind="primary"]:hover {
-    background : #14532d !important;
+.stButton > button[kind="primary"] p,
+.stButton > button[kind="primary"] span,
+.stButton > button[kind="primary"] div,
+.stButton > button[kind="primary"] * {
+    color : #ffffff !important;
 }
+.stButton > button[kind="primary"]:hover { background : #14532d !important; }
+
+/* Secondary button — green text */
 .stButton > button[kind="secondary"] {
     background : var(--white) !important;
     border     : 1.5px solid var(--green) !important;
     color      : var(--green) !important;
 }
-.stButton > button[kind="secondary"]:hover {
-    background : var(--green-bg) !important;
+.stButton > button[kind="secondary"] p,
+.stButton > button[kind="secondary"] span,
+.stButton > button[kind="secondary"] div,
+.stButton > button[kind="secondary"] * {
+    color : var(--green) !important;
+}
+.stButton > button[kind="secondary"]:hover { background : var(--green-bg) !important; }
+
+/* Tertiary / any other button kind — dark text */
+.stButton > button:not([kind="primary"]):not([kind="secondary"]) {
+    color : var(--text-1) !important;
+}
+.stButton > button:not([kind="primary"]):not([kind="secondary"]) * {
+    color : var(--text-1) !important;
 }
 .stTextInput > div > div > input,
 .stTextArea  > div > div > textarea,
@@ -612,18 +628,16 @@ TEAM = [
      "academic":"DAE Software Student",
      "linkedin":"https://www.linkedin.com/in/suhan-i/",
      "github":"https://github.com/SUHAN-I",
-     "contact":"suhanirazzaq@gmail.com"},
+     "contact":"https://wa.me/923359997679"},
     {"name":"Muhammad Haroon ul Hasnain","initials":"H","role":"Team Member",
      "academic":"MPhil BA & DA",
      "linkedin":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain",
      "github":"https://github.com/hasnain1669",
-     "contact":"haroon.hasnain669@gmail.com"},
+     "contact":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain"},
     # ── Add new members below — links optional, use "" if not yet available ──
-    {"name":"Daniya khadija Anwar","initials":"D","role":"Team Member","academic":"BS CS",
-    "linkedin":"www.linkedin.com/in/daniya-anwar",
-    "github":"https://github.com/daniyakhadija-0814",
-    "contact":"daniyakhadija@gmail.com"},
-    None, None,   # placeholders — replace None with a member dict when ready
+    # {"name":"Ali Raza","initials":"A","role":"Team Member","academic":"BS CS",
+    #  "linkedin":"","github":"","contact":""},
+    None, None, None,   # placeholders — replace None with a member dict when ready
 ]
 # Grid auto-adjusts: just append more member dicts above and remove a None.
 
@@ -1109,6 +1123,8 @@ def render_review(db, v, lang, context="main"):
 # ════════════════════════════════════════════════════════════
 def section_nearby(db, lat, lng, lang):
     st.markdown(f"#### {t('nearby',lang)}")
+    if db is None:
+        st.info("📡 Database unavailable in demo mode."); return
     with st.spinner("Searching…"):
         from database import get_nearby_scans
         scans = get_nearby_scans(db, lat, lng, limit=10)
@@ -1135,6 +1151,8 @@ def section_nearby(db, lat, lng, lang):
 
 def section_history(db, lang):
     st.markdown(f"#### {t('history',lang)}")
+    if db is None:
+        st.info("📡 Database unavailable in demo mode."); return
     from database import get_recent_scans
     rows = get_recent_scans(db, limit=20)
     if not rows: st.info(t("no_scans",lang)); return
@@ -1162,6 +1180,8 @@ def section_market(lang):
 
 def section_stats(db, lang):
     st.markdown(f"#### {t('stats',lang)}")
+    if db is None:
+        st.info("📡 Database unavailable in demo mode."); return
     try:
         from database import get_recent_scans
         rows = get_recent_scans(db, limit=200)
@@ -1183,6 +1203,8 @@ def section_stats(db, lang):
 
 def section_chat_history(db, lang):
     st.markdown(f"#### {t('chat_hist',lang)}")
+    if db is None:
+        st.info("📡 Database unavailable in demo mode."); return
     user = st.session_state.get("current_user")
     if not user or user.get("user_id")=="GUEST":
         st.info("Log in to view your chat history."); return
@@ -1462,7 +1484,7 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
 # ════════════════════════════════════════════════════════════
 # TAB: JUDGE DEMO
 # ════════════════════════════════════════════════════════════
-def render_demo_tab(lang, vclient, components):
+def render_demo_tab(lang, vclient, components, db):
     st.markdown(f"""<div style="background:linear-gradient(135deg,#14532d,#16a34a);
         border-radius:var(--r-lg);padding:1.4rem 1.8rem;margin-bottom:1.2rem">
         <h3 style="color:white;margin:0;font-family:Syne,sans-serif">🎯 Judge Demo Panel</h3>
@@ -1493,7 +1515,7 @@ def render_demo_tab(lang, vclient, components):
             st.session_state["review_submitted_scan"] = False
             st.rerun()
         st.markdown("---")
-        run_analysis("english","Demo",0,0,None,vclient,components,
+        run_analysis("english","Demo",0,0,db,vclient,components,
                      image_bytes=da["image_bytes"])
         return
 
@@ -1742,7 +1764,7 @@ def main():
     with scan_tab:
         render_scan_tab(language, city, lat, lng, vclient, components, db)
     with demo_tab:
-        render_demo_tab(language, vclient, components)
+        render_demo_tab(language, vclient, components, db)
     with team_tab:
         render_team_tab(language)
 
