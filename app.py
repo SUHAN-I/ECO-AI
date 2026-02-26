@@ -549,49 +549,54 @@ div[role="dialog"] .stMarkdown p {
 
 # ════════════════════════════════════════════════════════════
 # JS — Force sidebar toggle button always visible & clickable
+# IMPORTANT: Must use st.components.v1.html() — st.markdown
+# does NOT execute <script> tags. The iframe uses
+# window.parent.document to reach the real Streamlit page.
 # ════════════════════════════════════════════════════════════
-st.markdown("""
+import streamlit.components.v1 as _components
+_components.html("""
 <script>
 (function() {
-    // Runs immediately + every 400ms to keep the toggle button styled & visible
-    // This beats any CSS specificity issues Streamlit may cause
-    function fixSidebarToggle() {
-        // The "reopen sidebar" button (shown when sidebar is collapsed)
-        var btn = document.querySelector('[data-testid="collapsedControl"]');
-        if (btn) {
-            btn.style.setProperty('display',     'flex',               'important');
-            btn.style.setProperty('visibility',  'visible',            'important');
-            btn.style.setProperty('opacity',     '1',                  'important');
-            btn.style.setProperty('position',    'fixed',              'important');
-            btn.style.setProperty('left',        '0px',                'important');
-            btn.style.setProperty('top',         '50%',                'important');
-            btn.style.setProperty('transform',   'translateY(-50%)',   'important');
-            btn.style.setProperty('z-index',     '9999999',            'important');
-            btn.style.setProperty('width',       '28px',               'important');
-            btn.style.setProperty('height',      '56px',               'important');
-            btn.style.setProperty('min-width',   '28px',               'important');
-            btn.style.setProperty('background',  '#166534',            'important');
-            btn.style.setProperty('border',      'none',               'important');
-            btn.style.setProperty('border-radius','0 8px 8px 0',      'important');
-            btn.style.setProperty('cursor',      'pointer',            'important');
-            btn.style.setProperty('box-shadow',  '2px 0 8px rgba(0,0,0,0.22)', 'important');
-            btn.style.setProperty('align-items', 'center',             'important');
-            btn.style.setProperty('justify-content','center',          'important');
-            // Make the arrow icon white
-            var svgs = btn.querySelectorAll('svg, path');
-            svgs.forEach(function(s){
-                s.style.setProperty('fill',  'white', 'important');
-                s.style.setProperty('color', 'white', 'important');
-            });
-        }
+    function fixBtn() {
+        try {
+            var doc = window.parent.document;
+            // This button appears in the page when the sidebar is COLLAPSED
+            var btn = doc.querySelector('[data-testid="collapsedControl"]');
+            if (btn) {
+                var s = btn.style;
+                s.setProperty('display',          'flex',                        'important');
+                s.setProperty('visibility',       'visible',                     'important');
+                s.setProperty('opacity',          '1',                           'important');
+                s.setProperty('position',         'fixed',                       'important');
+                s.setProperty('left',             '0px',                         'important');
+                s.setProperty('top',              '50%',                         'important');
+                s.setProperty('transform',        'translateY(-50%)',             'important');
+                s.setProperty('z-index',          '9999999',                     'important');
+                s.setProperty('width',            '28px',                        'important');
+                s.setProperty('min-width',        '28px',                        'important');
+                s.setProperty('height',           '56px',                        'important');
+                s.setProperty('background',       '#166534',                     'important');
+                s.setProperty('border',           'none',                        'important');
+                s.setProperty('border-radius',    '0 8px 8px 0',                 'important');
+                s.setProperty('cursor',           'pointer',                     'important');
+                s.setProperty('box-shadow',       '2px 0 8px rgba(0,0,0,0.25)', 'important');
+                s.setProperty('align-items',      'center',                      'important');
+                s.setProperty('justify-content',  'center',                      'important');
+                btn.querySelectorAll('svg, path, polyline, line').forEach(function(el) {
+                    el.style.setProperty('fill',   'white', 'important');
+                    el.style.setProperty('stroke', 'white', 'important');
+                    el.style.setProperty('color',  'white', 'important');
+                });
+            }
+        } catch(e) { /* cross-origin safety — silently ignore */ }
     }
-    // Run on load and keep checking
-    fixSidebarToggle();
-    setInterval(fixSidebarToggle, 400);
-    document.addEventListener('DOMContentLoaded', fixSidebarToggle);
+    // Fire immediately, after DOM loads, and on every tick
+    fixBtn();
+    document.addEventListener('DOMContentLoaded', fixBtn);
+    setInterval(fixBtn, 250);
 })();
 </script>
-""", unsafe_allow_html=True)
+""", height=0, scrolling=False)
 
 
 # ════════════════════════════════════════════════════════════
@@ -780,6 +785,8 @@ def init_state():
         "review_submitted":False,"last_vision":None,"rag_result":None,
         "input_mode":"image","session_id":str(uuid.uuid4())[:8],
         "save_preference":None,"current_user":None,"show_id_popup":False,
+        "voice_text":None,"voice_ready":False,
+        "demo_sel":None,"demo_analysed":False,
     }
     for k,v in defaults.items():
         if k not in st.session_state:
@@ -1267,9 +1274,6 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
             render_tts(st, result)
     except: pass
 
-    # Review (always visible)
-    render_review(db, v, lang, key_suffix="_main")
-
     # Follow-up
     st.markdown("---")
     fc1,fc2 = st.columns([5,1])
@@ -1314,6 +1318,10 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
     if st.session_state.get(tk("market")):    section_market(lang)
     if st.session_state.get(tk("stats")):     section_stats(db,lang)
     if st.session_state.get(tk("chat_hist")): section_chat_history(db,lang)
+
+    # ── Review & Rating at the very end ──
+    st.markdown("---")
+    render_review(db, v, lang, key_suffix="_main")
 
 
 # ════════════════════════════════════════════════════════════
@@ -1377,32 +1385,67 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
             <div style="font-size:2rem;margin-bottom:0.4rem">🎤</div>
             <div style="color:#334155;font-weight:600;font-size:0.9rem">
                 {t('voice_hint',lang)}</div>
+            <div style="color:#64748b;font-size:0.8rem;margin-top:0.3rem">
+                Record your voice, then press <strong>Analyse Voice</strong></div>
         </div>""", unsafe_allow_html=True)
+
         if whisper:
-            audio = st.audio_input("Record", label_visibility="collapsed")
+            audio = st.audio_input("🎙️ Tap to record", label_visibility="collapsed",
+                                   key="voice_audio_input")
+
+            # Step 1 — Transcribe when audio is received
             if audio:
-                with st.spinner("🎤 Transcribing…"):
-                    try:
-                        import tempfile, os
-                        from voice import speech_to_text
-                        # Save audio bytes to a temp file so Whisper can read it
-                        audio_bytes = audio.getvalue()
-                        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-                            tmp.write(audio_bytes)
-                            tmp_path = tmp.name
+                audio_bytes = audio.getvalue()
+                # Only re-transcribe if the audio changed
+                if st.session_state.get("_last_audio_size") != len(audio_bytes):
+                    st.session_state["_last_audio_size"] = len(audio_bytes)
+                    st.session_state["voice_text"]  = None
+                    st.session_state["voice_ready"] = False
+                    with st.spinner("🎤 Transcribing audio…"):
                         try:
-                            text = speech_to_text(whisper, tmp_path, lang)
-                        finally:
-                            try: os.unlink(tmp_path)
-                            except: pass
-                    except Exception as e:
-                        text = None
-                        st.error(f"Voice error: {e}")
-                if text and text.strip():
-                    st.success(f"📝 You said: *{text}*")
-                    run_analysis(lang,city,lat,lng,db,vclient,components,text_input=text.strip())
-                elif text is not None:
-                    st.warning("⚠️ Could not transcribe. Please speak clearly into your microphone and try again.")
+                            import tempfile, os
+                            from voice import speech_to_text
+                            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
+                                tmp.write(audio_bytes)
+                                tmp_path = tmp.name
+                            try:
+                                result_text = speech_to_text(whisper, tmp_path, lang)
+                            finally:
+                                try: os.unlink(tmp_path)
+                                except: pass
+                            if result_text and result_text.strip():
+                                st.session_state["voice_text"]  = result_text.strip()
+                                st.session_state["voice_ready"] = True
+                            else:
+                                st.session_state["voice_text"]  = None
+                                st.session_state["voice_ready"] = False
+                        except Exception as e:
+                            st.error(f"Transcription error: {e}")
+                            st.session_state["voice_text"]  = None
+                            st.session_state["voice_ready"] = False
+
+            # Step 2 — Show transcription and Analyse button
+            vtext = st.session_state.get("voice_text")
+            if vtext:
+                st.success(f"📝 **Transcribed:** {vtext}")
+                vc1, vc2 = st.columns([3, 1])
+                with vc1:
+                    # Allow user to edit the transcription before sending
+                    edited = st.text_input("Edit if needed:", value=vtext,
+                                           key="voice_edit_input",
+                                           label_visibility="collapsed")
+                with vc2:
+                    if st.button("🔍 Analyse Voice", type="primary",
+                                 use_container_width=True, key="voice_analyse_btn"):
+                        st.session_state["voice_text"]  = None
+                        st.session_state["voice_ready"] = False
+                        run_analysis(lang, city, lat, lng, db, vclient,
+                                     components, text_input=edited.strip() or vtext)
+            elif audio and not vtext:
+                st.warning("⚠️ Could not transcribe speech. Please speak clearly and try again.")
+                if st.button("🔄 Try Again", key="voice_retry"):
+                    st.session_state["_last_audio_size"] = None
+                    st.rerun()
         else:
             st.warning("⚠️ Voice model unavailable. Use Image or Text mode instead.")
 
@@ -1428,7 +1471,61 @@ def render_demo_tab(lang, vclient, components):
             Pre-loaded waste images — click any to run full AI analysis instantly</p>
     </div>""", unsafe_allow_html=True)
 
-    active = st.session_state.get(tk("demo_images"),False)
+    # ── If a demo has already been analysed, show results from session state ──
+    # This prevents re-running on every rerender (e.g. when clicking rating)
+    if st.session_state.get("demo_analysed") and st.session_state.get("last_vision"):
+        da1, da2 = st.columns([5, 1])
+        with da1:
+            v   = st.session_state["last_vision"]
+            rag = st.session_state.get("rag_result")
+            st.markdown(f"### ✅ Demo Result: **{v.get('emoji','')} {v.get('waste_type','').title()}**")
+        with da2:
+            if st.button("🔄 New Demo", type="secondary", use_container_width=True,
+                         key="demo_new_btn"):
+                st.session_state["demo_analysed"]   = False
+                st.session_state["demo_sel"]        = None
+                st.session_state["last_vision"]     = None
+                st.session_state["rag_result"]      = None
+                st.session_state["review_submitted"] = False
+                st.rerun()
+
+        st.markdown("---")
+        render_result_card(v, lang)
+
+        if rag:
+            st.markdown(f"### {t('ai_guide',lang)}")
+            st.markdown(f"""<div class="ai-box">
+                {md_to_html(rag['answer'])}
+            </div>""", unsafe_allow_html=True)
+            if rag.get("sources_used"):
+                with st.expander(t("sources",lang)):
+                    for src in rag["sources_used"]: st.markdown(f"- `{src}`")
+
+        # Follow-up
+        st.markdown("---")
+        fc1, fc2 = st.columns([5, 1])
+        with fc1:
+            fup = st.text_input(t("fup_ph",lang), key="demo_fup_i",
+                                label_visibility="collapsed", placeholder=t("fup_ph",lang))
+        with fc2:
+            ask = st.button(t("ask",lang), use_container_width=True, key="demo_fup_btn")
+        if ask and fup.strip():
+            with st.spinner("🤖 Answering…"):
+                from rag_engine import run_rag_pipeline
+                fr = run_rag_pipeline(components=components, vision_result=v,
+                                      user_question=fup, language=lang)
+            st.markdown(f"""<div class="ai-box" style="border-top-color:#16a34a">
+                <strong style="color:#0f172a">Q: {fup}</strong><br><br>
+                {md_to_html(fr['answer'])}
+            </div>""", unsafe_allow_html=True)
+
+        # Rating at the very end — won't re-trigger demo analysis
+        st.markdown("---")
+        render_review(None, v, lang, key_suffix="_demo")
+        return   # ← stop here; don't show the image grid again
+
+    # ── Image grid (shown when no demo is running) ──
+    active = st.session_state.get(tk("demo_images"), False)
     if st.button(t("hide_demo",lang) if active else t("show_demo",lang),
                  type="primary" if active else "secondary", key="demo_toggle"):
         st.session_state[tk("demo_images")] = not active; st.rerun()
@@ -1446,18 +1543,15 @@ def render_demo_tab(lang, vclient, components):
     st.info(f"📸 {len(DEMO_IMAGES)} demo images available — select one to analyse")
     st.markdown("---")
 
-    # Render 5 images per row, handle any number of images
     COLS_PER_ROW = 5
     sel = None
 
     for row_start in range(0, len(DEMO_IMAGES), COLS_PER_ROW):
         row_items = DEMO_IMAGES[row_start : row_start + COLS_PER_ROW]
         cols = st.columns(COLS_PER_ROW)
-
         for i, demo in enumerate(row_items):
             global_idx = row_start + i
             with cols[i]:
-                # Display image directly — show emoji fallback if it fails
                 try:
                     st.image(demo["url"], use_container_width=True)
                 except Exception:
@@ -1466,34 +1560,44 @@ def render_demo_tab(lang, vclient, components):
                         f"border-radius:10px;padding:1.5rem 0;text-align:center;"
                         f"font-size:2.5rem'>{demo['emoji']}</div>",
                         unsafe_allow_html=True)
-
                 st.markdown(
                     f"<div style='text-align:center;padding:0.3rem 0'>"
                     f"<div style='font-weight:700;font-size:0.82rem;color:#0f172a'>"
                     f"{demo['emoji']} {demo['label']}</div>"
                     f"<div style='color:#94a3b8;font-size:0.72rem'>{demo['hint']}</div>"
-                    f"</div>",
-                    unsafe_allow_html=True)
-
+                    f"</div>", unsafe_allow_html=True)
                 if st.button("▶ Test", key=f"d_{global_idx}", use_container_width=True):
                     sel = demo
-
-        # Empty spacer columns for incomplete last row
         for j in range(len(row_items), COLS_PER_ROW):
-            with cols[j]:
-                st.empty()
+            with cols[j]: st.empty()
 
     if sel:
         import requests
         st.markdown("---")
-        st.info(f"🔍 Testing: **{sel['emoji']} {sel['label']}**")
-        with st.spinner("Downloading image…"):
+        st.info(f"🔍 Analysing: **{sel['emoji']} {sel['label']}**")
+        with st.spinner("Downloading & analysing image…"):
             try:
                 r = requests.get(sel["url"], timeout=15)
                 r.raise_for_status()
-                run_analysis("english","Demo",0,0,None,vclient,components,image_bytes=r.content)
+                # Run analysis — it saves results to session_state
+                from vision import classify_waste
+                from rag_engine import run_rag_pipeline
+                v = classify_waste(vclient, r.content)
+                if is_valid_waste(v):
+                    rag = run_rag_pipeline(components=components, vision_result=v,
+                                          language="english")
+                    st.session_state.update({
+                        "last_vision"    : v,
+                        "rag_result"     : rag,
+                        "demo_analysed"  : True,
+                        "demo_sel"       : sel,
+                        "review_submitted": False,
+                    })
+                    st.rerun()   # Rerun now shows the persistent result view above
+                else:
+                    st.error("This demo image wasn't classified as waste. Try another.")
             except Exception as e:
-                st.error(f"Could not load demo image: {e}\n\nTip: Try a different demo image.")
+                st.error(f"Could not load demo image: {e}")
 
 
 # ════════════════════════════════════════════════════════════
@@ -1516,20 +1620,32 @@ def render_team_tab(lang):
 
         for i, member in enumerate(row_members):
             with cols[i]:
-                if member:
-                    li = member.get("linkedin",""); gh = member.get("github","")
-                    ac = member.get("academic","")
-                    links = ""
-                    if li: links += f'<a href="{li}" target="_blank" class="t-link" title="LinkedIn">in LinkedIn</a>'
-                    if gh: links += f'<a href="{gh}" target="_blank" class="t-link" title="GitHub">⌥ GitHub</a>'
-                    st.markdown(f"""<div class="team-card">
-                        <div class="t-avatar">{member['initials']}</div>
-                        <div class="t-name">{member['name']}</div>
-                        <div class="t-role">{member['role']}</div>
-                        {"<div class='t-acad'>"+ac+"</div>" if ac else ""}
-                        {"<div class='t-acad' style='color:#94a3b8;font-style:italic'>Links coming soon</div>" if not li and not gh else ""}
-                        <div class="t-links">{links}</div>
-                    </div>""", unsafe_allow_html=True)
+                ac = member.get("academic","")
+                li = member.get("linkedin","")
+                gh = member.get("github","")
+
+                # ── Card shell (no <a> tags inside — Streamlit sanitizes them) ──
+                st.markdown(f"""<div class="team-card">
+                    <div class="t-avatar">{member['initials']}</div>
+                    <div class="t-name">{member['name']}</div>
+                    <div class="t-role">{member['role']}</div>
+                    {f"<div class='t-acad'>{ac}</div>" if ac else ""}
+                </div>""", unsafe_allow_html=True)
+
+                # ── Links rendered as native Streamlit buttons (never sanitized) ──
+                if li or gh:
+                    if li and gh:
+                        lc1, lc2 = st.columns(2)
+                        with lc1:
+                            st.link_button("🔗 LinkedIn", li, use_container_width=True)
+                        with lc2:
+                            st.link_button("💻 GitHub", gh, use_container_width=True)
+                    elif li:
+                        st.link_button("🔗 LinkedIn", li, use_container_width=True)
+                    elif gh:
+                        st.link_button("💻 GitHub", gh, use_container_width=True)
+                else:
+                    st.caption("🔗 Links coming soon")
 
         # Empty spacer columns for incomplete last row
         for j in range(len(row_members), COLS_PER_ROW):
