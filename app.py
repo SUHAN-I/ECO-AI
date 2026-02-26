@@ -221,15 +221,15 @@ label, .stRadio label, .stCheckbox label {
 
 /* ── High-contrast text — always readable in every condition ── */
 /* Streamlit applies generic color rules that can clash — override explicitly */
-.stMarkdown p, .stMarkdown li, .stMarkdown div,
-[data-testid="stMarkdownContainer"] p,
-[data-testid="stMarkdownContainer"] div,
-[data-testid="stMarkdownContainer"] span { color: var(--text-2) !important; }
+.stMarkdown p, .stMarkdown li,
+[data-testid="stMarkdownContainer"] p { color: var(--text-2) !important; }
 .stMarkdown strong, .stMarkdown b,
 [data-testid="stMarkdownContainer"] strong { color: var(--text-1) !important; }
 .stMarkdown h1,.stMarkdown h2,.stMarkdown h3,.stMarkdown h4 { color: var(--text-1) !important; }
 .stMarkdown a { color: var(--green-mid) !important; }
 .stMarkdown code { color: var(--green) !important; background: var(--green-bg) !important; }
+/* NOTE: Do NOT override span/div colors globally — inline styles in custom HTML
+   (e.g. white text on dark-green About section) must be respected. */
 
 /* ── Dialog / Modal — all text must be readable ── */
 [data-testid="stModal"] p,
@@ -809,7 +809,9 @@ def init_state():
     defaults = {
         "show_nearby":False,"show_history":False,"show_market":False,
         "show_stats":False,"show_demo_images":False,"show_chat_hist":False,
-        "review_submitted":False,"last_vision":None,"rag_result":None,
+        "review_submitted":False,  # legacy key kept for safety
+        "review_submitted_scan":False,"review_submitted_scan2":False,"review_submitted_sb":False,
+        "last_vision":None,"rag_result":None,
         "input_mode":"image","session_id":str(uuid.uuid4())[:8],
         "save_preference":None,"current_user":None,"show_id_popup":False,
         "modal_dismissed_count":0,
@@ -1052,40 +1054,42 @@ def render_result_card(v, lang):
 # ════════════════════════════════════════════════════════════
 # REVIEW
 # ════════════════════════════════════════════════════════════
-def render_review(db, v, lang):
+def render_review(db, v, lang, context="main"):
+    """context = unique string per call site, prevents duplicate widget keys."""
+    k = context   # short alias
     st.markdown("---")
     st.markdown(f"""<div class="review-box">
         <div style="font-family:Syne,sans-serif;font-weight:700;font-size:0.97rem;
                     color:#0f172a;margin-bottom:1rem">{t('rv_title',lang)}</div>
     </div>""", unsafe_allow_html=True)
-    if st.session_state.get("review_submitted"):
+    if st.session_state.get(f"review_submitted_{k}"):
         st.markdown(f"""<div class="review-done">
             {t('rv_thanks',lang)}<br>
             <small style="font-weight:400;color:#166534">{t('rv_saved',lang)}</small>
         </div>""", unsafe_allow_html=True)
-        if st.button("✏️ Edit", key="rv_edit"):
-            st.session_state["review_submitted"] = False; st.rerun()
+        if st.button("✏️ Edit", key=f"rv_edit_{k}"):
+            st.session_state[f"review_submitted_{k}"] = False; st.rerun()
         return
     rc1,rc2 = st.columns([1,2])
     with rc1:
         st.markdown(f"**{t('rv_stars',lang)}**")
-        stars = st.select_slider("rv_sl",[1,2,3,4,5],5,
-                    format_func=lambda x:"⭐"*x, label_visibility="collapsed", key="rv_s_w")
+        stars = st.select_slider(f"rv_sl_{k}",[1,2,3,4,5],5,
+                    format_func=lambda x:"⭐"*x, label_visibility="collapsed", key=f"rv_s_{k}")
         st.markdown(f"{'⭐'*stars}{'☆'*(5-stars)}")
     with rc2:
         st.markdown(f"**{t('rv_q',lang)}**")
-        correct = st.radio("rv_c_r",["yes","no"],
+        correct = st.radio(f"rv_c_r_{k}",["yes","no"],
             format_func=lambda x:("✅ Yes" if lang=="english" else "✅ ہاں") if x=="yes"
                                  else("❌ No" if lang=="english" else "❌ نہیں"),
-            horizontal=True, index=0, label_visibility="collapsed", key="rv_c_w")
+            horizontal=True, index=0, label_visibility="collapsed", key=f"rv_c_{k}")
     correction = ""
     if correct == "no":
-        correction = st.text_input(t("rv_cor",lang), placeholder="e.g. metal can", key="rv_cor_i")
+        correction = st.text_input(t("rv_cor",lang), placeholder="e.g. metal can", key=f"rv_cor_{k}")
     feedback = st.text_area(t("rv_fb",lang), placeholder=t("rv_fb",lang),
-                            height=75, label_visibility="collapsed", key="rv_fb_w")
-    if st.button(t("rv_sub",lang), type="primary", key="rv_sub_btn"):
+                            height=75, label_visibility="collapsed", key=f"rv_fb_{k}")
+    if st.button(t("rv_sub",lang), type="primary", key=f"rv_sub_{k}"):
         try:
-            sheet = db.get("sheet")
+            sheet = db.get("sheet") if db else None
             if sheet:
                 try: ws = sheet.worksheet("reviews")
                 except:
@@ -1095,7 +1099,7 @@ def render_review(db, v, lang):
                 ws.append_row([datetime.now().isoformat(), user.get("user_id","GUEST"),
                                v.get("waste_type",""), stars, correct, correction, feedback, lang])
         except: pass
-        st.session_state["review_submitted"] = True; st.rerun()
+        st.session_state[f"review_submitted_{k}"] = True; st.rerun()
 
 
 # ════════════════════════════════════════════════════════════
@@ -1226,7 +1230,8 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
         </div>""", unsafe_allow_html=True)
         st.session_state["last_vision"] = None; return
 
-    st.session_state.update({"last_vision":v,"rag_result":None,"review_submitted":False})
+    st.session_state.update({"last_vision":v,"rag_result":None,
+                              "review_submitted_scan":False,"review_submitted_scan2":False})
 
     # Save scan + increment count
     if db and image_bytes:
@@ -1297,7 +1302,7 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
                     st.warning(f"⚠️ Voice output unavailable: {e}")
 
     # Review (always visible)
-    render_review(db, v, lang)
+    render_review(db, v, lang, context="scan")
 
     # Follow-up
     st.markdown("---")
@@ -1389,7 +1394,7 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
                 st.markdown(f"""<div class="ai-box">
                     {st.session_state['rag_result']['answer'].replace(chr(10),'<br>')}
                 </div>""", unsafe_allow_html=True)
-            render_review(db, st.session_state["last_vision"], lang)
+            render_review(db, st.session_state["last_vision"], lang, context="scan2")
 
     # ── TEXT ────────────────────────────────────────────────────
     elif mode == "text":
@@ -1483,7 +1488,7 @@ def render_demo_tab(lang, vclient, components):
         st.info(f"🔍 Showing result for: **{da['label']}**")
         if st.button("🔄  New Demo", type="secondary", key="demo_new_btn"):
             st.session_state["demo_active_result"] = None
-            st.session_state["review_submitted"] = False
+            st.session_state["review_submitted_scan"] = False
             st.rerun()
         st.markdown("---")
         run_analysis("english","Demo",0,0,None,vclient,components,
@@ -1527,7 +1532,7 @@ def render_demo_tab(lang, vclient, components):
                 "label"      : sel["label"],
                 "image_bytes": r.content,
             }
-            st.session_state["review_submitted"] = False
+            st.session_state["review_submitted_scan"] = False
             st.rerun()
         except Exception as e:
             st.error(f"Demo error: {e}")
@@ -1659,15 +1664,15 @@ def render_sidebar():
 - 🎤 Whisper STT + gTTS TTS
             """)
 
-        # ── Review & Rating (moves here from main area) ──────
+        # ── Review & Rating (sidebar) ──────
         v = st.session_state.get("last_vision")
         if v:
             st.markdown("---")
             st.markdown("### ⭐ Rate This Result")
-            if st.session_state.get("review_submitted"):
+            if st.session_state.get("review_submitted_sb"):
                 st.success("✅ Thank you for your feedback!")
                 if st.button("✏️ Edit Review", key="rv_edit_sb"):
-                    st.session_state["review_submitted"] = False; st.rerun()
+                    st.session_state["review_submitted_sb"] = False; st.rerun()
             else:
                 stars = st.select_slider("Rating", [1,2,3,4,5], 5,
                             format_func=lambda x:"⭐"*x,
@@ -1699,7 +1704,7 @@ def render_sidebar():
                                            v.get("waste_type",""), stars,
                                            correct, correction, feedback, language])
                     except: pass
-                    st.session_state["review_submitted"] = True; st.rerun()
+                    st.session_state["review_submitted_sb"] = True; st.rerun()
 
     return language, city, lat, lng
 
