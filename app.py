@@ -74,50 +74,70 @@ code {
     font-size     : 0.85em !important;
 }
 
-/* ── Sidebar — FIX: Force collapse/expand button to always be visible ── */
+/* ── Sidebar ── */
 [data-testid="stSidebar"] {
     background    : var(--white) !important;
     border-right  : 1px solid var(--border) !important;
 }
 
-/* Force the sidebar toggle button to always show */
-[data-testid="collapsedControl"],
-button[kind="header"],
-[data-testid="stSidebarCollapsedControl"] {
+/*
+   SIDEBAR TOGGLE BUTTON — open AND close arrow
+   ─────────────────────────────────────────────
+   Streamlit renders TWO buttons:
+     1. Inside the sidebar  → closes it   (data-testid="stSidebarNavItems" parent)
+     2. In the main area    → reopens it  (data-testid="collapsedControl")
+   We style both without touching their position so Streamlit keeps them
+   in the right place. DO NOT use position:fixed here — it breaks the reopen button.
+*/
+[data-testid="collapsedControl"] {
     display          : flex !important;
     visibility       : visible !important;
     opacity          : 1 !important;
     background       : var(--green) !important;
     border-radius    : 0 8px 8px 0 !important;
-    color            : white !important;
     width            : 28px !important;
     min-width        : 28px !important;
+    height           : 56px !important;
     align-items      : center !important;
     justify-content  : center !important;
-    box-shadow       : 2px 0 8px rgba(0,0,0,0.2) !important;
-    z-index          : 9999 !important;
+    box-shadow       : 2px 0 8px rgba(0,0,0,0.18) !important;
+    z-index          : 999990 !important;
     border           : none !important;
     cursor           : pointer !important;
-    position         : fixed !important;
-    top              : 50% !important;
-    transform        : translateY(-50%) !important;
 }
-[data-testid="collapsedControl"]:hover,
-[data-testid="stSidebarCollapsedControl"]:hover {
-    background: #14532d !important;
+[data-testid="collapsedControl"]:hover {
+    background : #14532d !important;
 }
-[data-testid="collapsedControl"] svg,
-[data-testid="stSidebarCollapsedControl"] svg,
-button[kind="header"] svg {
+[data-testid="collapsedControl"] svg {
     fill   : white !important;
     stroke : white !important;
-    color  : white !important;
 }
 
-/* Also style the sidebar's own close/open arrow */
-[data-testid="stSidebar"] [data-testid="collapsedControl"] {
-    left: auto !important;
-    right: -28px !important;
+/* The close (collapse) button inside the sidebar */
+[data-testid="stSidebar"] button[data-testid="baseButton-header"],
+[data-testid="stSidebar"] button[kind="header"] {
+    display          : flex !important;
+    visibility       : visible !important;
+    opacity          : 1 !important;
+    background       : var(--green) !important;
+    border-radius    : 0 8px 8px 0 !important;
+    width            : 28px !important;
+    min-width        : 28px !important;
+    height           : 56px !important;
+    align-items      : center !important;
+    justify-content  : center !important;
+    box-shadow       : 2px 0 8px rgba(0,0,0,0.18) !important;
+    border           : none !important;
+    cursor           : pointer !important;
+}
+[data-testid="stSidebar"] button[data-testid="baseButton-header"]:hover,
+[data-testid="stSidebar"] button[kind="header"]:hover {
+    background : #14532d !important;
+}
+[data-testid="stSidebar"] button[data-testid="baseButton-header"] svg,
+[data-testid="stSidebar"] button[kind="header"] svg {
+    fill   : white !important;
+    stroke : white !important;
 }
 
 /* ── Streamlit overrides ── */
@@ -581,38 +601,23 @@ div[role="dialog"] .stMarkdown p {
 # CONSTANTS
 # ════════════════════════════════════════════════════════════
 
-# FIX: Use only reliable image URLs, fallback to emoji if image fails to load
 DEMO_IMAGES = [
-    {"label":"Plastic Bottles","emoji":"🧴","category":"plastic",
-     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Plastic_Bottles.jpg/640px-Plastic_Bottles.jpg",
-     "hint":"Recyclable · Low"},
+    {"label":"Plastic","emoji":"🧴","category":"plastic",
+     "url":"https://img.freepik.com/premium-photo/plastic-waste-garbage-plastic-bottle-background-texture_32511-13.jpg","hint":"Recyclable · Low"},
     {"label":"Cardboard","emoji":"📦","category":"cardboard",
-     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Cardboard_box_with_recycle_symbol.jpg/640px-Cardboard_box_with_recycle_symbol.jpg",
-     "hint":"Recyclable · Low"},
-    {"label":"Glass Bottles","emoji":"🍾","category":"glass",
-     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Glass_bottles_for_recycling.jpg/640px-Glass_bottles_for_recycling.jpg",
-     "hint":"Recyclable · Med"},
+     "url":"https://img.freepik.com/premium-photo/recyclable-materials-assorted-paper-waste-cardboard-materials-marked-recycle-sign-eco-green_955712-39950.jpg","hint":"Recyclable · Low"},
+    {"label":"Glass","emoji":"🍾","category":"glass",
+     "url":"https://img.freepik.com/premium-photo/up-close-view-large-heap-glass-waste-with-focus-tangled-mass-broken-bottles_361816-16244.jpg","hint":"Recyclable · Med"},
     {"label":"Rubber Tyre","emoji":"⚫","category":"rubber",
-     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Waste_tires.jpg/640px-Waste_tires.jpg",
-     "hint":"Recyclable · Med"},
+     "url":"https://img.freepik.com/premium-photo/landfill-with-old-tires-tyres-recycling-reuse-waste-rubber-tyres-disposal-waste-tires-worn-out-wheels-recycling-tyre-dump-burning-plant-regenerated-tire-rubber-produced_140282-1356.jpg","hint":"Recyclable · Med"},
     {"label":"Organic Waste","emoji":"🍌","category":"organic",
-     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Compost_heap_with_vegetable_waste.jpg/640px-Compost_heap_with_vegetable_waste.jpg",
-     "hint":"Compost · Low"},
-    {"label":"Metal Scrap","emoji":"⚙️","category":"metal",
-     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Scrap_metal_at_a_scrapyard.jpg/640px-Scrap_metal_at_a_scrapyard.jpg",
-     "hint":"Recyclable · Med"},
-    {"label":"Mixed Metal","emoji":"🔩","category":"metal",
-     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Metal_scrap_yard.jpg/640px-Metal_scrap_yard.jpg",
-     "hint":"Recyclable · Med"},
-    {"label":"Mixed Waste","emoji":"🗑","category":"trash",
-     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Mixed_municipal_solid_waste.jpg/640px-Mixed_municipal_solid_waste.jpg",
-     "hint":"Recyclable · Low"},
-    {"label":"E-Waste","emoji":"💻","category":"e-waste",
-     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Electronic_waste_in_Agbogbloshie%2C_Ghana.jpg/640px-Electronic_waste_in_Agbogbloshie%2C_Ghana.jpg",
-     "hint":"Special Disposal · High"},
-    {"label":"Paper Waste","emoji":"📄","category":"paper",
-     "url":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Wastepaper.jpg/640px-Wastepaper.jpg",
-     "hint":"Recyclable · Low"},
+     "url":"https://img.freepik.com/premium-photo/waste-vegetables-fruits-compost-heap-as-fertilizer-garden_317169-1266.jpg","hint":"Compost · Low"},
+    {"label":"Metal","emoji":"⚙️","category":"metal",
+     "url":"https://img.freepik.com/free-photo/dirty-dumped-objects-arrangement_23-2148996942.jpg","hint":"Recyclable · Med"},
+    {"label":"Mix Metal","emoji":"🔩","category":"metal",
+     "url":"https://img.freepik.com/premium-photo/scrap-metal-yard_798657-22963.jpg","hint":"Recyclable · Med"},
+    {"label":"Mix Waste","emoji":"🗑","category":"trash",
+     "url":"https://img.freepik.com/free-photo/old-rusty-junk-garbage-steel-rubber_1150-10991.jpg","hint":"Recyclable · Low"},
 ]
 
 TEAM = [
@@ -1394,14 +1399,9 @@ def render_demo_tab(lang, vclient, components):
         for i, demo in enumerate(row_items):
             global_idx = row_start + i
             with cols[i]:
-                # Safe image display — show emoji box if URL fails
+                # Display image directly — show emoji fallback if it fails
                 try:
-                    import requests as _req
-                    resp = _req.head(demo["url"], timeout=4, allow_redirects=True)
-                    if resp.status_code == 200:
-                        st.image(demo["url"], use_container_width=True)
-                    else:
-                        raise ValueError("bad status")
+                    st.image(demo["url"], use_container_width=True)
                 except Exception:
                     st.markdown(
                         f"<div style='background:#f0fdf4;border:2px dashed #bbf7d0;"
@@ -1601,4 +1601,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
