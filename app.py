@@ -456,8 +456,8 @@ label, .stRadio label, .stCheckbox label {
 # ════════════════════════════════════════════════════════════
 DEMO_IMAGES = [
     {"label":"Plastic Bottle","emoji":"🧴","category":"plastic",
-     "url":"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80","hint":"Recyclable · Low"},
-    {"label":"Cardboard Box","emoji":"📦","category":"cardboard",
+     "url":"https://img.freepik.com/premium-photo/plastic-waste-garbage-plastic-bottle-background-texture_32511-13.jpg","hint":"Recyclable · Low"},
+    {"label":"Cardboard","emoji":"📦","category":"cardboard",
      "url":"https://images.unsplash.com/photo-1607166452427-7e4477079cb9?w=400&q=80","hint":"Recyclable · Low"},
     {"label":"Glass Bottle","emoji":"🍾","category":"glass",
      "url":"https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=400&q=80","hint":"Recyclable · Med"},
