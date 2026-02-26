@@ -79,7 +79,6 @@ code {
 [data-testid="stSidebar"] {
     background    : var(--white) !important;
     border-right  : 1px solid var(--border) !important;
-    min-width     : 260px !important;
 }
 
 /* ── Sidebar: open/close button INSIDE the sidebar ── */
@@ -879,11 +878,6 @@ def _dialog_save_pref():
             "user_id":"GUEST","name":"Guest","city":"—","is_new":False}
         st.rerun()
     st.markdown("<div style='height:0.4rem'></div>", unsafe_allow_html=True)
-    st.markdown(
-        "<div style='text-align:center'>"
-        "<small style='color:#94a3b8'>Press <strong>✕</strong> at top-right or click "
-        "<em>Continue as Guest</em> to close without registering.</small></div>",
-        unsafe_allow_html=True)
 
 
 @st.dialog("👤 Create your account")
