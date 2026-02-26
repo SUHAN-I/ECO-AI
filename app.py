@@ -62,10 +62,13 @@ h1,h2,h3,h4,h5 {
     color       : var(--text-1) !important;
     line-height : 1.2 !important;
 }
-/* Base text — exclude button children so button text CSS wins */
-p:not(button p), li { color: var(--text-2); }
+/* Base text — only applies to streamlit-generated markdown, not custom HTML */
+.stMarkdown > div > p,
+.stMarkdown > div > ul > li,
+.stMarkdown > div > ol > li { color: var(--text-2); }
 small, caption, .caption { color: var(--text-3) !important; }
-strong, b { color: var(--text-1) !important; font-weight: 600 !important; }
+/* strong/b: only in markdown, not inside custom inline-styled HTML */
+.stMarkdown strong, .stMarkdown b { color: var(--text-1) !important; font-weight: 600 !important; }
 a { color: var(--green-mid) !important; }
 code {
     background    : var(--green-bg) !important;
@@ -77,8 +80,16 @@ code {
 
 /* ── Sidebar ── */
 [data-testid="stSidebar"] {
-    background    : var(--white) !important;
-    border-right  : 1px solid var(--border) !important;
+    background   : var(--white) !important;
+    border-right : 1px solid var(--border) !important;
+}
+/* Main content area always fills available width */
+[data-testid="stAppViewContainer"] > section:last-child,
+[data-testid="stMain"] {
+    width          : 100% !important;
+    min-width      : 0 !important;
+    flex           : 1 1 0% !important;
+    overflow-x     : hidden !important;
 }
 
 /* ── Sidebar: open/close button INSIDE the sidebar ── */
@@ -1290,49 +1301,42 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
     save_chat(db,"assistant", rag["answer"][:800], v.get("waste_type",""))
 
     # TTS button
-    tts_col1, tts_col2 = st.columns([1, 1])
-    with tts_col1:
-        if st.button(t("speak_btn", lang), key="tts_btn", use_container_width=True):
-            tts_text = rag["answer"][:500]
-            tts_done = False
-            # Try streamlit-tts first (browser-native, no network required)
+    if st.button(t("speak_btn", lang), key="tts_btn"):
+        tts_text = rag["answer"][:500]
+        tts_done = False
+        try:
+            from streamlit_tts import auto_play
+            lc = "ur-PK" if lang == "urdu" else "en-US"
+            auto_play(tts_text, language=lc)
+            st.caption("🔊 Playing via browser TTS")
+            tts_done = True
+        except Exception:
+            pass
+        if not tts_done:
             try:
-                from streamlit_tts import auto_play
-                lc = "ur-PK" if lang == "urdu" else "en-US"
-                auto_play(tts_text, language=lc)
-                st.caption("🔊 Playing via browser TTS")
+                from gtts import gTTS
+                import io as _io
+                lc = "ur" if lang == "urdu" else "en"
+                buf = _io.BytesIO()
+                gTTS(text=tts_text, lang=lc, slow=False).write_to_fp(buf)
+                buf.seek(0)
+                st.audio(buf.read(), format="audio/mp3", autoplay=True)
+                st.caption("🔊 Audio by gTTS")
                 tts_done = True
-            except Exception:
-                pass
-            # Fallback: gTTS (needs internet)
-            if not tts_done:
-                try:
-                    from gtts import gTTS
-                    import io as _io
-                    lc = "ur" if lang == "urdu" else "en"
-                    buf = _io.BytesIO()
-                    gTTS(text=tts_text, lang=lc, slow=False).write_to_fp(buf)
-                    buf.seek(0)
-                    st.audio(buf.read(), format="audio/mp3", autoplay=True)
-                    st.caption("🔊 Audio by gTTS")
-                    tts_done = True
-                except Exception as e:
-                    st.warning(f"⚠️ Voice output unavailable: {e}")
+            except Exception as e:
+                st.warning(f"⚠️ Voice output unavailable: {e}")
 
-    # Review (always visible)
-    render_review(db, v, lang, context="scan")
-
-    # Follow-up
+    # Follow-up question
     st.markdown("---")
-    fc1,fc2 = st.columns([5,1])
+    fc1, fc2 = st.columns([5, 1])
     with fc1:
-        fup = st.text_input(t("fup_ph",lang), key="fup_i",
-                            label_visibility="collapsed", placeholder=t("fup_ph",lang))
+        fup = st.text_input(t("fup_ph", lang), key="fup_i",
+                            label_visibility="collapsed", placeholder=t("fup_ph", lang))
     with fc2:
-        ask = st.button(t("ask",lang), use_container_width=True, key="fup_btn")
+        ask = st.button(t("ask", lang), use_container_width=True, key="fup_btn")
 
     if ask and fup.strip():
-        save_chat(db,"user", fup, v.get("waste_type",""))
+        save_chat(db, "user", fup, v.get("waste_type", ""))
         with st.spinner("🤖 Answering…"):
             from rag_engine import run_rag_pipeline
             fr = run_rag_pipeline(components=components, vision_result=v,
@@ -1341,31 +1345,20 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
             <strong style="color:#0f172a;display:block;margin-bottom:0.6rem">Q: {fup}</strong>
             {fmt(fr['answer'])}
         </div>""", unsafe_allow_html=True)
-        save_chat(db,"assistant", fr["answer"][:800], v.get("waste_type",""))
+        save_chat(db, "assistant", fr["answer"][:800], v.get("waste_type", ""))
 
-    # Explore more toggles
+    # ── Explore More — always visible as tabs ──────────────────
     st.markdown("---")
-    st.markdown("### 🔽 " + ("Explore More" if lang=="english" else "مزید دیکھیں"))
-    toggle_specs = [
-        ("nearby",    t("nearby",    lang)),
-        ("history",   t("history",   lang)),
-        ("market",    t("market",    lang)),
-        ("stats",     t("stats",     lang)),
-        ("chat_hist", t("chat_hist", lang)),
-    ]
-    cols = st.columns(len(toggle_specs))
-    for col,(key,label) in zip(cols, toggle_specs):
-        with col:
-            active = st.session_state.get(tk(key),False)
-            if st.button(label, use_container_width=True, key=f"tb_{key}",
-                         type="primary" if active else "secondary"):
-                st.session_state[tk(key)] = not active; st.rerun()
-
-    if st.session_state.get(tk("nearby")):    section_nearby(db,lat,lng,lang)
-    if st.session_state.get(tk("history")):   section_history(db,lang)
-    if st.session_state.get(tk("market")):    section_market(lang)
-    if st.session_state.get(tk("stats")):     section_stats(db,lang)
-    if st.session_state.get(tk("chat_hist")): section_chat_history(db,lang)
+    st.markdown("### 🔽 " + ("Explore More" if lang == "english" else "مزید دیکھیں"))
+    exp_tabs = st.tabs([
+        t("nearby", lang), t("history", lang),
+        t("market", lang), t("stats", lang), t("chat_hist", lang),
+    ])
+    with exp_tabs[0]: section_nearby(db, lat, lng, lang)
+    with exp_tabs[1]: section_history(db, lang)
+    with exp_tabs[2]: section_market(lang)
+    with exp_tabs[3]: section_stats(db, lang)
+    with exp_tabs[4]: section_chat_history(db, lang)
 
 
 # ════════════════════════════════════════════════════════════
@@ -1410,9 +1403,8 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
             render_result_card(st.session_state["last_vision"], lang)
             if st.session_state.get("rag_result"):
                 st.markdown(f"""<div class="ai-box">
-                    {st.session_state['rag_result']['answer'].replace(chr(10),'<br>')}
+                    {fmt(st.session_state['rag_result']['answer'])}
                 </div>""", unsafe_allow_html=True)
-            render_review(db, st.session_state["last_vision"], lang, context="scan2")
 
     # ── TEXT ────────────────────────────────────────────────────
     elif mode == "text":
@@ -1509,7 +1501,7 @@ def render_demo_tab(lang, vclient, components, db):
             st.session_state["review_submitted_scan"] = False
             st.rerun()
         st.markdown("---")
-        run_analysis("english","Demo",0,0,db,vclient,components,
+        run_analysis(lang,"Demo",0,0,db,vclient,components,
                      image_bytes=da["image_bytes"])
         return
 
