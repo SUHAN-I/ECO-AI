@@ -78,27 +78,69 @@ code {
 [data-testid="stSidebar"] {
     background    : var(--white) !important;
     border-right  : 1px solid var(--border) !important;
+    min-width     : 260px !important;
 }
-/* Collapse arrow — visible green tab, sidebar can open & close */
-[data-testid="collapsedControl"] {
-    display       : flex !important;
-    visibility    : visible !important;
+
+/* ── Sidebar open: collapse button (inside sidebar) ── */
+[data-testid="stSidebarCollapseButton"] button,
+[data-testid="stSidebar"] [data-testid="baseButton-header"] {
     background    : var(--green) !important;
-    border-radius : 0 10px 10px 0 !important;
-    width         : 26px !important;
-    height        : 52px !important;
-    align-items   : center !important;
-    justify-content: center !important;
-    box-shadow    : 2px 0 8px rgba(22,101,52,0.18) !important;
-    transition    : background 0.15s !important;
+    color         : white !important;
+    border-radius : 50% !important;
+    width         : 32px !important;
+    height        : 32px !important;
+    border        : none !important;
     cursor        : pointer !important;
 }
-[data-testid="collapsedControl"]:hover {
+[data-testid="stSidebarCollapseButton"] button:hover,
+[data-testid="stSidebar"] [data-testid="baseButton-header"]:hover {
     background    : #14532d !important;
 }
-[data-testid="collapsedControl"] svg {
+[data-testid="stSidebarCollapseButton"] svg,
+[data-testid="stSidebar"] [data-testid="baseButton-header"] svg {
     fill  : white !important;
+    color : white !important;
+}
+
+/* ── Sidebar closed: expand button (floating tab) ── */
+[data-testid="collapsedControl"],
+[data-testid="stSidebarCollapsedControl"] {
+    display          : flex !important;
+    visibility       : visible !important;
+    opacity          : 1 !important;
+    background       : var(--green) !important;
+    border-radius    : 0 10px 10px 0 !important;
+    width            : 28px !important;
+    min-height       : 56px !important;
+    align-items      : center !important;
+    justify-content  : center !important;
+    box-shadow       : 2px 2px 10px rgba(22,101,52,0.25) !important;
+    cursor           : pointer !important;
+    transition       : background 0.15s !important;
+    position         : fixed !important;
+    left             : 0 !important;
+    top              : 50% !important;
+    transform        : translateY(-50%) !important;
+    z-index          : 999 !important;
+}
+[data-testid="collapsedControl"]:hover,
+[data-testid="stSidebarCollapsedControl"]:hover {
+    background       : #14532d !important;
+}
+[data-testid="collapsedControl"] svg,
+[data-testid="stSidebarCollapsedControl"] svg {
+    fill  : white !important;
+    color : white !important;
     width : 16px !important;
+}
+
+/* ── Remove X close button from dialogs/modals ── */
+[data-testid="stModal"] > div > div > div:first-child button,
+[data-testid="stBaseButton-header"],
+button[aria-label="Close"],
+[data-baseweb="modal"] button[aria-label="close"],
+.stModal [data-testid="stHeaderActionElements"] button {
+    display : none !important;
 }
 
 /* ── Streamlit overrides ── */
@@ -176,6 +218,61 @@ label, .stRadio label, .stCheckbox label {
 }
 .stAlert { border-radius: var(--r-sm) !important; }
 #MainMenu, footer, header { visibility: hidden !important; }
+
+/* ── High-contrast text — always readable in every condition ── */
+/* Streamlit applies generic color rules that can clash — override explicitly */
+.stMarkdown p, .stMarkdown li, .stMarkdown div,
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] div,
+[data-testid="stMarkdownContainer"] span { color: var(--text-2) !important; }
+.stMarkdown strong, .stMarkdown b,
+[data-testid="stMarkdownContainer"] strong { color: var(--text-1) !important; }
+.stMarkdown h1,.stMarkdown h2,.stMarkdown h3,.stMarkdown h4 { color: var(--text-1) !important; }
+.stMarkdown a { color: var(--green-mid) !important; }
+.stMarkdown code { color: var(--green) !important; background: var(--green-bg) !important; }
+
+/* ── Dialog / Modal — all text must be readable ── */
+[data-testid="stModal"] p,
+[data-testid="stModal"] span,
+[data-testid="stModal"] label,
+[data-testid="stModal"] div { color: var(--text-2) !important; }
+[data-testid="stModal"] strong,
+[data-testid="stModal"] b { color: var(--text-1) !important; }
+[data-testid="stModal"] h1,
+[data-testid="stModal"] h2,
+[data-testid="stModal"] h3 { color: var(--text-1) !important; }
+/* Dialog button text — must always show */
+[data-testid="stModal"] .stButton > button[kind="primary"] {
+    background : var(--green) !important;
+    color      : #ffffff !important;
+    font-weight: 700 !important;
+}
+[data-testid="stModal"] .stButton > button[kind="secondary"] {
+    background : var(--white) !important;
+    color      : var(--green) !important;
+    border     : 1.5px solid var(--green) !important;
+    font-weight: 600 !important;
+}
+[data-testid="stModal"] .stButton > button {
+    color : var(--text-1) !important; /* fallback for any other button kind */
+}
+/* Captions and small text in dialogs */
+[data-testid="stModal"] .stCaption,
+[data-testid="stModal"] small { color: var(--text-3) !important; }
+/* Radio and checkbox labels inside dialogs */
+[data-testid="stModal"] .stRadio label,
+[data-testid="stModal"] .stCheckbox label { color: var(--text-2) !important; }
+/* Inputs inside dialogs */
+[data-testid="stModal"] input,
+[data-testid="stModal"] textarea { color: var(--text-1) !important; background: var(--white) !important; }
+
+/* ── Sidebar text always readable ── */
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] div,
+[data-testid="stSidebar"] span { color: var(--text-2) !important; }
+[data-testid="stSidebar"] strong,
+[data-testid="stSidebar"] b { color: var(--text-1) !important; }
+[data-testid="stSidebar"] label { color: var(--text-2) !important; }
 
 /* ── Header banner ── */
 .eco-header {
@@ -395,27 +492,59 @@ label, .stRadio label, .stCheckbox label {
    MOBILE — max-width 768px
 ══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-    /* Header */
-    .eco-header { padding:1.2rem 1rem; border-radius:var(--r-md); }
-    .eco-header h1 { font-size:1.25rem !important; }
+    /* Sidebar: start collapsed on mobile, full-width when open */
+    [data-testid="stSidebar"] {
+        position  : absolute !important;
+        z-index   : 1000 !important;
+        width     : 85vw !important;
+        max-width : 320px !important;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.15) !important;
+    }
+
+    /* Header — compact */
+    .eco-header { padding:1rem 0.9rem; border-radius:var(--r-md); }
+    .eco-header h1 { font-size:1.2rem !important; }
+    .eco-header p  { font-size:0.8rem; }
     .eco-header::after { display:none; }
 
-    /* Cards & boxes */
-    .card, .ai-box, .review-box { padding:1rem; }
-    .ai-box { font-size:0.88rem; }
+    /* Cards & boxes — tighter padding */
+    .card, .ai-box, .review-box { padding:0.9rem; }
+    .ai-box { font-size:0.87rem; line-height:1.75; }
 
-    /* Team grid: 2 columns on mobile */
-    .team-card { padding:1.1rem 0.8rem; }
-    .t-avatar  { width:58px; height:58px; font-size:1.4rem; }
+    /* Team cards — 2 per row via Streamlit columns */
+    .team-card { padding:1rem 0.75rem; }
+    .t-avatar  { width:54px; height:54px; font-size:1.3rem; }
+    .t-name    { font-size:0.82rem !important; }
+    .t-links   { flex-direction:column; align-items:center; }
+    .t-link    { font-size:0.7rem !important; padding:0.2rem 0.5rem !important; }
 
-    /* Metrics stack better */
-    [data-testid="column"] { padding:0.15rem !important; }
+    /* Result card grid: 2x2 on mobile */
+    .res-grid { grid-template-columns: repeat(2,1fr) !important; }
 
-    /* Tabs: compact text */
-    .stTabs [data-baseweb="tab"] { font-size:0.78rem !important; padding:0.4rem 0.5rem !important; }
+    /* Metrics */
+    [data-testid="column"] { padding:0.1rem !important; }
+
+    /* Tabs */
+    .stTabs [data-baseweb="tab"] { font-size:0.76rem !important; padding:0.35rem 0.4rem !important; }
 
     /* Market table */
-    .mkt-row { font-size:0.82rem; }
+    .mkt-row { font-size:0.8rem; }
+
+    /* User bar — stack vertically */
+    .user-bar { flex-direction:column; align-items:flex-start; gap:0.3rem; }
+    .user-bar .sep { display:none; }
+
+    /* Buttons — bigger touch targets */
+    .stButton > button { min-height:42px !important; font-size:0.82rem !important; }
+
+    /* Demo images — 2 per row */
+    .demo-grid-2col [data-testid="column"]:nth-child(n+3) { display:none; }
+
+    /* Input elements — full width */
+    .stTextInput, .stTextArea { width:100% !important; }
+
+    /* Navigation map buttons */
+    .nav-btn { font-size:0.74rem !important; padding:0.35rem 0.65rem !important; }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -443,10 +572,12 @@ label, .stRadio label, .stCheckbox label {
     .block-container { padding: 1rem 1.2rem !important; }
 }
 @media (max-width: 480px) {
-    .eco-header h1 { font-size:1.05rem !important; }
-    .eco-header p  { font-size:0.78rem; }
-    .stButton > button { font-size:0.8rem !important; padding:0.4rem 0.6rem !important; }
-    .badge { font-size:0.72rem !important; padding:0.15rem 0.6rem !important; }
+    .eco-header h1 { font-size:1rem !important; }
+    .eco-header p  { font-size:0.76rem; }
+    .stButton > button { font-size:0.78rem !important; padding:0.35rem 0.5rem !important; min-height:40px !important; }
+    .badge { font-size:0.7rem !important; padding:0.12rem 0.5rem !important; }
+    /* Stack result card grid to 1 col on very small screens */
+    .res-grid { grid-template-columns: repeat(2,1fr) !important; gap:0.4rem !important; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -456,17 +587,25 @@ label, .stRadio label, .stCheckbox label {
 # CONSTANTS
 # ════════════════════════════════════════════════════════════
 DEMO_IMAGES = [
-    {"label":"Plastic Bottle","emoji":"🧴","category":"plastic",
-     "url":"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80","hint":"Recyclable · Low"},
-    {"label":"Cardboard Box","emoji":"📦","category":"cardboard",
-     "url":"https://images.unsplash.com/photo-1607166452427-7e4477079cb9?w=400&q=80","hint":"Recyclable · Low"},
-    {"label":"Glass Bottle","emoji":"🍾","category":"glass",
-     "url":"https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=400&q=80","hint":"Recyclable · Med"},
+    {"label":"Plastic","emoji":"🧴","category":"plastic",
+     "url":"https://img.freepik.com/premium-photo/plastic-waste-garbage-plastic-bottle-background-texture_32511-13.jpg","hint":"Recyclable · Low"},
+    {"label":"Cardboard","emoji":"📦","category":"cardboard",
+     "url":"https://img.freepik.com/premium-photo/recyclable-materials-assorted-paper-waste-cardboard-materials-marked-recycle-sign-eco-green_955712-39950.jpg","hint":"Recyclable · Low"},
+    {"label":"Glass","emoji":"🍾","category":"glass",
+     "url":"https://img.freepik.com/premium-photo/up-close-view-large-heap-glass-waste-with-focus-tangled-mass-broken-bottles_361816-16244.jpg","hint":"Recyclable · Med"},
     {"label":"Rubber Tyre","emoji":"⚫","category":"rubber",
-     "url":"https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400&q=80","hint":"Recyclable · Med"},
+     "url":"https://img.freepik.com/premium-photo/landfill-with-old-tires-tyres-recycling-reuse-waste-rubber-tyres-disposal-waste-tires-worn-out-wheels-recycling-tyre-dump-burning-plant-regenerated-tire-rubber-produced_140282-1356.jpg","hint":"Recyclable · Med"},
     {"label":"Organic Waste","emoji":"🍌","category":"organic",
-     "url":"https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400&q=80","hint":"Compost · Low"},
+     "url":"https://img.freepik.com/premium-photo/waste-vegetables-fruits-compost-heap-as-fertilizer-garden_317169-1266.jpg","hint":"Compost · Low"},
+    {"label":"Metal","emoji":"⚙️","category":"metal",
+     "url":"https://img.freepik.com/free-photo/dirty-dumped-objects-arrangement_23-2148996942.jpg","hint":"Recyclable · Med"},
+    {"label":"Mix Metal","emoji":"🔩","category":"metal",
+     "url":"https://img.freepik.com/premium-photo/scrap-metal-yard_798657-22963.jpg","hint":"Recyclable · Med"},
+    {"label":"Mix Waste","emoji":"🗑","category":"trash",
+     "url":"https://img.freepik.com/free-photo/old-rusty-junk-garbage-steel-rubber_1150-10991.jpg","hint":"Recyclable · Low"},
 ]
+# To add more demo images later, simply append a dict to DEMO_IMAGES above.
+# Grid auto-adjusts to any number of images (4 per row).
 
 TEAM = [
     {"name":"Suhani","initials":"S","role":"Team Leader",
@@ -479,8 +618,12 @@ TEAM = [
      "linkedin":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain",
      "github":"https://github.com/hasnain1669",
      "contact":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain"},
-    None, None, None,
+    # ── Add new members below — links optional, use "" if not yet available ──
+    # {"name":"Ali Raza","initials":"A","role":"Team Member","academic":"BS CS",
+    #  "linkedin":"","github":"","contact":""},
+    None, None, None,   # placeholders — replace None with a member dict when ready
 ]
+# Grid auto-adjusts: just append more member dicts above and remove a None.
 
 MARKET = {
     "Plastic"  :("PKR 60–140/kg",   "پلاسٹک"),
@@ -577,6 +720,53 @@ def harm_html(level, lang):
     return HARM_MAP.get(key, HARM_MAP["medium"])[idx]
 def gmaps(lat,lng): return f"https://www.google.com/maps/dir/?api=1&destination={lat},{lng}"
 def osm(lat,lng):   return f"https://www.openstreetmap.org/directions?to={lat},{lng}"
+
+def fmt(text):
+    """
+    Convert plain AI text with basic markdown into readable HTML.
+    Handles: ## headings, **bold**, bullet lines (- / •), paragraphs.
+    """
+    import re
+    lines   = text.split("\n")
+    out     = []
+    in_list = False
+    for raw in lines:
+        line = raw.rstrip()
+        # Heading ##
+        if re.match(r"^#{1,3}\s+", line):
+            if in_list: out.append("</ul>"); in_list = False
+            htext = re.sub(r"^#{1,3}\s+","",line)
+            htext = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", htext)
+            out.append(f'<h4 style="font-family:Syne,sans-serif;color:#0f172a;'
+                       f'font-size:0.97rem;margin:1rem 0 0.3rem;font-weight:700">{htext}</h4>')
+        # Bullet line
+        elif re.match(r"^[-•*]\s+", line):
+            if not in_list: out.append('<ul style="margin:0.3rem 0 0.3rem 1.2rem;padding:0">'); in_list = True
+            item = re.sub(r"^[-•*]\s+","",line)
+            item = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", item)
+            out.append(f"<li style='margin-bottom:0.2rem;color:#334155'>{item}</li>")
+        # Numbered line
+        elif re.match(r"^\d+\.\s+", line):
+            if in_list: out.append("</ul>"); in_list = False
+            item = re.sub(r"^\d+\.\s+","",line)
+            item = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", item)
+            out.append(f'<p style="margin:0.15rem 0;color:#334155"><strong style="color:#166534">'
+                       f'{re.match(r"^\d+",raw).group()}.</strong> {item}</p>')
+        # Horizontal rule
+        elif line.startswith("---") or line.startswith("==="):
+            if in_list: out.append("</ul>"); in_list = False
+            out.append('<hr style="border:none;border-top:1px solid #e2e8f0;margin:0.7rem 0">')
+        # Empty line — paragraph break
+        elif line == "":
+            if in_list: out.append("</ul>"); in_list = False
+            out.append('<div style="height:0.4rem"></div>')
+        # Normal text
+        else:
+            if in_list: out.append("</ul>"); in_list = False
+            para = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", line)
+            out.append(f'<p style="margin:0.1rem 0;color:#334155">{para}</p>')
+    if in_list: out.append("</ul>")
+    return "\n".join(out)
 
 
 # ════════════════════════════════════════════════════════════
@@ -837,7 +1027,7 @@ def render_result_card(v, lang):
                     {v.get('urdu_label','نامعلوم')}</div>
             </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.7rem;margin-bottom:0.85rem">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.7rem;margin-bottom:0.85rem" class="res-grid">
             <div><div style="font-size:0.67rem;color:#94a3b8;text-transform:uppercase;letter-spacing:0.7px;
                         margin-bottom:0.25rem">{t('cat',lang)}</div>
                 <strong style="color:#0f172a;font-size:0.87rem">{v.get('label_en','—')}</strong></div>
@@ -1065,9 +1255,7 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
     st.session_state["rag_result"] = rag
 
     st.markdown(f"### {t('ai_guide',lang)}")
-    st.markdown(f"""<div class="ai-box">
-        {rag['answer'].replace(chr(10),'<br>')}
-    </div>""", unsafe_allow_html=True)
+    st.markdown(f"""<div class="ai-box">{fmt(rag['answer'])}</div>""", unsafe_allow_html=True)
 
     if rag.get("is_demo"):
         st.markdown('<span class="badge b-demo">⚠️ Demo Mode</span>', unsafe_allow_html=True)
@@ -1079,13 +1267,34 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
     save_chat(db,"assistant", rag["answer"][:800], v.get("waste_type",""))
 
     # TTS button
-    try:
-        from voice import speak, render_tts
-        if st.button(t("speak_btn",lang), key="tts_btn"):
-            with st.spinner("🔊 Generating audio…"):
-                result = speak(rag["answer"][:450], lang)
-            render_tts(st, result)
-    except: pass
+    tts_col1, tts_col2 = st.columns([1, 1])
+    with tts_col1:
+        if st.button(t("speak_btn", lang), key="tts_btn", use_container_width=True):
+            tts_text = rag["answer"][:500]
+            tts_done = False
+            # Try streamlit-tts first (browser-native, no network required)
+            try:
+                from streamlit_tts import auto_play
+                lc = "ur-PK" if lang == "urdu" else "en-US"
+                auto_play(tts_text, language=lc)
+                st.caption("🔊 Playing via browser TTS")
+                tts_done = True
+            except Exception:
+                pass
+            # Fallback: gTTS (needs internet)
+            if not tts_done:
+                try:
+                    from gtts import gTTS
+                    import io as _io
+                    lc = "ur" if lang == "urdu" else "en"
+                    buf = _io.BytesIO()
+                    gTTS(text=tts_text, lang=lc, slow=False).write_to_fp(buf)
+                    buf.seek(0)
+                    st.audio(buf.read(), format="audio/mp3", autoplay=True)
+                    st.caption("🔊 Audio by gTTS")
+                    tts_done = True
+                except Exception as e:
+                    st.warning(f"⚠️ Voice output unavailable: {e}")
 
     # Review (always visible)
     render_review(db, v, lang)
@@ -1106,8 +1315,8 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
             fr = run_rag_pipeline(components=components, vision_result=v,
                                   user_question=fup, language=lang)
         st.markdown(f"""<div class="ai-box" style="border-top-color:#16a34a">
-            <strong style="color:#0f172a">Q: {fup}</strong><br><br>
-            {fr['answer'].replace(chr(10),'<br>')}
+            <strong style="color:#0f172a;display:block;margin-bottom:0.6rem">Q: {fup}</strong>
+            {fmt(fr['answer'])}
         </div>""", unsafe_allow_html=True)
         save_chat(db,"assistant", fr["answer"][:800], v.get("waste_type",""))
 
@@ -1192,40 +1401,47 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
 
     # ── VOICE ───────────────────────────────────────────────────
     elif mode == "voice":
-        whisper = get_whisper()
         st.markdown(f"""<div class="voice-box">
             <div style="font-size:2rem;margin-bottom:0.4rem">🎤</div>
-            <div style="color:#334155;font-weight:600;font-size:0.9rem">
+            <div style="color:#0f172a;font-weight:600;font-size:0.9rem">
                 {t('voice_hint',lang)}</div>
+            <div style="color:#64748b;font-size:0.78rem;margin-top:0.25rem">
+                Record → Transcribe → Submit</div>
         </div>""", unsafe_allow_html=True)
-        if whisper:
-            audio = st.audio_input("🎙️ Record your message", label_visibility="collapsed")
-            if audio:
-                # Transcribe first, show text, then user decides to submit
-                if "voice_transcribed" not in st.session_state:
-                    st.session_state["voice_transcribed"] = ""
-                if st.button("🔍  Transcribe & Preview", type="secondary",
-                             use_container_width=True, key="voice_transcribe_btn"):
+
+        audio = st.audio_input("🎙️ Tap to record", label_visibility="collapsed")
+
+        if audio:
+            if "voice_transcribed" not in st.session_state:
+                st.session_state["voice_transcribed"] = ""
+
+            if st.button("🔍 Transcribe", type="secondary",
+                         use_container_width=True, key="voice_transcribe_btn"):
+                whisper = get_whisper()
+                if whisper:
                     try:
                         with st.spinner("🎤 Transcribing…"):
                             from voice import speech_to_text
                             text = speech_to_text(whisper, audio.getvalue(), lang)
                         st.session_state["voice_transcribed"] = text or ""
                         if not text:
-                            st.warning("⚠️ Could not transcribe. Please speak clearly and try again.")
+                            st.warning("⚠️ Could not transcribe. Speak clearly and try again.")
                     except Exception as e:
-                        st.error(f"⚠️ Voice error: {e}")
+                        st.error(f"STT error: {e}")
                         st.session_state["voice_transcribed"] = ""
+                else:
+                    st.warning("⚠️ Whisper model unavailable — type your message in Text mode instead.")
+                    st.session_state["voice_transcribed"] = ""
 
-                txt = st.session_state.get("voice_transcribed","")
-                if txt:
-                    st.success(f"📝 Transcribed: *{txt}*")
-                    if st.button("🚀  Analyse This", type="primary",
-                                 use_container_width=True, key="voice_submit_btn"):
-                        st.session_state["voice_transcribed"] = ""
-                        run_analysis(lang,city,lat,lng,db,vclient,components,text_input=txt)
+            txt = st.session_state.get("voice_transcribed", "")
+            if txt:
+                st.success(f"📝 Transcribed: *{txt}*")
+                if st.button("🚀 Submit & Analyse", type="primary",
+                             use_container_width=True, key="voice_submit_btn"):
+                    st.session_state["voice_transcribed"] = ""
+                    run_analysis(lang, city, lat, lng, db, vclient, components, text_input=txt)
         else:
-            st.warning("⚠️ Voice model unavailable. Use Image or Text mode instead.")
+            st.info("Record your voice above, then click **Transcribe** to see the text before submitting.")
 
     else:
         st.markdown("""<div style="text-align:center;padding:2.5rem;color:#94a3b8">
@@ -1274,22 +1490,33 @@ def render_demo_tab(lang, vclient, components):
                      image_bytes=da["image_bytes"])
         return
 
-    # ── Image grid ────────────────────────────────────────────
+    # ── Image grid — auto-wraps any number of images, 4 per row ──
+    COLS_PER_ROW = 4
     st.markdown(f"**{t('demo_try',lang)}**")
     st.markdown("---")
-    cols = st.columns(5)
-    sel  = None
-    for i, demo in enumerate(DEMO_IMAGES):
-        with cols[i]:
-            try: st.image(demo["url"], use_container_width=True)
-            except: st.markdown(f"<div style='text-align:center;font-size:3rem'>{demo['emoji']}</div>",
-                                 unsafe_allow_html=True)
-            st.markdown(f"""<div style="text-align:center;padding:0.3rem 0">
-                <div style="font-weight:700;font-size:0.82rem;color:#0f172a">{demo['emoji']} {demo['label']}</div>
-                <div style="color:#94a3b8;font-size:0.72rem">{demo['hint']}</div>
-            </div>""", unsafe_allow_html=True)
-            if st.button("Test", key=f"d_{i}", use_container_width=True):
-                sel = demo
+    sel = None
+    for row_start in range(0, len(DEMO_IMAGES), COLS_PER_ROW):
+        row_items = DEMO_IMAGES[row_start : row_start + COLS_PER_ROW]
+        # Fill last row with empty slots so grid stays uniform
+        padded    = row_items + [None] * (COLS_PER_ROW - len(row_items))
+        cols      = st.columns(COLS_PER_ROW)
+        for col, demo in zip(cols, padded):
+            if demo is None:
+                continue          # empty slot — skip
+            with col:
+                try: st.image(demo["url"], use_container_width=True)
+                except: st.markdown(
+                    f"<div style='text-align:center;font-size:3rem;padding:1rem'>{demo['emoji']}</div>",
+                    unsafe_allow_html=True)
+                st.markdown(f"""<div style="text-align:center;padding:0.3rem 0">
+                    <div style="font-weight:700;font-size:0.82rem;color:#0f172a">
+                        {demo['emoji']} {demo['label']}</div>
+                    <div style="color:#94a3b8;font-size:0.72rem">{demo['hint']}</div>
+                </div>""", unsafe_allow_html=True)
+                if st.button("▶ Test", key=f"d_{DEMO_IMAGES.index(demo)}",
+                             use_container_width=True):
+                    sel = demo
+        st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
 
     if sel:
         import requests
@@ -1318,29 +1545,37 @@ def render_team_tab(lang):
                     border-radius:2px;margin:0.75rem auto 1.5rem"></div>
     </div>""", unsafe_allow_html=True)
 
-    cols = st.columns(5)
-    for i,member in enumerate(TEAM):
-        with cols[i]:
-            if member:
-                li = member.get("linkedin",""); gh = member.get("github","")
-                ac = member.get("academic",""); ct = member.get("contact","")
-                links = ""
-                if li: links += f'<a href="{li}" target="_blank" class="t-link" title="LinkedIn">in LinkedIn</a>'
-                if gh: links += f'<a href="{gh}" target="_blank" class="t-link" title="GitHub">⌥ GitHub</a>'
-                if ct: links += f'<a href="{ct}" target="_blank" class="t-link" title="Contact">📞 Contact</a>'
-                st.markdown(f"""<div class="team-card">
-                    <div class="t-avatar">{member['initials']}</div>
-                    <div class="t-name">{member['name']}</div>
-                    <div class="t-role">{member['role']}</div>
-                    {"<div class='t-acad'>"+ac+"</div>" if ac else ""}
-                    <div class="t-links">{links}</div>
-                </div>""", unsafe_allow_html=True)
-            else:
-                st.markdown(f"""<div class="t-ph">
-                    <div style="font-size:1.8rem;margin-bottom:0.4rem">👤</div>
-                    <div style="font-weight:600;font-size:0.85rem">{t('coming',lang)}</div>
-                    <div style="font-size:0.75rem;margin-top:0.2rem;color:#cbd5e1">Member {i+1}</div>
-                </div>""", unsafe_allow_html=True)
+    TEAM_COLS = 5
+    real_members = [m for m in TEAM if m is not None]
+    placeholders  = [m for m in TEAM if m is None]
+    all_slots     = real_members + placeholders  # real first, then placeholders
+
+    for row_start in range(0, len(all_slots), TEAM_COLS):
+        row = all_slots[row_start : row_start + TEAM_COLS]
+        cols = st.columns(TEAM_COLS)
+        for ci, member in enumerate(row):
+            with cols[ci]:
+                if member:
+                    li = member.get("linkedin",""); gh = member.get("github","")
+                    ac = member.get("academic",""); ct = member.get("contact","")
+                    links = ""
+                    if li: links += f'<a href="{li}" target="_blank" class="t-link">in LinkedIn</a>'
+                    if gh: links += f'<a href="{gh}" target="_blank" class="t-link">⌥ GitHub</a>'
+                    if ct: links += f'<a href="{ct}" target="_blank" class="t-link">📞 Contact</a>'
+                    st.markdown(f"""<div class="team-card">
+                        <div class="t-avatar">{member['initials']}</div>
+                        <div class="t-name">{member['name']}</div>
+                        <div class="t-role">{member['role']}</div>
+                        {"<div class='t-acad'>"+ac+"</div>" if ac else ""}
+                        <div class="t-links">{links if links else '<span style=\"color:#94a3b8;font-size:0.75rem\">Links coming soon</span>'}</div>
+                    </div>""", unsafe_allow_html=True)
+                else:
+                    slot_n = row_start + ci + 1
+                    st.markdown(f"""<div class="t-ph">
+                        <div style="font-size:1.8rem;margin-bottom:0.4rem">👤</div>
+                        <div style="font-weight:600;font-size:0.85rem">{t('coming',lang)}</div>
+                        <div style="font-size:0.75rem;margin-top:0.2rem;color:#cbd5e1">Slot {slot_n}</div>
+                    </div>""", unsafe_allow_html=True)
 
     st.markdown("---")
     st.markdown("""<div style="background:linear-gradient(135deg,#14532d,#166534);
