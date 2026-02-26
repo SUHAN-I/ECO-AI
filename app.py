@@ -668,7 +668,7 @@ def save_chat(db, role, message, waste_type=""):
 @st.dialog("♻️ Welcome to Eco AI!")
 def _dialog_save_pref():
     st.markdown(
-        "<p style='text-align:center;color:#64748b;font-size:0.9rem;margin:0 0 1.2rem'>"
+        "<p style='text-align:center;color:#cccdcf;font-size:0.9rem;margin:0 0 1.2rem'>"
         "Would you like to save your scans and chat history for future visits?</p>",
         unsafe_allow_html=True)
     if st.button("✅  Yes — Save My Data", type="primary",
