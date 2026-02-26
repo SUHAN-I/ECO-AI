@@ -79,66 +79,16 @@ code {
     background    : var(--white) !important;
     border-right  : 1px solid var(--border) !important;
 }
-
-/*
-   SIDEBAR TOGGLE BUTTON — open AND close arrow
-   ─────────────────────────────────────────────
-   Streamlit renders TWO buttons:
-     1. Inside the sidebar  → closes it   (data-testid="stSidebarNavItems" parent)
-     2. In the main area    → reopens it  (data-testid="collapsedControl")
-   We style both without touching their position so Streamlit keeps them
-   in the right place. DO NOT use position:fixed here — it breaks the reopen button.
-*/
+/* Base styling for the toggle — JS below keeps it visible */
 [data-testid="collapsedControl"] {
-    display          : flex !important;
-    visibility       : visible !important;
-    opacity          : 1 !important;
-    background       : var(--green) !important;
-    border-radius    : 0 8px 8px 0 !important;
-    width            : 28px !important;
-    min-width        : 28px !important;
-    height           : 56px !important;
-    align-items      : center !important;
-    justify-content  : center !important;
-    box-shadow       : 2px 0 8px rgba(0,0,0,0.18) !important;
-    z-index          : 999990 !important;
-    border           : none !important;
-    cursor           : pointer !important;
+    background    : var(--green) !important;
+    border-radius : 0 8px 8px 0 !important;
+    border        : none !important;
+    cursor        : pointer !important;
+    box-shadow    : 2px 0 8px rgba(0,0,0,0.18) !important;
 }
-[data-testid="collapsedControl"]:hover {
-    background : #14532d !important;
-}
-[data-testid="collapsedControl"] svg {
-    fill   : white !important;
-    stroke : white !important;
-}
-
-/* The close (collapse) button inside the sidebar */
-[data-testid="stSidebar"] button[data-testid="baseButton-header"],
-[data-testid="stSidebar"] button[kind="header"] {
-    display          : flex !important;
-    visibility       : visible !important;
-    opacity          : 1 !important;
-    background       : var(--green) !important;
-    border-radius    : 0 8px 8px 0 !important;
-    width            : 28px !important;
-    min-width        : 28px !important;
-    height           : 56px !important;
-    align-items      : center !important;
-    justify-content  : center !important;
-    box-shadow       : 2px 0 8px rgba(0,0,0,0.18) !important;
-    border           : none !important;
-    cursor           : pointer !important;
-}
-[data-testid="stSidebar"] button[data-testid="baseButton-header"]:hover,
-[data-testid="stSidebar"] button[kind="header"]:hover {
-    background : #14532d !important;
-}
-[data-testid="stSidebar"] button[data-testid="baseButton-header"] svg,
-[data-testid="stSidebar"] button[kind="header"] svg {
-    fill   : white !important;
-    stroke : white !important;
-}
+[data-testid="collapsedControl"]:hover { background: #14532d !important; }
+[data-testid="collapsedControl"] svg   { fill: white !important; stroke: white !important; }
 
 /* ── Streamlit overrides ── */
 .stButton > button {
@@ -598,6 +548,53 @@ div[role="dialog"] .stMarkdown p {
 
 
 # ════════════════════════════════════════════════════════════
+# JS — Force sidebar toggle button always visible & clickable
+# ════════════════════════════════════════════════════════════
+st.markdown("""
+<script>
+(function() {
+    // Runs immediately + every 400ms to keep the toggle button styled & visible
+    // This beats any CSS specificity issues Streamlit may cause
+    function fixSidebarToggle() {
+        // The "reopen sidebar" button (shown when sidebar is collapsed)
+        var btn = document.querySelector('[data-testid="collapsedControl"]');
+        if (btn) {
+            btn.style.setProperty('display',     'flex',               'important');
+            btn.style.setProperty('visibility',  'visible',            'important');
+            btn.style.setProperty('opacity',     '1',                  'important');
+            btn.style.setProperty('position',    'fixed',              'important');
+            btn.style.setProperty('left',        '0px',                'important');
+            btn.style.setProperty('top',         '50%',                'important');
+            btn.style.setProperty('transform',   'translateY(-50%)',   'important');
+            btn.style.setProperty('z-index',     '9999999',            'important');
+            btn.style.setProperty('width',       '28px',               'important');
+            btn.style.setProperty('height',      '56px',               'important');
+            btn.style.setProperty('min-width',   '28px',               'important');
+            btn.style.setProperty('background',  '#166534',            'important');
+            btn.style.setProperty('border',      'none',               'important');
+            btn.style.setProperty('border-radius','0 8px 8px 0',      'important');
+            btn.style.setProperty('cursor',      'pointer',            'important');
+            btn.style.setProperty('box-shadow',  '2px 0 8px rgba(0,0,0,0.22)', 'important');
+            btn.style.setProperty('align-items', 'center',             'important');
+            btn.style.setProperty('justify-content','center',          'important');
+            // Make the arrow icon white
+            var svgs = btn.querySelectorAll('svg, path');
+            svgs.forEach(function(s){
+                s.style.setProperty('fill',  'white', 'important');
+                s.style.setProperty('color', 'white', 'important');
+            });
+        }
+    }
+    // Run on load and keep checking
+    fixSidebarToggle();
+    setInterval(fixSidebarToggle, 400);
+    document.addEventListener('DOMContentLoaded', fixSidebarToggle);
+})();
+</script>
+""", unsafe_allow_html=True)
+
+
+# ════════════════════════════════════════════════════════════
 # CONSTANTS
 # ════════════════════════════════════════════════════════════
 
@@ -998,7 +995,10 @@ def render_result_card(v, lang):
 # ════════════════════════════════════════════════════════════
 # REVIEW
 # ════════════════════════════════════════════════════════════
-def render_review(db, v, lang):
+def render_review(db, v, lang, key_suffix=""):
+    # key_suffix makes all widget keys unique when this function is called
+    # from multiple places on the same page (avoids DuplicateWidgetID error)
+    k = key_suffix
     st.markdown("---")
     st.markdown(f"""<div class="review-box">
         <div style="font-family:Syne,sans-serif;font-weight:700;font-size:0.97rem;
@@ -1009,27 +1009,27 @@ def render_review(db, v, lang):
             {t('rv_thanks',lang)}<br>
             <small style="font-weight:400;color:#166534">{t('rv_saved',lang)}</small>
         </div>""", unsafe_allow_html=True)
-        if st.button("✏️ Edit", key="rv_edit"):
+        if st.button("✏️ Edit", key=f"rv_edit{k}"):
             st.session_state["review_submitted"] = False; st.rerun()
         return
     rc1,rc2 = st.columns([1,2])
     with rc1:
         st.markdown(f"**{t('rv_stars',lang)}**")
-        stars = st.select_slider("rv_sl",[1,2,3,4,5],5,
-                    format_func=lambda x:"⭐"*x, label_visibility="collapsed", key="rv_s_w")
+        stars = st.select_slider(f"rv_sl{k}",[1,2,3,4,5],5,
+                    format_func=lambda x:"⭐"*x, label_visibility="collapsed", key=f"rv_s_w{k}")
         st.markdown(f"{'⭐'*stars}{'☆'*(5-stars)}")
     with rc2:
         st.markdown(f"**{t('rv_q',lang)}**")
-        correct = st.radio("rv_c_r",["yes","no"],
+        correct = st.radio(f"rv_c_r{k}",["yes","no"],
             format_func=lambda x:("✅ Yes" if lang=="english" else "✅ ہاں") if x=="yes"
                                  else("❌ No" if lang=="english" else "❌ نہیں"),
-            horizontal=True, index=0, label_visibility="collapsed", key="rv_c_w")
+            horizontal=True, index=0, label_visibility="collapsed", key=f"rv_c_w{k}")
     correction = ""
     if correct == "no":
-        correction = st.text_input(t("rv_cor",lang), placeholder="e.g. metal can", key="rv_cor_i")
+        correction = st.text_input(t("rv_cor",lang), placeholder="e.g. metal can", key=f"rv_cor_i{k}")
     feedback = st.text_area(t("rv_fb",lang), placeholder=t("rv_fb",lang),
-                            height=75, label_visibility="collapsed", key="rv_fb_w")
-    if st.button(t("rv_sub",lang), type="primary", key="rv_sub_btn"):
+                            height=75, label_visibility="collapsed", key=f"rv_fb_w{k}")
+    if st.button(t("rv_sub",lang), type="primary", key=f"rv_sub_btn{k}"):
         try:
             sheet = db.get("sheet")
             if sheet:
@@ -1143,6 +1143,50 @@ def section_chat_history(db, lang):
 
 
 # ════════════════════════════════════════════════════════════
+# MARKDOWN → HTML  (so AI answer renders bold/bullets properly)
+# ════════════════════════════════════════════════════════════
+def md_to_html(text: str) -> str:
+    """Convert basic markdown to HTML for display inside raw HTML divs.
+    Tries the `markdown` package first; falls back to manual regex conversion."""
+    try:
+        import markdown as _md
+        return _md.markdown(text, extensions=["nl2br", "sane_lists"])
+    except Exception:
+        import re
+        # Bold **text** and __text__
+        text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
+        text = re.sub(r'__(.*?)__',     r'<strong>\1</strong>', text)
+        # Italic *text* and _text_
+        text = re.sub(r'\*(.*?)\*', r'<em>\1</em>', text)
+        text = re.sub(r'_(.*?)_',   r'<em>\1</em>', text)
+        lines = text.split('\n')
+        html_parts = []
+        in_list = False
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith('### '):
+                if in_list: html_parts.append('</ul>'); in_list = False
+                html_parts.append(f'<h4 style="margin:0.9rem 0 0.3rem;color:#0f172a">{stripped[4:]}</h4>')
+            elif stripped.startswith('## '):
+                if in_list: html_parts.append('</ul>'); in_list = False
+                html_parts.append(f'<h3 style="margin:0.9rem 0 0.3rem;color:#0f172a">{stripped[3:]}</h3>')
+            elif stripped.startswith('# '):
+                if in_list: html_parts.append('</ul>'); in_list = False
+                html_parts.append(f'<h2 style="margin:0.9rem 0 0.3rem;color:#0f172a">{stripped[2:]}</h2>')
+            elif stripped.startswith('- ') or stripped.startswith('* '):
+                if not in_list: html_parts.append('<ul style="margin:0.4rem 0 0.4rem 1.2rem;padding:0">'); in_list = True
+                html_parts.append(f'<li style="margin-bottom:0.25rem">{stripped[2:]}</li>')
+            elif stripped == '':
+                if in_list: html_parts.append('</ul>'); in_list = False
+                html_parts.append('<br>')
+            else:
+                if in_list: html_parts.append('</ul>'); in_list = False
+                html_parts.append(f'<p style="margin:0 0 0.5rem">{line}</p>')
+        if in_list: html_parts.append('</ul>')
+        return '\n'.join(html_parts)
+
+
+# ════════════════════════════════════════════════════════════
 # ANALYSIS RUNNER
 # ════════════════════════════════════════════════════════════
 def run_analysis(lang, city, lat, lng, db, vclient, components,
@@ -1202,7 +1246,7 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
 
     st.markdown(f"### {t('ai_guide',lang)}")
     st.markdown(f"""<div class="ai-box">
-        {rag['answer'].replace(chr(10),'<br>')}
+        {md_to_html(rag['answer'])}
     </div>""", unsafe_allow_html=True)
 
     if rag.get("is_demo"):
@@ -1224,7 +1268,7 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
     except: pass
 
     # Review (always visible)
-    render_review(db, v, lang)
+    render_review(db, v, lang, key_suffix="_main")
 
     # Follow-up
     st.markdown("---")
@@ -1243,7 +1287,7 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
                                   user_question=fup, language=lang)
         st.markdown(f"""<div class="ai-box" style="border-top-color:#16a34a">
             <strong style="color:#0f172a">Q: {fup}</strong><br><br>
-            {fr['answer'].replace(chr(10),'<br>')}
+            {md_to_html(fr['answer'])}
         </div>""", unsafe_allow_html=True)
         save_chat(db,"assistant", fr["answer"][:800], v.get("waste_type",""))
 
@@ -1314,9 +1358,9 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
             render_result_card(st.session_state["last_vision"], lang)
             if st.session_state.get("rag_result"):
                 st.markdown(f"""<div class="ai-box">
-                    {st.session_state['rag_result']['answer'].replace(chr(10),'<br>')}
+                    {md_to_html(st.session_state['rag_result']['answer'])}
                 </div>""", unsafe_allow_html=True)
-            render_review(db, st.session_state["last_vision"], lang)
+            render_review(db, st.session_state["last_vision"], lang, key_suffix="_scan")
 
     # ── TEXT ────────────────────────────────────────────────────
     elif mode == "text":
@@ -1338,13 +1382,27 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
             audio = st.audio_input("Record", label_visibility="collapsed")
             if audio:
                 with st.spinner("🎤 Transcribing…"):
-                    from voice import speech_to_text
-                    text = speech_to_text(whisper, audio.getvalue(), lang)
-                if text:
+                    try:
+                        import tempfile, os
+                        from voice import speech_to_text
+                        # Save audio bytes to a temp file so Whisper can read it
+                        audio_bytes = audio.getvalue()
+                        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
+                            tmp.write(audio_bytes)
+                            tmp_path = tmp.name
+                        try:
+                            text = speech_to_text(whisper, tmp_path, lang)
+                        finally:
+                            try: os.unlink(tmp_path)
+                            except: pass
+                    except Exception as e:
+                        text = None
+                        st.error(f"Voice error: {e}")
+                if text and text.strip():
                     st.success(f"📝 You said: *{text}*")
-                    run_analysis(lang,city,lat,lng,db,vclient,components,text_input=text)
-                else:
-                    st.warning("⚠️ Could not transcribe. Please speak clearly and try again.")
+                    run_analysis(lang,city,lat,lng,db,vclient,components,text_input=text.strip())
+                elif text is not None:
+                    st.warning("⚠️ Could not transcribe. Please speak clearly into your microphone and try again.")
         else:
             st.warning("⚠️ Voice model unavailable. Use Image or Text mode instead.")
 
