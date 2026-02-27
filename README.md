@@ -454,7 +454,7 @@ Python 3.11+   Git
 ### Installation
 ```bash
 # 1. Clone the repository
-git clone https://github.com/YOUR-USERNAME/eco-ai.git
+git clone https://github.com/ECO-AI/eco-ai.git
 cd eco-ai
 
 # 2. Install dependencies
@@ -492,7 +492,7 @@ GOOGLE_MAPS_API_KEY=your_maps_api_key
 
 ### Deploy to HuggingFace Spaces
 ```bash
-git remote add hf https://huggingface.co/spaces/YOUR-USERNAME/eco-ai
+git remote add hf https://huggingface.co/spaces/hasnain1669/eco-ai
 git push hf main
 ```
 Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
@@ -500,8 +500,6 @@ Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
 ---
 
 ## 👥 Team
-
-> 📝 **How to update:** Replace each `YOUR-*` placeholder with real values. Avatar images auto-generate from names — swap the `ui-avatars.com` URL with a real photo URL to show actual pictures.
 
 <br/>
 
@@ -542,7 +540,7 @@ Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
 
 <!-- ═══ MEMBER 3 ═══ -->
 <td align="center" width="200">
-<a href="https://github.com/YOUR-GITHUB-3">
+<a href="https://github.com/hammadgill7809-lang">
 <img src="https://ui-avatars.com/api/?name=Yashfa+Arooj+Gill&background=3d8a3d&color=ffffff&size=120&bold=true&rounded=true" width="100" height="100" style="border-radius:50%; border:3px solid #2d7a2d;"/></a>
 <br/><br/>
 <b>Yashfa Arooj Gill</b>
@@ -551,9 +549,9 @@ Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
 <br/>
 <sub>M.Phil Chemistry</sub>
 <br/><br/>
-<a href="https://github.com/YOUR-GITHUB-3"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"/></a>
-<a href="https://linkedin.com/in/YOUR-LINKEDIN-3"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
-<a href="https://huggingface.co/YOUR-HF-3"><img src="https://img.shields.io/badge/🤗-FFD21E?style=flat-square" alt="HuggingFace"/></a>
+<a href="https://github.com/hammadgill7809-lang"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"/></a>
+<a href="https://linkedin.com/in/yashfa-arooj-gill-71187839b"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
+<a href="https://huggingface.co/hammadgill7809"><img src="https://img.shields.io/badge/🤗-FFD21E?style=flat-square" alt="HuggingFace"/></a>
 </td>
 
 </tr>
@@ -572,7 +570,7 @@ Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
 <br/><br/>
 <a href="https://github.com/daniyakhadija-0814"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"/></a>
 <a href="https://linkedin.com/in/daniya-anwar"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
-<a href="https://huggingface.co/YOUR-HF-4"><img src="https://img.shields.io/badge/🤗-FFD21E?style=flat-square" alt="HuggingFace"/></a>
+<a href="https://huggingface.co/Daniya-0814"><img src="https://img.shields.io/badge/🤗-FFD21E?style=flat-square" alt="HuggingFace"/></a>
 </td>
 
 <!-- ═══ MEMBER 5 ═══ -->
