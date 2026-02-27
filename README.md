@@ -648,7 +648,7 @@ git push origin feature/your-feature-name
 |-|----------|------|
 | 🌐 | **Website** | [www.eco.ai](https://www.eco.ai) — will replace with live URL soon |
 | 🐙 | **GitHub** | [github.com/hasnain1669/eco-ai](https://github.com/hasnain1669/eco-ai) |
-| 💼 | **LinkedIn** | [linkedin.com/muhammad-haroon-ul-hasnain//eco-ai](https://www.linkedin.com/muhammad-haroon-ul-hasnain//eco-ai) |
+| 💼 | **LinkedIn** | [linkedin.com/in/muhammad-haroon-ul-hasnain//eco-ai](https://www.linkedin.com/in/muhammad-haroon-ul-hasnain//eco-ai) |
 | 📧 | **Email** | contact@eco.ai — will replace with real email soon |
 
 </div>
