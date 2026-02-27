@@ -634,21 +634,40 @@ DEMO_IMAGES = [
 # Grid auto-adjusts to any number of images (4 per row).
 
 TEAM = [
-    {"name":"Suhani","initials":"S","role":"Team Leader",
+    {
+     "name":"Suhani",
+     "initials":"S",
+     "role":"Team Leader",
      "academic":"DAE Software Student",
      "linkedin":"https://www.linkedin.com/in/suhan-i/",
      "github":"https://github.com/SUHAN-I",
-     "contact":"https://wa.me/923359997679"},
-    {"name":"Hasnain Ahmad","initials":"H","role":"Team Member","academic":"BS Computer Science (Student)","image": "images/Hasnain.jpeg",
-     "linkedin":"https://www.linkedin.com/in/hasnain-ahmad-047210349","github":"https://github.com/HasnainAhmad67","contact":"https://www.linkedin.com/in/hasnain-ahmad-047210349"},
-    {"name":"Muhammad Haroon ul Hasnain","initials":"H","role":"Team Member",
+     "contact":"https://wa.me/923359997679"
+    },
+
+    {
+     "name":"Hasnain Ahmad",
+     "initials":"H",
+     "role":"Team Member",
+     "academic":"BS Computer Science (Student)",
+     "image":"images/Hasnain.jpeg",
+     "linkedin":"https://www.linkedin.com/in/hasnain-ahmad-047210349",
+     "github":"https://github.com/HasnainAhmad67",
+     "contact":"https://www.linkedin.com/in/hasnain-ahmad-047210349"
+    },
+
+    {
+     "name":"Muhammad Haroon ul Hasnain",
+     "initials":"H",
+     "role":"Team Member",
      "academic":"MPhil BA & DA",
+     "image":"images/haroon.png",
      "linkedin":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain",
      "github":"https://github.com/hasnain1669",
-     "contact":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain"},
-    # ── Add new members below — links optional, use "" if not yet available ──
-    #{"name":"","initials":"","role":"","academic":"","linkedin":"","github":"", "contact":""},
-     None, None,   # placeholders — replace None with a member dict when ready
+     "contact":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain"
+    },
+
+    None,
+    None
 ]
 # Grid auto-adjusts: just append more member dicts above and remove a None.
 
@@ -1549,10 +1568,11 @@ def render_demo_tab(lang, vclient, components, db):
             st.error(f"Demo error: {e}")
 
 
-# ════════════════════════════════════════════════════════════
 # TAB: TEAM
 # ════════════════════════════════════════════════════════════
+
 def render_team_tab(lang):
+
     st.markdown(f"""<div style="text-align:center;padding:1.5rem 1rem 1rem">
         <h2 style="font-family:Syne,sans-serif;color:#0f172a;font-size:1.75rem;margin:0">
             {t('team_title',lang)}</h2>
@@ -1564,27 +1584,45 @@ def render_team_tab(lang):
     TEAM_COLS = 5
     real_members = [m for m in TEAM if m is not None]
     placeholders  = [m for m in TEAM if m is None]
-    all_slots     = real_members + placeholders  # real first, then placeholders
+    all_slots     = real_members + placeholders
 
     for row_start in range(0, len(all_slots), TEAM_COLS):
         row = all_slots[row_start : row_start + TEAM_COLS]
         cols = st.columns(TEAM_COLS)
+
         for ci, member in enumerate(row):
             with cols[ci]:
+
                 if member:
-                    li = member.get("linkedin",""); gh = member.get("github","")
-                    ac = member.get("academic",""); ct = member.get("contact","")
+
+                    li = member.get("linkedin","")
+                    gh = member.get("github","")
+                    ac = member.get("academic","")
+                    ct = member.get("contact","")
+
                     links = ""
                     if li: links += f'<a href="{li}" target="_blank" class="t-link">in LinkedIn</a>'
                     if gh: links += f'<a href="{gh}" target="_blank" class="t-link">⌥ GitHub</a>'
                     if ct: links += f'<a href="{ct}" target="_blank" class="t-link">📞 Contact</a>'
-                    st.markdown(f"""<div class="team-card">
-    <img src="{member.get('image','https://via.placeholder.com/90')}"  style="width:90px;height:90px;border-radius:50%;object-fit:cover;margin-bottom:0.6rem;">
-    <div class="t-name">{member['name']}</div>
-    <div class="t-role">{member['role']}</div>
-    {"<div class='t-acad'>"+ac+"</div>" if ac else ""}
-    <div class="t-links">{links if links else '<span style=\"color:#94a3b8;font-size:0.75rem\">Links coming soon</span>'}</div>
-</div>""", unsafe_allow_html=True)
+
+                    # IMAGE OR INITIALS
+                    img = member.get("image")
+
+                    if img:
+                        avatar = f'<img src="{img}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;margin-bottom:0.6rem;">'
+                    else:
+                        avatar = f'<div style="width:90px;height:90px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;margin:auto;margin-bottom:0.6rem;font-weight:600;color:#475569;font-size:1.4rem">{member["initials"]}</div>'
+
+                    st.markdown(f"""
+<div class="team-card">
+{avatar}
+<div class="t-name">{member['name']}</div>
+<div class="t-role">{member['role']}</div>
+{"<div class='t-acad'>"+ac+"</div>" if ac else ""}
+<div class="t-links">{links if links else '<span style="color:#94a3b8;font-size:0.75rem">Links coming soon</span>'}</div>
+</div>
+""", unsafe_allow_html=True)
+
                 else:
                     slot_n = row_start + ci + 1
                     st.markdown(f"""<div class="t-ph">
@@ -1594,6 +1632,7 @@ def render_team_tab(lang):
                     </div>""", unsafe_allow_html=True)
 
     st.markdown("---")
+
     st.markdown("""<div style="background:linear-gradient(135deg,#14532d,#166534);
         border-radius:var(--r-lg);padding:1.5rem 2rem">
         <h4 style="color:white;margin:0 0 0.9rem;font-family:Syne,sans-serif">🌿 About This Project</h4>
@@ -1608,7 +1647,6 @@ def render_team_tab(lang):
                 <span style="color:rgba(255,255,255,0.82)">Helping kabariwalas access real market intelligence</span></div>
         </div>
     </div>""", unsafe_allow_html=True)
-
 
 # ════════════════════════════════════════════════════════════
 # SIDEBAR
