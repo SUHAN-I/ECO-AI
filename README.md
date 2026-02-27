@@ -580,7 +580,7 @@ Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
 <!-- ═══ MEMBER 5 ═══ -->
 <td align="center" width="200">
 <a href="https://github.com/YOUR-GITHUB-5">
-<img src="https://ui-avatars.com/api/?name=Muhammad+Haroon&background=2d7a2d&color=ffffff&size=120&bold=true&rounded=true" width="100" height="100" style="border-radius:50%; border:3px solid #2d7a2d;"/></a>
+<img src="C:\Users\T15\Downloads\Hasnain Pic.png"/></a>
 <br/><br/>
 <b>Muhammad Haroon ul Hasnain</b>
 <br/>
@@ -588,9 +588,9 @@ Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
 <br/>
 <sub>MPhil BA & DA</sub>
 <br/><br/>
-<a href="https://github.com/YOUR-GITHUB-5"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"/></a>
-<a href="https://linkedin.com/in/YOUR-LINKEDIN-5"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
-<a href="https://huggingface.co/YOUR-HF-5"><img src="https://img.shields.io/badge/🤗-FFD21E?style=flat-square" alt="HuggingFace"/></a>
+<a href="https://github.com/hasnain1669"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"/></a>
+<a href="https://linkedin.com/in/muhammad-haroon-ul-hasnain/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
+<a href="https://huggingface.co/hasnain1669"><img src="https://img.shields.io/badge/🤗-FFD21E?style=flat-square" alt="HuggingFace"/></a>
 </td>
 
 <td></td>
@@ -644,7 +644,7 @@ Contributions from developers, chemists, domain experts, and policy makers are a
 git checkout -b feature/your-feature-name
 
 # 3. Commit your changes
-git commit -m "Add: brief description of change"
+git commit -m "Add: brief description of change."
 
 # 4. Push & open a Pull Request
 git push origin feature/your-feature-name
