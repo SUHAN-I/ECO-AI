@@ -1579,7 +1579,7 @@ def render_team_tab(lang):
                     if gh: links += f'<a href="{gh}" target="_blank" class="t-link">⌥ GitHub</a>'
                     if ct: links += f'<a href="{ct}" target="_blank" class="t-link">📞 Contact</a>'
                     st.markdown(f"""<div class="team-card">
-    <img src="{member['image']}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;margin-bottom:0.6rem;">
+    <img src="{member.get('image','https://via.placeholder.com/90')}"  style="width:90px;height:90px;border-radius:50%;object-fit:cover;margin-bottom:0.6rem;">
     <div class="t-name">{member['name']}</div>
     <div class="t-role">{member['role']}</div>
     {"<div class='t-acad'>"+ac+"</div>" if ac else ""}
