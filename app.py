@@ -634,37 +634,25 @@ DEMO_IMAGES = [
 # Grid auto-adjusts to any number of images (4 per row).
 
 TEAM = [
-    {
-     "name":"Suhani",
-     "initials":"S",
-     "role":"Team Leader",
+    {"name":"Suhani","initials":"S","role":"Team Leader",
      "academic":"DAE Software Student",
      "linkedin":"https://www.linkedin.com/in/suhan-i/",
      "github":"https://github.com/SUHAN-I",
-     "contact":"https://wa.me/923359997679"
-    },
+     "contact":"https://wa.me/923359997679"},
 
-    {
-     "name":"Hasnain Ahmad",
-     "initials":"H",
-     "role":"Team Member",
+    {"name":"Hasnain Ahmad","initials":"H","role":"Team Member",
      "academic":"BS Computer Science (Student)",
      "image":"images/Hasnain.jpeg",
      "linkedin":"https://www.linkedin.com/in/hasnain-ahmad-047210349",
      "github":"https://github.com/HasnainAhmad67",
-     "contact":"https://www.linkedin.com/in/hasnain-ahmad-047210349"
-    },
+     "contact":"https://www.linkedin.com/in/hasnain-ahmad-047210349"},
 
-    {
-     "name":"Muhammad Haroon ul Hasnain",
-     "initials":"H",
-     "role":"Team Member",
+    {"name":"Muhammad Haroon ul Hasnain","initials":"H","role":"Team Member",
      "academic":"MPhil BA & DA",
-     "image":"images/haroon.png",
+     "image":"images/Hasnain Pic.png",
      "linkedin":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain",
      "github":"https://github.com/hasnain1669",
-     "contact":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain"
-    },
+     "contact":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain"},
 
     None,
     None
