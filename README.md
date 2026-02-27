@@ -512,8 +512,8 @@ Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
 
 <!-- ═══ TEAM LEADER ═══ -->
 <td align="center" width="200">
-<a href="https://github.com/YOUR-GITHUB-1">
-<img src="https://ui-avatars.com/api/?name=Suhani+Abdul+Razzaq&background=1a4d1a&color=ffffff&size=120&bold=true&rounded=true" width="100" height="100" style="border-radius:50%; border:3px solid #2d7a2d;"/></a>
+<a href="https://github.com/SUHAN-I">
+<img src="https://github.com/user-attachments/assets/451ce3f3-e0c0-4d4b-a78c-94ed0f3ad86f" width="100" height="100" style="border-radius:50%; border:3px solid #2d7a2d;"/></a>
 <br/><br/>
 <b>Suhani Abdul Razzaq</b>
 <br/>
@@ -521,15 +521,15 @@ Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
 <br/>
 <sub>DAE Software Technology</sub>
 <br/><br/>
-<a href="https://github.com/YOUR-GITHUB-1"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"/></a>
-<a href="https://linkedin.com/in/YOUR-LINKEDIN-1"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
+<a href="https://github.com/SUHAN-I"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"/></a>
+<a href="https://linkedin.com/in/suhan-i/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
 <a href="https://huggingface.co/YOUR-HF-1"><img src="https://img.shields.io/badge/🤗-FFD21E?style=flat-square" alt="HuggingFace"/></a>
 </td>
 
 <!-- ═══ MEMBER 2 ═══ -->
 <td align="center" width="200">
-<a href="https://github.com/YOUR-GITHUB-2">
-<img src="https://ui-avatars.com/api/?name=Hasnain+Ahmad&background=2d7a2d&color=ffffff&size=120&bold=true&rounded=true" width="100" height="100" style="border-radius:50%; border:3px solid #2d7a2d;"/></a>
+<a href="https://github.com/HasnainAhmad67">
+<img src="https://github.com/user-attachments/assets/976e67de-9bdb-4c2c-8763-6f8c2c585859" width="100" height="100" style="border-radius:50%; border:3px solid #2d7a2d;"/></a>
 <br/><br/>
 <b>Hasnain Ahmad</b>
 <br/>
@@ -537,9 +537,9 @@ Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
 <br/>
 <sub>BS Computer Science</sub>
 <br/><br/>
-<a href="https://github.com/YOUR-GITHUB-2"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"/></a>
-<a href="https://linkedin.com/in/YOUR-LINKEDIN-2"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
-<a href="https://huggingface.co/YOUR-HF-2"><img src="https://img.shields.io/badge/🤗-FFD21E?style=flat-square" alt="HuggingFace"/></a>
+<a href="https://github.com/HasnainAhmad67"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"/></a>
+<a href="https://linkedin.com/in/hasnain-ahmad-047210349/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
+<a href="https://huggingface.co/hasnainahmad167"><img src="https://img.shields.io/badge/🤗-FFD21E?style=flat-square" alt="HuggingFace"/></a>
 </td>
 
 <!-- ═══ MEMBER 3 ═══ -->
