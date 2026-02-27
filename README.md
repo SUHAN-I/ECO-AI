@@ -19,8 +19,6 @@ gives real-time local scrap value, and provides business roadmaps to convert was
 <a href="https://github.com/YOUR-USERNAME/eco-ai"><img src="https://img.shields.io/badge/GitHub-ECO--AI-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/></a>
 &nbsp;
 <a href="https://www.linkedin.com/company/eco-ai"><img src="https://img.shields.io/badge/LinkedIn-ECO%20AI-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
-&nbsp;
-<a href="https://huggingface.co/spaces/YOUR-USERNAME/eco-ai"><img src="https://img.shields.io/badge/🤗%20HuggingFace-ECO--AI-FFD21E?style=for-the-badge" alt="HuggingFace"/></a>
 
 <br/><br/>
 
@@ -76,7 +74,7 @@ Pakistan generates **30+ million metric tons** of municipal solid waste annually
 
 ### The Scale of the Crisis
 
-- 🇵🇰 Pakistan generates **30M+ metric tons** of waste/year — only a small fraction recycled
+- 🇵🇰 Pakistan generates **30M+ metric tons** of waste/year — only a small fraction is recycled
 - 💸 **$1.2 billion** lost yearly as valuable materials are landfilled instead of industrialized
 - 👷 Informal collectors lose **up to 40% income** to middlemen due to lack of pricing transparency
 - 🏢 Corporations struggle with **2026 EPR compliance** — missing Digital Product Passports
@@ -523,7 +521,7 @@ Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
 <br/><br/>
 <a href="https://github.com/SUHAN-I"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"/></a>
 <a href="https://linkedin.com/in/suhan-i/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
-<a href="https://huggingface.co/YOUR-HF-1"><img src="https://img.shields.io/badge/🤗-FFD21E?style=flat-square" alt="HuggingFace"/></a>
+<a href="https://huggingface.co/SUHAN-1"><img src="https://img.shields.io/badge/🤗-FFD21E?style=flat-square" alt="HuggingFace"/></a>
 </td>
 
 <!-- ═══ MEMBER 2 ═══ -->
@@ -619,7 +617,7 @@ Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
 - 💳 **Green Finance Layer** — carbon credit generation and trading for verified waste diversion
 - 🏛️ **Policy Intelligence** — AI-driven EPR regulation advisory tools for governments
 
-> *"We can make this vision turn to reality through innovative thinking and collective action."*
+> *"We can make this vision turn into reality through innovative thinking and collective action."*
 > — **ECO AI Team, 2026**
 
 ---
@@ -650,8 +648,7 @@ git push origin feature/your-feature-name
 |-|----------|------|
 | 🌐 | **Website** | [www.eco.ai](https://www.eco.ai) — will replace with live URL soon |
 | 🐙 | **GitHub** | [github.com/hasnain1669/eco-ai](https://github.com/hasnain1669/eco-ai) |
-| 💼 | **LinkedIn** | [linkedin.com/company/eco-ai](https://www.linkedin.com/company/eco-ai) |
-| 🤗 | **HuggingFace** | [huggingface.co/spaces/hasnain1669/eco-ai](https://huggingface.co/spaces/hasnain1669/eco-ai) |
+| 💼 | **LinkedIn** | [linkedin.com/muhammad-haroon-ul-hasnain//eco-ai](https://www.linkedin.com/muhammad-haroon-ul-hasnain//eco-ai) |
 | 📧 | **Email** | contact@eco.ai — will replace with real email soon |
 
 </div>
