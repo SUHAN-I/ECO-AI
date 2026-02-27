@@ -639,14 +639,15 @@ TEAM = [
      "linkedin":"https://www.linkedin.com/in/suhan-i/",
      "github":"https://github.com/SUHAN-I",
      "contact":"https://wa.me/923359997679"},
+    {"name":"Hasnain Ahmad","initials":"H","role":"Team Member","academic":"BS Computer Science (Student)",
+     "linkedin":"https://www.linkedin.com/in/hasnain-ahmad-047210349","github":"https://github.com/HasnainAhmad67","contact":"https://www.linkedin.com/in/hasnain-ahmad-047210349"},
     {"name":"Muhammad Haroon ul Hasnain","initials":"H","role":"Team Member",
      "academic":"MPhil BA & DA",
      "linkedin":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain",
      "github":"https://github.com/hasnain1669",
      "contact":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain"},
     # ── Add new members below — links optional, use "" if not yet available ──
-    {"name":"Hasnain Ahmad","initials":"H","role":"Team Member","academic":"BS CS",
-     "linkedin":"https://www.linkedin.com/in/hasnain-ahmad-047210349","github":"https://github.com/HasnainAhmad67","contact":"https://www.linkedin.com/in/hasnain-ahmad-047210349"},
+    #{"name":"","initials":"","role":"","academic":"","linkedin":"","github":"", "contact":""},
      None, None,   # placeholders — replace None with a member dict when ready
 ]
 # Grid auto-adjusts: just append more member dicts above and remove a None.
