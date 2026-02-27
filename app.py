@@ -639,7 +639,7 @@ TEAM = [
      "linkedin":"https://www.linkedin.com/in/suhan-i/",
      "github":"https://github.com/SUHAN-I",
      "contact":"https://wa.me/923359997679"},
-    {"name":"Hasnain Ahmad","initials":"H","role":"Team Member","academic":"BS Computer Science (Student)",
+    {"name":"Hasnain Ahmad","initials":"H","role":"Team Member","academic":"BS Computer Science (Student)","image": "images/hasnain.jpg",
      "linkedin":"https://www.linkedin.com/in/hasnain-ahmad-047210349","github":"https://github.com/HasnainAhmad67","contact":"https://www.linkedin.com/in/hasnain-ahmad-047210349"},
     {"name":"Muhammad Haroon ul Hasnain","initials":"H","role":"Team Member",
      "academic":"MPhil BA & DA",
@@ -1579,12 +1579,12 @@ def render_team_tab(lang):
                     if gh: links += f'<a href="{gh}" target="_blank" class="t-link">⌥ GitHub</a>'
                     if ct: links += f'<a href="{ct}" target="_blank" class="t-link">📞 Contact</a>'
                     st.markdown(f"""<div class="team-card">
-                        <div class="t-avatar">{member['initials']}</div>
-                        <div class="t-name">{member['name']}</div>
-                        <div class="t-role">{member['role']}</div>
-                        {"<div class='t-acad'>"+ac+"</div>" if ac else ""}
-                        <div class="t-links">{links if links else '<span style=\"color:#94a3b8;font-size:0.75rem\">Links coming soon</span>'}</div>
-                    </div>""", unsafe_allow_html=True)
+    <img src="{member['image']}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;margin-bottom:0.6rem;">
+    <div class="t-name">{member['name']}</div>
+    <div class="t-role">{member['role']}</div>
+    {"<div class='t-acad'>"+ac+"</div>" if ac else ""}
+    <div class="t-links">{links if links else '<span style=\"color:#94a3b8;font-size:0.75rem\">Links coming soon</span>'}</div>
+</div>""", unsafe_allow_html=True)
                 else:
                     slot_n = row_start + ci + 1
                     st.markdown(f"""<div class="t-ph">
