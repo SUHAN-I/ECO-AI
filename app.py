@@ -645,9 +645,9 @@ TEAM = [
      "github":"https://github.com/hasnain1669",
      "contact":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain"},
     # ── Add new members below — links optional, use "" if not yet available ──
-    # {"name":"Ali Raza","initials":"A","role":"Team Member","academic":"BS CS",
-    #  "linkedin":"","github":"","contact":""},
-    None, None, None,   # placeholders — replace None with a member dict when ready
+    {"name":"Hasnain Ahmad","initials":"H","role":"Team Member","academic":"BS CS",
+     "linkedin":"https://www.linkedin.com/in/hasnain-ahmad-047210349","github":"https://github.com/HasnainAhmad67","contact":"https://www.linkedin.com/in/hasnain-ahmad-047210349"},
+     None, None,   # placeholders — replace None with a member dict when ready
 ]
 # Grid auto-adjusts: just append more member dicts above and remove a None.
 
