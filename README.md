@@ -580,7 +580,7 @@ Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
 <!-- ═══ MEMBER 5 ═══ -->
 <td align="center" width="200">
 <a href="https://github.com/YOUR-GITHUB-5">
-<img src="[C:\Users\T15\Downloads\Hasnain Pic.png"](https://github.com/user-attachments/assets/1aa158d0-83cc-467b-934b-11cef71d4f43")/></a>
+<img src="[C:\Users\T15\Downloads\Hasnain Pic.png"](https://github.com/user-attachments/assets/1aa158d0-83cc-467b-934b-11cef71d4f43") width="100" height="100" style="border-radius:50%; border:3px solid #2d7a2d;"/></a>
 <br/><br/>
 <b>Muhammad Haroon ul Hasnain</b>
 <br/>
