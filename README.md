@@ -563,8 +563,8 @@ Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
 
 <!-- ═══ MEMBER 4 ═══ -->
 <td align="center" width="200">
-<a href="https://github.com/YOUR-GITHUB-4">
-<img src="https://ui-avatars.com/api/?name=Daniya+Anwar&background=1a4d1a&color=ffffff&size=120&bold=true&rounded=true" width="100" height="100" style="border-radius:50%; border:3px solid #2d7a2d;"/></a>
+<a href="https://github.com/daniyakhadija-0814">
+<img src="https://github.com/user-attachments/assets/31e633c7-e8f9-4ecc-9298-1768767c9399" width="100" height="100" style="border-radius:50%; border:3px solid #2d7a2d;"/></a>
 <br/><br/>
 <b>Daniya Anwar</b>
 <br/>
@@ -572,8 +572,8 @@ Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
 <br/>
 <sub>MS Biochemistry</sub>
 <br/><br/>
-<a href="https://github.com/YOUR-GITHUB-4"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"/></a>
-<a href="https://linkedin.com/in/YOUR-LINKEDIN-4"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
+<a href="https://github.com/daniyakhadija-0814"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"/></a>
+<a href="https://linkedin.com/in/daniya-anwar"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
 <a href="https://huggingface.co/YOUR-HF-4"><img src="https://img.shields.io/badge/🤗-FFD21E?style=flat-square" alt="HuggingFace"/></a>
 </td>
 
@@ -596,16 +596,6 @@ Add secrets above in **HuggingFace Space → Settings → Repository Secrets**.
 <td></td>
 </tr>
 </table>
-
-### Replacing Placeholder Links — Quick Guide
-
-| Placeholder | Replace With |
-|------------|-------------|
-| `YOUR-USERNAME` | Your GitHub repo username |
-| `YOUR-GITHUB-1` … `YOUR-GITHUB-5` | Each member's GitHub username |
-| `YOUR-LINKEDIN-1` … `YOUR-LINKEDIN-5` | Each member's LinkedIn profile handle |
-| `YOUR-HF-1` … `YOUR-HF-5` | Each member's HuggingFace username |
-| `ui-avatars.com/…` URL | Direct URL to each member's actual photo |
 
 ---
 
@@ -658,11 +648,11 @@ git push origin feature/your-feature-name
 
 | | Platform | Link |
 |-|----------|------|
-| 🌐 | **Website** | [www.eco.ai](https://www.eco.ai) — replace with live URL |
-| 🐙 | **GitHub** | [github.com/YOUR-USERNAME/eco-ai](https://github.com/YOUR-USERNAME/eco-ai) |
+| 🌐 | **Website** | [www.eco.ai](https://www.eco.ai) — will replace with live URL soon |
+| 🐙 | **GitHub** | [github.com/hasnain1669/eco-ai](https://github.com/hasnain1669/eco-ai) |
 | 💼 | **LinkedIn** | [linkedin.com/company/eco-ai](https://www.linkedin.com/company/eco-ai) |
-| 🤗 | **HuggingFace** | [huggingface.co/spaces/YOUR-USERNAME/eco-ai](https://huggingface.co/spaces/YOUR-USERNAME/eco-ai) |
-| 📧 | **Email** | contact@eco.ai — replace with real email |
+| 🤗 | **HuggingFace** | [huggingface.co/spaces/hasnain1669/eco-ai](https://huggingface.co/spaces/hasnain1669/eco-ai) |
+| 📧 | **Email** | contact@eco.ai — will replace with real email soon |
 
 </div>
 
