@@ -62,13 +62,9 @@ h1,h2,h3,h4,h5 {
     color       : var(--text-1) !important;
     line-height : 1.2 !important;
 }
-/* Base text — only applies to streamlit-generated markdown, not custom HTML */
-.stMarkdown > div > p,
-.stMarkdown > div > ul > li,
-.stMarkdown > div > ol > li { color: var(--text-2); }
+p, li, div { color: var(--text-2); }
 small, caption, .caption { color: var(--text-3) !important; }
-/* strong/b: only in markdown, not inside custom inline-styled HTML */
-.stMarkdown strong, .stMarkdown b { color: var(--text-1) !important; font-weight: 600 !important; }
+strong, b { color: var(--text-1) !important; font-weight: 600 !important; }
 a { color: var(--green-mid) !important; }
 code {
     background    : var(--green-bg) !important;
@@ -78,76 +74,30 @@ code {
     font-size     : 0.85em !important;
 }
 
-/* ── Sidebar ── */
+/* ── Sidebar — collapsible with visible arrow ── */
 [data-testid="stSidebar"] {
-    background   : var(--white) !important;
-    border-right : 1px solid var(--border) !important;
+    background    : var(--white) !important;
+    border-right  : 1px solid var(--border) !important;
 }
-/* Main content area always fills available width */
-[data-testid="stAppViewContainer"] > section:last-child,
-[data-testid="stMain"] {
-    width          : 100% !important;
-    min-width      : 0 !important;
-    flex           : 1 1 0% !important;
-    overflow-x     : hidden !important;
-}
-
-/* ── Sidebar: open/close button INSIDE the sidebar ── */
-[data-testid="stSidebar"] button[kind="header"],
-[data-testid="stSidebarCollapseButton"] button {
-    background    : var(--green) !important;
-    border        : none !important;
-    border-radius : 50% !important;
-    color         : #fff !important;
-}
-[data-testid="stSidebar"] button[kind="header"] svg,
-[data-testid="stSidebarCollapseButton"] button svg {
-    fill  : #fff !important;
-    color : #fff !important;
-}
-
-/* ── Sidebar EXPAND tab — visible green pull-tab when sidebar is closed ──
-   Targets every testid Streamlit has ever used for this element           */
-[data-testid="collapsedControl"],
-[data-testid="stSidebarCollapsedControl"],
-section[data-testid="stSidebar"][aria-expanded="false"] ~ div button,
-div[data-testid="collapsedControl"] {
+/* Make collapse arrow always visible and styled */
+[data-testid="collapsedControl"] {
     display          : flex !important;
     visibility       : visible !important;
-    opacity          : 1 !important;
     background       : var(--green) !important;
-    border-radius    : 0 10px 10px 0 !important;
-    width            : 32px !important;
-    min-height       : 60px !important;
-    padding          : 0 !important;
+    border-radius    : 0 8px 8px 0 !important;
+    color            : white !important;
+    width            : 24px !important;
     align-items      : center !important;
     justify-content  : center !important;
-    box-shadow       : 3px 0 10px rgba(22,101,52,0.3) !important;
-    cursor           : pointer !important;
-    transition       : background 0.15s !important;
-    border           : none !important;
-    z-index          : 9998 !important;
+    box-shadow       : 2px 0 8px rgba(0,0,0,0.12) !important;
+    top              : 50% !important;
+    z-index          : 999 !important;
 }
-[data-testid="collapsedControl"]:hover,
-[data-testid="stSidebarCollapsedControl"]:hover {
-    background : #14532d !important;
+[data-testid="collapsedControl"]:hover {
+    background: #14532d !important;
 }
-[data-testid="collapsedControl"] svg,
-[data-testid="stSidebarCollapsedControl"] svg,
-[data-testid="collapsedControl"] button svg {
-    fill  : #fff !important;
-    color : #fff !important;
-    width : 18px !important;
-    height: 18px !important;
-}
-
-/* ── Remove X close button from dialogs/modals ── */
-[data-testid="stModal"] > div > div > div:first-child button,
-[data-testid="stBaseButton-header"],
-button[aria-label="Close"],
-[data-baseweb="modal"] button[aria-label="close"],
-.stModal [data-testid="stHeaderActionElements"] button {
-    display : none !important;
+[data-testid="collapsedControl"] svg {
+    fill: white !important;
 }
 
 /* ── Streamlit overrides ── */
@@ -158,40 +108,21 @@ button[aria-label="Close"],
     font-size     : 0.88rem !important;
     transition    : all 0.15s !important;
 }
-/* Primary button — white text, must target inner elements too */
 .stButton > button[kind="primary"] {
     background : var(--green) !important;
     border     : none !important;
     color      : #ffffff !important;
 }
-.stButton > button[kind="primary"] p,
-.stButton > button[kind="primary"] span,
-.stButton > button[kind="primary"] div,
-.stButton > button[kind="primary"] * {
-    color : #ffffff !important;
+.stButton > button[kind="primary"]:hover {
+    background : #14532d !important;
 }
-.stButton > button[kind="primary"]:hover { background : #14532d !important; }
-
-/* Secondary button — green text */
 .stButton > button[kind="secondary"] {
     background : var(--white) !important;
     border     : 1.5px solid var(--green) !important;
     color      : var(--green) !important;
 }
-.stButton > button[kind="secondary"] p,
-.stButton > button[kind="secondary"] span,
-.stButton > button[kind="secondary"] div,
-.stButton > button[kind="secondary"] * {
-    color : var(--green) !important;
-}
-.stButton > button[kind="secondary"]:hover { background : var(--green-bg) !important; }
-
-/* Tertiary / any other button kind — dark text */
-.stButton > button:not([kind="primary"]):not([kind="secondary"]) {
-    color : var(--text-1) !important;
-}
-.stButton > button:not([kind="primary"]):not([kind="secondary"]) * {
-    color : var(--text-1) !important;
+.stButton > button[kind="secondary"]:hover {
+    background : var(--green-bg) !important;
 }
 .stTextInput > div > div > input,
 .stTextArea  > div > div > textarea,
@@ -244,61 +175,6 @@ label, .stRadio label, .stCheckbox label {
 }
 .stAlert { border-radius: var(--r-sm) !important; }
 #MainMenu, footer, header { visibility: hidden !important; }
-
-/* ── High-contrast text — always readable in every condition ── */
-/* Streamlit applies generic color rules that can clash — override explicitly */
-.stMarkdown p, .stMarkdown li,
-[data-testid="stMarkdownContainer"] p { color: var(--text-2) !important; }
-.stMarkdown strong, .stMarkdown b,
-[data-testid="stMarkdownContainer"] strong { color: var(--text-1) !important; }
-.stMarkdown h1,.stMarkdown h2,.stMarkdown h3,.stMarkdown h4 { color: var(--text-1) !important; }
-.stMarkdown a { color: var(--green-mid) !important; }
-.stMarkdown code { color: var(--green) !important; background: var(--green-bg) !important; }
-/* NOTE: Do NOT override span/div colors globally — inline styles in custom HTML
-   (e.g. white text on dark-green About section) must be respected. */
-
-/* ── Dialog / Modal — all text must be readable ── */
-[data-testid="stModal"] p,
-[data-testid="stModal"] span,
-[data-testid="stModal"] label,
-[data-testid="stModal"] div { color: var(--text-2) !important; }
-[data-testid="stModal"] strong,
-[data-testid="stModal"] b { color: var(--text-1) !important; }
-[data-testid="stModal"] h1,
-[data-testid="stModal"] h2,
-[data-testid="stModal"] h3 { color: var(--text-1) !important; }
-/* Dialog button text — must always show */
-[data-testid="stModal"] .stButton > button[kind="primary"] {
-    background : var(--green) !important;
-    color      : #ffffff !important;
-    font-weight: 700 !important;
-}
-[data-testid="stModal"] .stButton > button[kind="secondary"] {
-    background : var(--white) !important;
-    color      : var(--green) !important;
-    border     : 1.5px solid var(--green) !important;
-    font-weight: 600 !important;
-}
-[data-testid="stModal"] .stButton > button {
-    color : var(--text-1) !important; /* fallback for any other button kind */
-}
-/* Captions and small text in dialogs */
-[data-testid="stModal"] .stCaption,
-[data-testid="stModal"] small { color: var(--text-3) !important; }
-/* Radio and checkbox labels inside dialogs */
-[data-testid="stModal"] .stRadio label,
-[data-testid="stModal"] .stCheckbox label { color: var(--text-2) !important; }
-/* Inputs inside dialogs */
-[data-testid="stModal"] input,
-[data-testid="stModal"] textarea { color: var(--text-1) !important; background: var(--white) !important; }
-
-/* ── Sidebar text always readable ── */
-[data-testid="stSidebar"] p,
-[data-testid="stSidebar"] div,
-[data-testid="stSidebar"] span { color: var(--text-2) !important; }
-[data-testid="stSidebar"] strong,
-[data-testid="stSidebar"] b { color: var(--text-1) !important; }
-[data-testid="stSidebar"] label { color: var(--text-2) !important; }
 
 /* ── Header banner ── */
 .eco-header {
@@ -518,59 +394,27 @@ label, .stRadio label, .stCheckbox label {
    MOBILE — max-width 768px
 ══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-    /* Sidebar: start collapsed on mobile, full-width when open */
-    [data-testid="stSidebar"] {
-        position  : absolute !important;
-        z-index   : 1000 !important;
-        width     : 85vw !important;
-        max-width : 320px !important;
-        box-shadow: 4px 0 20px rgba(0,0,0,0.15) !important;
-    }
-
-    /* Header — compact */
-    .eco-header { padding:1rem 0.9rem; border-radius:var(--r-md); }
-    .eco-header h1 { font-size:1.2rem !important; }
-    .eco-header p  { font-size:0.8rem; }
+    /* Header */
+    .eco-header { padding:1.2rem 1rem; border-radius:var(--r-md); }
+    .eco-header h1 { font-size:1.25rem !important; }
     .eco-header::after { display:none; }
 
-    /* Cards & boxes — tighter padding */
-    .card, .ai-box, .review-box { padding:0.9rem; }
-    .ai-box { font-size:0.87rem; line-height:1.75; }
+    /* Cards & boxes */
+    .card, .ai-box, .review-box { padding:1rem; }
+    .ai-box { font-size:0.88rem; }
 
-    /* Team cards — 2 per row via Streamlit columns */
-    .team-card { padding:1rem 0.75rem; }
-    .t-avatar  { width:54px; height:54px; font-size:1.3rem; }
-    .t-name    { font-size:0.82rem !important; }
-    .t-links   { flex-direction:column; align-items:center; }
-    .t-link    { font-size:0.7rem !important; padding:0.2rem 0.5rem !important; }
+    /* Team grid: 2 columns on mobile */
+    .team-card { padding:1.1rem 0.8rem; }
+    .t-avatar  { width:58px; height:58px; font-size:1.4rem; }
 
-    /* Result card grid: 2x2 on mobile */
-    .res-grid { grid-template-columns: repeat(2,1fr) !important; }
+    /* Metrics stack better */
+    [data-testid="column"] { padding:0.15rem !important; }
 
-    /* Metrics */
-    [data-testid="column"] { padding:0.1rem !important; }
-
-    /* Tabs */
-    .stTabs [data-baseweb="tab"] { font-size:0.76rem !important; padding:0.35rem 0.4rem !important; }
+    /* Tabs: compact text */
+    .stTabs [data-baseweb="tab"] { font-size:0.78rem !important; padding:0.4rem 0.5rem !important; }
 
     /* Market table */
-    .mkt-row { font-size:0.8rem; }
-
-    /* User bar — stack vertically */
-    .user-bar { flex-direction:column; align-items:flex-start; gap:0.3rem; }
-    .user-bar .sep { display:none; }
-
-    /* Buttons — bigger touch targets */
-    .stButton > button { min-height:42px !important; font-size:0.82rem !important; }
-
-    /* Demo images — 2 per row */
-    .demo-grid-2col [data-testid="column"]:nth-child(n+3) { display:none; }
-
-    /* Input elements — full width */
-    .stTextInput, .stTextArea { width:100% !important; }
-
-    /* Navigation map buttons */
-    .nav-btn { font-size:0.74rem !important; padding:0.35rem 0.65rem !important; }
+    .mkt-row { font-size:0.82rem; }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -598,12 +442,10 @@ label, .stRadio label, .stCheckbox label {
     .block-container { padding: 1rem 1.2rem !important; }
 }
 @media (max-width: 480px) {
-    .eco-header h1 { font-size:1rem !important; }
-    .eco-header p  { font-size:0.76rem; }
-    .stButton > button { font-size:0.78rem !important; padding:0.35rem 0.5rem !important; min-height:40px !important; }
-    .badge { font-size:0.7rem !important; padding:0.12rem 0.5rem !important; }
-    /* Stack result card grid to 1 col on very small screens */
-    .res-grid { grid-template-columns: repeat(2,1fr) !important; gap:0.4rem !important; }
+    .eco-header h1 { font-size:1.05rem !important; }
+    .eco-header p  { font-size:0.78rem; }
+    .stButton > button { font-size:0.8rem !important; padding:0.4rem 0.6rem !important; }
+    .badge { font-size:0.72rem !important; padding:0.15rem 0.6rem !important; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -623,41 +465,36 @@ DEMO_IMAGES = [
      "url":"https://img.freepik.com/premium-photo/landfill-with-old-tires-tyres-recycling-reuse-waste-rubber-tyres-disposal-waste-tires-worn-out-wheels-recycling-tyre-dump-burning-plant-regenerated-tire-rubber-produced_140282-1356.jpg","hint":"Recyclable · Med"},
     {"label":"Organic Waste","emoji":"🍌","category":"organic",
      "url":"https://img.freepik.com/premium-photo/waste-vegetables-fruits-compost-heap-as-fertilizer-garden_317169-1266.jpg","hint":"Compost · Low"},
-    {"label":"Metal","emoji":"⚙️","category":"metal",
+    {"label":"Matel","emoji":"⚙️","category":"plastic",
      "url":"https://img.freepik.com/free-photo/dirty-dumped-objects-arrangement_23-2148996942.jpg","hint":"Recyclable · Med"},
-    {"label":"Mix Metal","emoji":"🔩","category":"metal",
+    {"label":"Mix Matel","emoji":"🔩","category":"cardboard",
      "url":"https://img.freepik.com/premium-photo/scrap-metal-yard_798657-22963.jpg","hint":"Recyclable · Med"},
-    {"label":"Mix Waste","emoji":"🗑","category":"trash",
+    {"label":"Mix Waste","emoji":"🗑","category":"glass",
      "url":"https://img.freepik.com/free-photo/old-rusty-junk-garbage-steel-rubber_1150-10991.jpg","hint":"Recyclable · Low"},
 ]
-# To add more demo images later, simply append a dict to DEMO_IMAGES above.
-# Grid auto-adjusts to any number of images (4 per row).
 
 TEAM = [
     {"name":"Suhani","initials":"S","role":"Team Leader",
      "academic":"DAE Software Student",
      "linkedin":"https://www.linkedin.com/in/suhan-i/",
-     "github":"https://github.com/SUHAN-I",
-     "contact":"https://wa.me/923359997679"},
-
-    {"name":"Hasnain Ahmad","initials":"H","role":"Team Member",
-     "academic":"BS Computer Science (Student)",
-     "image":"images/Hasnain.jpeg",
-     "linkedin":"https://www.linkedin.com/in/hasnain-ahmad-047210349",
-     "github":"https://github.com/HasnainAhmad67",
-     "contact":"https://www.linkedin.com/in/hasnain-ahmad-047210349"},
-
+     "github":"https://github.com/SUHAN-I"},
     {"name":"Muhammad Haroon ul Hasnain","initials":"H","role":"Team Member",
      "academic":"MPhil BA & DA",
-     "image":"images/Hasnain Pic.png",
      "linkedin":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain",
-     "github":"https://github.com/hasnain1669",
-     "contact":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain"},
-
-    None,
-    None
+     "github":"https://github.com/hasnain1669"},
+    {"name":"Yashfa Arooj Gill","initials":"Y","role":"Team Member",
+     "academic":"",
+     "linkedin":"",
+     "github":""},
+    {"name":"Daniya Khadija Anwar","initials":"D","role":"Team Member",
+     "academic":"",
+     "linkedin":"",
+     "github":""},
+    {"name":"Hasnain Ahmad","initials":"H","role":"Team Member",
+     "academic":"",
+     "linkedin":"",
+     "github":""},
 ]
-# Grid auto-adjusts: just append more member dicts above and remove a None.
 
 MARKET = {
     "Plastic"  :("PKR 60–140/kg",   "پلاسٹک"),
@@ -755,53 +592,6 @@ def harm_html(level, lang):
 def gmaps(lat,lng): return f"https://www.google.com/maps/dir/?api=1&destination={lat},{lng}"
 def osm(lat,lng):   return f"https://www.openstreetmap.org/directions?to={lat},{lng}"
 
-def fmt(text):
-    """
-    Convert plain AI text with basic markdown into readable HTML.
-    Handles: ## headings, **bold**, bullet lines (- / •), paragraphs.
-    """
-    import re
-    lines   = text.split("\n")
-    out     = []
-    in_list = False
-    for raw in lines:
-        line = raw.rstrip()
-        # Heading ##
-        if re.match(r"^#{1,3}\s+", line):
-            if in_list: out.append("</ul>"); in_list = False
-            htext = re.sub(r"^#{1,3}\s+","",line)
-            htext = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", htext)
-            out.append(f'<h4 style="font-family:Syne,sans-serif;color:#0f172a;'
-                       f'font-size:0.97rem;margin:1rem 0 0.3rem;font-weight:700">{htext}</h4>')
-        # Bullet line
-        elif re.match(r"^[-•*]\s+", line):
-            if not in_list: out.append('<ul style="margin:0.3rem 0 0.3rem 1.2rem;padding:0">'); in_list = True
-            item = re.sub(r"^[-•*]\s+","",line)
-            item = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", item)
-            out.append(f"<li style='margin-bottom:0.2rem;color:#334155'>{item}</li>")
-        # Numbered line
-        elif re.match(r"^\d+\.\s+", line):
-            if in_list: out.append("</ul>"); in_list = False
-            item = re.sub(r"^\d+\.\s+","",line)
-            item = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", item)
-            out.append(f'<p style="margin:0.15rem 0;color:#334155"><strong style="color:#166534">'
-                       f'{re.match(r"^\d+",raw).group()}.</strong> {item}</p>')
-        # Horizontal rule
-        elif line.startswith("---") or line.startswith("==="):
-            if in_list: out.append("</ul>"); in_list = False
-            out.append('<hr style="border:none;border-top:1px solid #e2e8f0;margin:0.7rem 0">')
-        # Empty line — paragraph break
-        elif line == "":
-            if in_list: out.append("</ul>"); in_list = False
-            out.append('<div style="height:0.4rem"></div>')
-        # Normal text
-        else:
-            if in_list: out.append("</ul>"); in_list = False
-            para = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", line)
-            out.append(f'<p style="margin:0.1rem 0;color:#334155">{para}</p>')
-    if in_list: out.append("</ul>")
-    return "\n".join(out)
-
 
 # ════════════════════════════════════════════════════════════
 # CACHED LOADERS
@@ -843,13 +633,9 @@ def init_state():
     defaults = {
         "show_nearby":False,"show_history":False,"show_market":False,
         "show_stats":False,"show_demo_images":False,"show_chat_hist":False,
-        "review_submitted":False,  # legacy key kept for safety
-        "review_submitted_scan":False,"review_submitted_scan2":False,"review_submitted_sb":False,
-        "last_vision":None,"rag_result":None,
+        "review_submitted":False,"last_vision":None,"rag_result":None,
         "input_mode":"image","session_id":str(uuid.uuid4())[:8],
         "save_preference":None,"current_user":None,"show_id_popup":False,
-        "modal_dismissed_count":0,
-        "demo_active_result":None,"voice_transcribed":"",
     }
     for k,v in defaults.items():
         if k not in st.session_state:
@@ -882,7 +668,7 @@ def save_chat(db, role, message, waste_type=""):
 @st.dialog("♻️ Welcome to Eco AI!")
 def _dialog_save_pref():
     st.markdown(
-        "<p style='text-align:center;color:#64748b;font-size:0.9rem;margin:0 0 1.2rem'>"
+        "<p style='text-align:center;color:#cccdcf;font-size:0.9rem;margin:0 0 1.2rem'>"
         "Would you like to save your scans and chat history for future visits?</p>",
         unsafe_allow_html=True)
     if st.button("✅  Yes — Save My Data", type="primary",
@@ -896,7 +682,6 @@ def _dialog_save_pref():
         st.session_state["current_user"] = {
             "user_id":"GUEST","name":"Guest","city":"—","is_new":False}
         st.rerun()
-    st.markdown("<div style='height:0.4rem'></div>", unsafe_allow_html=True)
 
 
 @st.dialog("👤 Create your account")
@@ -1003,19 +788,7 @@ def _dialog_id_popup():
 def render_user_modal(db):
     """Opens the correct native dialog based on session state."""
     if st.session_state.get("current_user"): return
-
-    # If user dismissed modal via native X (no button clicked),
-    # treat as guest after 1 dismissal to avoid looping.
-    dismissed = st.session_state.get("modal_dismissed_count", 0)
-
     if st.session_state["save_preference"] is None:
-        if dismissed >= 1:
-            # They closed via X — treat as guest, don't loop
-            st.session_state["save_preference"] = False
-            st.session_state["current_user"] = {
-                "user_id":"GUEST","name":"Guest","city":"—","is_new":False}
-            st.rerun()
-        st.session_state["modal_dismissed_count"] = dismissed + 1
         _dialog_save_pref()
     elif st.session_state["save_preference"] and not st.session_state.get("current_user"):
         _dialog_register(db)
@@ -1058,7 +831,7 @@ def render_result_card(v, lang):
                     {v.get('urdu_label','نامعلوم')}</div>
             </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.7rem;margin-bottom:0.85rem" class="res-grid">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.7rem;margin-bottom:0.85rem">
             <div><div style="font-size:0.67rem;color:#94a3b8;text-transform:uppercase;letter-spacing:0.7px;
                         margin-bottom:0.25rem">{t('cat',lang)}</div>
                 <strong style="color:#0f172a;font-size:0.87rem">{v.get('label_en','—')}</strong></div>
@@ -1083,42 +856,40 @@ def render_result_card(v, lang):
 # ════════════════════════════════════════════════════════════
 # REVIEW
 # ════════════════════════════════════════════════════════════
-def render_review(db, v, lang, context="main"):
-    """context = unique string per call site, prevents duplicate widget keys."""
-    k = context   # short alias
+def render_review(db, v, lang):
     st.markdown("---")
     st.markdown(f"""<div class="review-box">
         <div style="font-family:Syne,sans-serif;font-weight:700;font-size:0.97rem;
                     color:#0f172a;margin-bottom:1rem">{t('rv_title',lang)}</div>
     </div>""", unsafe_allow_html=True)
-    if st.session_state.get(f"review_submitted_{k}"):
+    if st.session_state.get("review_submitted"):
         st.markdown(f"""<div class="review-done">
             {t('rv_thanks',lang)}<br>
             <small style="font-weight:400;color:#166534">{t('rv_saved',lang)}</small>
         </div>""", unsafe_allow_html=True)
-        if st.button("✏️ Edit", key=f"rv_edit_{k}"):
-            st.session_state[f"review_submitted_{k}"] = False; st.rerun()
+        if st.button("✏️ Edit", key="rv_edit"):
+            st.session_state["review_submitted"] = False; st.rerun()
         return
     rc1,rc2 = st.columns([1,2])
     with rc1:
         st.markdown(f"**{t('rv_stars',lang)}**")
-        stars = st.select_slider(f"rv_sl_{k}",[1,2,3,4,5],5,
-                    format_func=lambda x:"⭐"*x, label_visibility="collapsed", key=f"rv_s_{k}")
+        stars = st.select_slider("rv_sl",[1,2,3,4,5],5,
+                    format_func=lambda x:"⭐"*x, label_visibility="collapsed", key="rv_s_w")
         st.markdown(f"{'⭐'*stars}{'☆'*(5-stars)}")
     with rc2:
         st.markdown(f"**{t('rv_q',lang)}**")
-        correct = st.radio(f"rv_c_r_{k}",["yes","no"],
+        correct = st.radio("rv_c_r",["yes","no"],
             format_func=lambda x:("✅ Yes" if lang=="english" else "✅ ہاں") if x=="yes"
                                  else("❌ No" if lang=="english" else "❌ نہیں"),
-            horizontal=True, index=0, label_visibility="collapsed", key=f"rv_c_{k}")
+            horizontal=True, index=0, label_visibility="collapsed", key="rv_c_w")
     correction = ""
     if correct == "no":
-        correction = st.text_input(t("rv_cor",lang), placeholder="e.g. metal can", key=f"rv_cor_{k}")
+        correction = st.text_input(t("rv_cor",lang), placeholder="e.g. metal can", key="rv_cor_i")
     feedback = st.text_area(t("rv_fb",lang), placeholder=t("rv_fb",lang),
-                            height=75, label_visibility="collapsed", key=f"rv_fb_{k}")
-    if st.button(t("rv_sub",lang), type="primary", key=f"rv_sub_{k}"):
+                            height=75, label_visibility="collapsed", key="rv_fb_w")
+    if st.button(t("rv_sub",lang), type="primary", key="rv_sub_btn"):
         try:
-            sheet = db.get("sheet") if db else None
+            sheet = db.get("sheet")
             if sheet:
                 try: ws = sheet.worksheet("reviews")
                 except:
@@ -1128,7 +899,7 @@ def render_review(db, v, lang, context="main"):
                 ws.append_row([datetime.now().isoformat(), user.get("user_id","GUEST"),
                                v.get("waste_type",""), stars, correct, correction, feedback, lang])
         except: pass
-        st.session_state[f"review_submitted_{k}"] = True; st.rerun()
+        st.session_state["review_submitted"] = True; st.rerun()
 
 
 # ════════════════════════════════════════════════════════════
@@ -1136,8 +907,6 @@ def render_review(db, v, lang, context="main"):
 # ════════════════════════════════════════════════════════════
 def section_nearby(db, lat, lng, lang):
     st.markdown(f"#### {t('nearby',lang)}")
-    if db is None:
-        st.info("📡 Database unavailable in demo mode."); return
     with st.spinner("Searching…"):
         from database import get_nearby_scans
         scans = get_nearby_scans(db, lat, lng, limit=10)
@@ -1164,8 +933,6 @@ def section_nearby(db, lat, lng, lang):
 
 def section_history(db, lang):
     st.markdown(f"#### {t('history',lang)}")
-    if db is None:
-        st.info("📡 Database unavailable in demo mode."); return
     from database import get_recent_scans
     rows = get_recent_scans(db, limit=20)
     if not rows: st.info(t("no_scans",lang)); return
@@ -1193,8 +960,6 @@ def section_market(lang):
 
 def section_stats(db, lang):
     st.markdown(f"#### {t('stats',lang)}")
-    if db is None:
-        st.info("📡 Database unavailable in demo mode."); return
     try:
         from database import get_recent_scans
         rows = get_recent_scans(db, limit=200)
@@ -1216,8 +981,6 @@ def section_stats(db, lang):
 
 def section_chat_history(db, lang):
     st.markdown(f"#### {t('chat_hist',lang)}")
-    if db is None:
-        st.info("📡 Database unavailable in demo mode."); return
     user = st.session_state.get("current_user")
     if not user or user.get("user_id")=="GUEST":
         st.info("Log in to view your chat history."); return
@@ -1267,8 +1030,7 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
         </div>""", unsafe_allow_html=True)
         st.session_state["last_vision"] = None; return
 
-    st.session_state.update({"last_vision":v,"rag_result":None,
-                              "review_submitted_scan":False,"review_submitted_scan2":False})
+    st.session_state.update({"last_vision":v,"rag_result":None,"review_submitted":False})
 
     # Save scan + increment count
     if db and image_bytes:
@@ -1297,7 +1059,9 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
     st.session_state["rag_result"] = rag
 
     st.markdown(f"### {t('ai_guide',lang)}")
-    st.markdown(f"""<div class="ai-box">{fmt(rag['answer'])}</div>""", unsafe_allow_html=True)
+    st.markdown(f"""<div class="ai-box">
+        {rag['answer'].replace(chr(10),'<br>')}
+    </div>""", unsafe_allow_html=True)
 
     if rag.get("is_demo"):
         st.markdown('<span class="badge b-demo">⚠️ Demo Mode</span>', unsafe_allow_html=True)
@@ -1309,64 +1073,61 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
     save_chat(db,"assistant", rag["answer"][:800], v.get("waste_type",""))
 
     # TTS button
-    if st.button(t("speak_btn", lang), key="tts_btn"):
-        tts_text = rag["answer"][:500]
-        tts_done = False
-        try:
-            from streamlit_tts import auto_play
-            lc = "ur-PK" if lang == "urdu" else "en-US"
-            auto_play(tts_text, language=lc)
-            st.caption("🔊 Playing via browser TTS")
-            tts_done = True
-        except Exception:
-            pass
-        if not tts_done:
-            try:
-                from gtts import gTTS
-                import io as _io
-                lc = "ur" if lang == "urdu" else "en"
-                buf = _io.BytesIO()
-                gTTS(text=tts_text, lang=lc, slow=False).write_to_fp(buf)
-                buf.seek(0)
-                st.audio(buf.read(), format="audio/mp3", autoplay=True)
-                st.caption("🔊 Audio by gTTS")
-                tts_done = True
-            except Exception as e:
-                st.warning(f"⚠️ Voice output unavailable: {e}")
+    try:
+        from voice import speak, render_tts
+        if st.button(t("speak_btn",lang), key="tts_btn"):
+            with st.spinner("🔊 Generating audio…"):
+                result = speak(rag["answer"][:450], lang)
+            render_tts(st, result)
+    except: pass
 
-    # Follow-up question
+    # Review (always visible)
+    render_review(db, v, lang)
+
+    # Follow-up
     st.markdown("---")
-    fc1, fc2 = st.columns([5, 1])
+    fc1,fc2 = st.columns([5,1])
     with fc1:
-        fup = st.text_input(t("fup_ph", lang), key="fup_i",
-                            label_visibility="collapsed", placeholder=t("fup_ph", lang))
+        fup = st.text_input(t("fup_ph",lang), key="fup_i",
+                            label_visibility="collapsed", placeholder=t("fup_ph",lang))
     with fc2:
-        ask = st.button(t("ask", lang), use_container_width=True, key="fup_btn")
+        ask = st.button(t("ask",lang), use_container_width=True, key="fup_btn")
 
     if ask and fup.strip():
-        save_chat(db, "user", fup, v.get("waste_type", ""))
+        save_chat(db,"user", fup, v.get("waste_type",""))
         with st.spinner("🤖 Answering…"):
             from rag_engine import run_rag_pipeline
             fr = run_rag_pipeline(components=components, vision_result=v,
                                   user_question=fup, language=lang)
         st.markdown(f"""<div class="ai-box" style="border-top-color:#16a34a">
-            <strong style="color:#0f172a;display:block;margin-bottom:0.6rem">Q: {fup}</strong>
-            {fmt(fr['answer'])}
+            <strong style="color:#0f172a">Q: {fup}</strong><br><br>
+            {fr['answer'].replace(chr(10),'<br>')}
         </div>""", unsafe_allow_html=True)
-        save_chat(db, "assistant", fr["answer"][:800], v.get("waste_type", ""))
+        save_chat(db,"assistant", fr["answer"][:800], v.get("waste_type",""))
 
-    # ── Explore More — always visible as tabs ──────────────────
+    # Explore more toggles
     st.markdown("---")
-    st.markdown("### 🔽 " + ("Explore More" if lang == "english" else "مزید دیکھیں"))
-    exp_tabs = st.tabs([
-        t("nearby", lang), t("history", lang),
-        t("market", lang), t("stats", lang), t("chat_hist", lang),
-    ])
-    with exp_tabs[0]: section_nearby(db, lat, lng, lang)
-    with exp_tabs[1]: section_history(db, lang)
-    with exp_tabs[2]: section_market(lang)
-    with exp_tabs[3]: section_stats(db, lang)
-    with exp_tabs[4]: section_chat_history(db, lang)
+    st.markdown("### 🔽 " + ("Explore More" if lang=="english" else "مزید دیکھیں"))
+    toggle_specs = [
+        ("nearby",    t("nearby",    lang)),
+        ("history",   t("history",   lang)),
+        ("market",    t("market",    lang)),
+        ("stats",     t("stats",     lang)),
+        ("chat_hist", t("chat_hist", lang)),
+    ]
+    cols = st.columns(len(toggle_specs))
+    for col,(key,label) in zip(cols, toggle_specs):
+        with col:
+            active = st.session_state.get(tk(key),False)
+            if st.button(label, use_container_width=True, key=f"tb_{key}",
+                         type="primary" if active else "secondary"):
+                st.session_state[tk(key)] = not active; st.rerun()
+
+    if st.session_state.get(tk("nearby")):    section_nearby(db,lat,lng,lang)
+    if st.session_state.get(tk("history")):   section_history(db,lang)
+    if st.session_state.get(tk("market")):    section_market(lang)
+    if st.session_state.get(tk("stats")):     section_stats(db,lang)
+    if st.session_state.get(tk("chat_hist")): section_chat_history(db,lang)
 
 
 # ════════════════════════════════════════════════════════════
@@ -1411,8 +1172,9 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
             render_result_card(st.session_state["last_vision"], lang)
             if st.session_state.get("rag_result"):
                 st.markdown(f"""<div class="ai-box">
-                    {fmt(st.session_state['rag_result']['answer'])}
+                    {st.session_state['rag_result']['answer'].replace(chr(10),'<br>')}
                 </div>""", unsafe_allow_html=True)
+            render_review(db, st.session_state["last_vision"], lang)
 
     # ── TEXT ────────────────────────────────────────────────────
     elif mode == "text":
@@ -1424,47 +1186,25 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
 
     # ── VOICE ───────────────────────────────────────────────────
     elif mode == "voice":
+        whisper = get_whisper()
         st.markdown(f"""<div class="voice-box">
             <div style="font-size:2rem;margin-bottom:0.4rem">🎤</div>
-            <div style="color:#0f172a;font-weight:600;font-size:0.9rem">
+            <div style="color:#334155;font-weight:600;font-size:0.9rem">
                 {t('voice_hint',lang)}</div>
-            <div style="color:#64748b;font-size:0.78rem;margin-top:0.25rem">
-                Record → Transcribe → Submit</div>
         </div>""", unsafe_allow_html=True)
-
-        audio = st.audio_input("🎙️ Tap to record", label_visibility="collapsed")
-
-        if audio:
-            if "voice_transcribed" not in st.session_state:
-                st.session_state["voice_transcribed"] = ""
-
-            if st.button("🔍 Transcribe", type="secondary",
-                         use_container_width=True, key="voice_transcribe_btn"):
-                whisper = get_whisper()
-                if whisper:
-                    try:
-                        with st.spinner("🎤 Transcribing…"):
-                            from voice import speech_to_text
-                            text = speech_to_text(whisper, audio.getvalue(), lang)
-                        st.session_state["voice_transcribed"] = text or ""
-                        if not text:
-                            st.warning("⚠️ Could not transcribe. Speak clearly and try again.")
-                    except Exception as e:
-                        st.error(f"STT error: {e}")
-                        st.session_state["voice_transcribed"] = ""
+        if whisper:
+            audio = st.audio_input("Record", label_visibility="collapsed")
+            if audio:
+                with st.spinner("🎤 Transcribing…"):
+                    from voice import speech_to_text
+                    text = speech_to_text(whisper, audio.getvalue(), lang)
+                if text:
+                    st.success(f"📝 You said: *{text}*")
+                    run_analysis(lang,city,lat,lng,db,vclient,components,text_input=text)
                 else:
-                    st.warning("⚠️ Whisper model unavailable — type your message in Text mode instead.")
-                    st.session_state["voice_transcribed"] = ""
-
-            txt = st.session_state.get("voice_transcribed", "")
-            if txt:
-                st.success(f"📝 Transcribed: *{txt}*")
-                if st.button("🚀 Submit & Analyse", type="primary",
-                             use_container_width=True, key="voice_submit_btn"):
-                    st.session_state["voice_transcribed"] = ""
-                    run_analysis(lang, city, lat, lng, db, vclient, components, text_input=txt)
+                    st.warning("⚠️ Could not transcribe. Please speak clearly and try again.")
         else:
-            st.info("Record your voice above, then click **Transcribe** to see the text before submitting.")
+            st.warning("⚠️ Voice model unavailable. Use Image or Text mode instead.")
 
     else:
         st.markdown("""<div style="text-align:center;padding:2.5rem;color:#94a3b8">
@@ -1478,7 +1218,7 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
 # ════════════════════════════════════════════════════════════
 # TAB: JUDGE DEMO
 # ════════════════════════════════════════════════════════════
-def render_demo_tab(lang, vclient, components, db):
+def render_demo_tab(lang, vclient, components):
     st.markdown(f"""<div style="background:linear-gradient(135deg,#14532d,#16a34a);
         border-radius:var(--r-lg);padding:1.4rem 1.8rem;margin-bottom:1.2rem">
         <h3 style="color:white;margin:0;font-family:Syne,sans-serif">🎯 Judge Demo Panel</h3>
@@ -1486,7 +1226,7 @@ def render_demo_tab(lang, vclient, components, db):
             Pre-loaded waste images — click any to run full AI analysis instantly</p>
     </div>""", unsafe_allow_html=True)
 
-    active = st.session_state.get(tk("demo_images"), False)
+    active = st.session_state.get(tk("demo_images"),False)
     if st.button(t("hide_demo",lang) if active else t("show_demo",lang),
                  type="primary" if active else "secondary", key="demo_toggle"):
         st.session_state[tk("demo_images")] = not active; st.rerun()
@@ -1500,67 +1240,34 @@ def render_demo_tab(lang, vclient, components, db):
         </div>""", unsafe_allow_html=True)
         return
 
-    # ── If a demo result is already loaded, show it with a "New Demo" button ──
-    if st.session_state.get("demo_active_result"):
-        da = st.session_state["demo_active_result"]
-        st.info(f"🔍 Showing result for: **{da['label']}**")
-        if st.button("🔄  New Demo", type="secondary", key="demo_new_btn"):
-            st.session_state["demo_active_result"] = None
-            st.session_state["review_submitted_scan"] = False
-            st.rerun()
-        st.markdown("---")
-        run_analysis(lang,"Demo",0,0,db,vclient,components,
-                     image_bytes=da["image_bytes"])
-        return
-
-    # ── Image grid — auto-wraps any number of images, 4 per row ──
-    COLS_PER_ROW = 4
     st.markdown(f"**{t('demo_try',lang)}**")
     st.markdown("---")
-    sel = None
-    for row_start in range(0, len(DEMO_IMAGES), COLS_PER_ROW):
-        row_items = DEMO_IMAGES[row_start : row_start + COLS_PER_ROW]
-        # Fill last row with empty slots so grid stays uniform
-        padded    = row_items + [None] * (COLS_PER_ROW - len(row_items))
-        cols      = st.columns(COLS_PER_ROW)
-        for col, demo in zip(cols, padded):
-            if demo is None:
-                continue          # empty slot — skip
-            with col:
-                try: st.image(demo["url"], use_container_width=True)
-                except: st.markdown(
-                    f"<div style='text-align:center;font-size:3rem;padding:1rem'>{demo['emoji']}</div>",
-                    unsafe_allow_html=True)
-                st.markdown(f"""<div style="text-align:center;padding:0.3rem 0">
-                    <div style="font-weight:700;font-size:0.82rem;color:#0f172a">
-                        {demo['emoji']} {demo['label']}</div>
-                    <div style="color:#94a3b8;font-size:0.72rem">{demo['hint']}</div>
-                </div>""", unsafe_allow_html=True)
-                if st.button("▶ Test", key=f"d_{DEMO_IMAGES.index(demo)}",
-                             use_container_width=True):
-                    sel = demo
-        st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
+    cols   = st.columns(5)
+    sel    = None
+    for i,demo in enumerate(DEMO_IMAGES):
+        with cols[i]:
+            try: st.image(demo["url"], use_container_width=True)
+            except: st.markdown(f"<div style='text-align:center;font-size:3rem'>{demo['emoji']}</div>",unsafe_allow_html=True)
+            st.markdown(f"""<div style="text-align:center;padding:0.3rem 0">
+                <div style="font-weight:700;font-size:0.82rem;color:#0f172a">{demo['emoji']} {demo['label']}</div>
+                <div style="color:#94a3b8;font-size:0.72rem">{demo['hint']}</div>
+            </div>""", unsafe_allow_html=True)
+            if st.button("Test", key=f"d_{i}", use_container_width=True): sel = demo
 
     if sel:
         import requests
+        st.markdown("---")
+        st.info(f"🔍 Testing: **{sel['label']}**")
         try:
             r = requests.get(sel["url"], timeout=10)
-            # Store in session so feedback/re-renders don't reset to grid
-            st.session_state["demo_active_result"] = {
-                "label"      : sel["label"],
-                "image_bytes": r.content,
-            }
-            st.session_state["review_submitted_scan"] = False
-            st.rerun()
-        except Exception as e:
-            st.error(f"Demo error: {e}")
+            run_analysis("english","Demo",0,0,None,vclient,components,image_bytes=r.content)
+        except Exception as e: st.error(f"Demo error: {e}")
 
 
+# ════════════════════════════════════════════════════════════
 # TAB: TEAM
 # ════════════════════════════════════════════════════════════
-
 def render_team_tab(lang):
-
     st.markdown(f"""<div style="text-align:center;padding:1.5rem 1rem 1rem">
         <h2 style="font-family:Syne,sans-serif;color:#0f172a;font-size:1.75rem;margin:0">
             {t('team_title',lang)}</h2>
@@ -1569,58 +1276,30 @@ def render_team_tab(lang):
                     border-radius:2px;margin:0.75rem auto 1.5rem"></div>
     </div>""", unsafe_allow_html=True)
 
-    TEAM_COLS = 5
-    real_members = [m for m in TEAM if m is not None]
-    placeholders  = [m for m in TEAM if m is None]
-    all_slots     = real_members + placeholders
-
-    for row_start in range(0, len(all_slots), TEAM_COLS):
-        row = all_slots[row_start : row_start + TEAM_COLS]
-        cols = st.columns(TEAM_COLS)
-
-        for ci, member in enumerate(row):
-            with cols[ci]:
-
-                if member:
-
-                    li = member.get("linkedin","")
-                    gh = member.get("github","")
-                    ac = member.get("academic","")
-                    ct = member.get("contact","")
-
-                    links = ""
-                    if li: links += f'<a href="{li}" target="_blank" class="t-link">in LinkedIn</a>'
-                    if gh: links += f'<a href="{gh}" target="_blank" class="t-link">⌥ GitHub</a>'
-                    if ct: links += f'<a href="{ct}" target="_blank" class="t-link">📞 Contact</a>'
-
-                    # IMAGE OR INITIALS
-                    img = member.get("image")
-
-                    if img:
-                        avatar = f'<img src="{img}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;margin-bottom:0.6rem;">'
-                    else:
-                        avatar = f'<div style="width:90px;height:90px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;margin:auto;margin-bottom:0.6rem;font-weight:600;color:#475569;font-size:1.4rem">{member["initials"]}</div>'
-
-                    st.markdown(f"""
-<div class="team-card">
-{avatar}
-<div class="t-name">{member['name']}</div>
-<div class="t-role">{member['role']}</div>
-{"<div class='t-acad'>"+ac+"</div>" if ac else ""}
-<div class="t-links">{links if links else '<span style="color:#94a3b8;font-size:0.75rem">Links coming soon</span>'}</div>
-</div>
-""", unsafe_allow_html=True)
-
-                else:
-                    slot_n = row_start + ci + 1
-                    st.markdown(f"""<div class="t-ph">
-                        <div style="font-size:1.8rem;margin-bottom:0.4rem">👤</div>
-                        <div style="font-weight:600;font-size:0.85rem">{t('coming',lang)}</div>
-                        <div style="font-size:0.75rem;margin-top:0.2rem;color:#cbd5e1">Slot {slot_n}</div>
-                    </div>""", unsafe_allow_html=True)
+    cols = st.columns(5)
+    for i,member in enumerate(TEAM):
+        with cols[i]:
+            if member:
+                li = member.get("linkedin",""); gh = member.get("github","")
+                ac = member.get("academic","")
+                links = ""
+                if li: links += f'<a href="{li}" target="_blank" class="t-link" title="LinkedIn">in LinkedIn</a>'
+                if gh: links += f'<a href="{gh}" target="_blank" class="t-link" title="GitHub">⌥ GitHub</a>'
+                st.markdown(f"""<div class="team-card">
+                    <div class="t-avatar">{member['initials']}</div>
+                    <div class="t-name">{member['name']}</div>
+                    <div class="t-role">{member['role']}</div>
+                    {"<div class='t-acad'>"+ac+"</div>" if ac else ""}
+                    <div class="t-links">{links}</div>
+                </div>""", unsafe_allow_html=True)
+            else:
+                st.markdown(f"""<div class="t-ph">
+                    <div style="font-size:1.8rem;margin-bottom:0.4rem">👤</div>
+                    <div style="font-weight:600;font-size:0.85rem">{t('coming',lang)}</div>
+                    <div style="font-size:0.75rem;margin-top:0.2rem;color:#cbd5e1">Member {i+1}</div>
+                </div>""", unsafe_allow_html=True)
 
     st.markdown("---")
-
     st.markdown("""<div style="background:linear-gradient(135deg,#14532d,#166534);
         border-radius:var(--r-lg);padding:1.5rem 2rem">
         <h4 style="color:white;margin:0 0 0.9rem;font-family:Syne,sans-serif">🌿 About This Project</h4>
@@ -1635,6 +1314,7 @@ def render_team_tab(lang):
                 <span style="color:rgba(255,255,255,0.82)">Helping kabariwalas access real market intelligence</span></div>
         </div>
     </div>""", unsafe_allow_html=True)
+
 
 # ════════════════════════════════════════════════════════════
 # SIDEBAR
@@ -1701,48 +1381,6 @@ def render_sidebar():
 - 🎤 Whisper STT + gTTS TTS
             """)
 
-        # ── Review & Rating (sidebar) ──────
-        v = st.session_state.get("last_vision")
-        if v:
-            st.markdown("---")
-            st.markdown("### ⭐ Rate This Result")
-            if st.session_state.get("review_submitted_sb"):
-                st.success("✅ Thank you for your feedback!")
-                if st.button("✏️ Edit Review", key="rv_edit_sb"):
-                    st.session_state["review_submitted_sb"] = False; st.rerun()
-            else:
-                stars = st.select_slider("Rating", [1,2,3,4,5], 5,
-                            format_func=lambda x:"⭐"*x,
-                            label_visibility="collapsed", key="rv_s_sb")
-                st.markdown(f"{'⭐'*stars}{'☆'*(5-stars)}")
-                correct = st.radio("Correct?", ["yes","no"],
-                    format_func=lambda x:"✅ Yes" if x=="yes" else "❌ No",
-                    horizontal=True, label_visibility="collapsed", key="rv_c_sb")
-                correction = ""
-                if correct == "no":
-                    correction = st.text_input("Correct type?",
-                                               placeholder="e.g. metal can", key="rv_cor_sb")
-                feedback = st.text_area("Feedback (optional)", height=70,
-                                        label_visibility="collapsed",
-                                        placeholder="Any feedback…", key="rv_fb_sb")
-                if st.button("📤 Submit Review", type="primary",
-                             use_container_width=True, key="rv_sub_sb"):
-                    try:
-                        sheet = db.get("sheet")
-                        if sheet:
-                            try: ws = sheet.worksheet("reviews")
-                            except:
-                                ws = sheet.add_worksheet(title="reviews",rows=1000,cols=10)
-                                ws.append_row(["timestamp","user_id","waste_type","stars",
-                                               "correct","correction","feedback","language"])
-                            usr = st.session_state.get("current_user",{})
-                            ws.append_row([datetime.now().isoformat(),
-                                           usr.get("user_id","GUEST"),
-                                           v.get("waste_type",""), stars,
-                                           correct, correction, feedback, language])
-                    except: pass
-                    st.session_state["review_submitted_sb"] = True; st.rerun()
-
     return language, city, lat, lng
 
 
@@ -1777,7 +1415,7 @@ def main():
     with scan_tab:
         render_scan_tab(language, city, lat, lng, vclient, components, db)
     with demo_tab:
-        render_demo_tab(language, vclient, components, db)
+        render_demo_tab(language, vclient, components)
     with team_tab:
         render_team_tab(language)
 
