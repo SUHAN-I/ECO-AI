@@ -79,33 +79,6 @@ code {
     background  : var(--white) !important;
     border-right: 1px solid var(--border) !important;
 }
-/* Reopen arrow (shown when sidebar is collapsed) — only colour/visibility,
-   never position, so Streamlit keeps it where it belongs */
-[data-testid="collapsedControl"] {
-    display         : flex !important;
-    visibility      : visible !important;
-    opacity         : 1 !important;
-    background      : #166534 !important;
-    border          : none !important;
-    border-radius   : 0 8px 8px 0 !important;
-    cursor          : pointer !important;
-    box-shadow      : 3px 0 10px rgba(0,0,0,0.3) !important;
-    align-items     : center !important;
-    justify-content : center !important;
-    min-width       : 28px !important;
-    width           : 28px !important;
-    height          : 56px !important;
-    z-index         : 9999999 !important;
-}
-[data-testid="collapsedControl"]:hover { background: #14532d !important; }
-[data-testid="collapsedControl"] svg,
-[data-testid="collapsedControl"] path,
-[data-testid="collapsedControl"] polyline,
-[data-testid="collapsedControl"] line {
-    fill   : white !important;
-    stroke : white !important;
-    color  : white !important;
-}
 
 /* ── Streamlit overrides ── */
 .stButton > button {
@@ -193,7 +166,82 @@ label, .stRadio label, .stCheckbox label {
     border-radius : var(--r-sm) !important;
 }
 .stAlert { border-radius: var(--r-sm) !important; }
-#MainMenu, footer, header { visibility: hidden !important; }
+
+/* Hide Streamlit chrome — but NOT header (sidebar buttons live there) */
+#MainMenu { visibility: hidden !important; }
+footer     { visibility: hidden !important; }
+/* Hide only the deploy/hamburger toolbar inside the header, not the whole header */
+[data-testid="stHeader"]          { background: transparent !important; }
+[data-testid="stToolbar"]         { visibility: hidden !important; }
+[data-testid="stDecoration"]      { visibility: hidden !important; }
+[data-testid="stStatusWidget"]    { visibility: hidden !important; }
+
+/* ── SIDEBAR TOGGLE BUTTONS — both collapse (×) and expand (›) ──────────
+   Target every selector Streamlit has ever used across versions.
+   visibility:visible + display:flex ensures they are NEVER hidden.         */
+
+/* Expand button — shown in main area when sidebar is COLLAPSED */
+[data-testid="collapsedControl"],
+[data-testid="collapsedControl"] > button {
+    display         : flex !important;
+    visibility      : visible !important;
+    opacity         : 1 !important;
+    background      : #166534 !important;
+    border          : none !important;
+    border-radius   : 0 8px 8px 0 !important;
+    cursor          : pointer !important;
+    box-shadow      : 3px 0 10px rgba(0,0,0,0.3) !important;
+    align-items     : center !important;
+    justify-content : center !important;
+    min-width       : 28px !important;
+    width           : 28px !important;
+    height          : 56px !important;
+    z-index         : 9999999 !important;
+}
+[data-testid="collapsedControl"]:hover,
+[data-testid="collapsedControl"] > button:hover {
+    background : #14532d !important;
+}
+[data-testid="collapsedControl"] svg,
+[data-testid="collapsedControl"] path,
+[data-testid="collapsedControl"] polyline,
+[data-testid="collapsedControl"] line,
+[data-testid="collapsedControl"] rect {
+    fill   : white !important;
+    stroke : white !important;
+}
+
+/* Collapse button — shown inside sidebar when it is OPEN */
+[data-testid="stSidebarCollapseButton"],
+[data-testid="stSidebarCollapseButton"] > button,
+[data-testid="stSidebar"] [data-testid="baseButton-header"],
+[data-testid="stSidebar"] button[kind="header"] {
+    display         : flex !important;
+    visibility      : visible !important;
+    opacity         : 1 !important;
+    background      : #166534 !important;
+    border          : none !important;
+    border-radius   : 0 8px 8px 0 !important;
+    cursor          : pointer !important;
+    box-shadow      : 3px 0 10px rgba(0,0,0,0.3) !important;
+    align-items     : center !important;
+    justify-content : center !important;
+    min-width       : 28px !important;
+    width           : 28px !important;
+    height          : 56px !important;
+    position        : absolute !important;
+    right           : -28px !important;
+    top             : 50% !important;
+    transform       : translateY(-50%) !important;
+    z-index         : 9999999 !important;
+}
+[data-testid="stSidebarCollapseButton"] svg,
+[data-testid="stSidebarCollapseButton"] path,
+[data-testid="stSidebar"] [data-testid="baseButton-header"] svg,
+[data-testid="stSidebar"] [data-testid="baseButton-header"] path {
+    fill   : white !important;
+    stroke : white !important;
+}
 
 /* ════════════════════════════════════════════════════════
    DIALOG / MODAL FIXES
@@ -1712,46 +1760,48 @@ def main():
     language, city, lat, lng = render_sidebar()
 
     # ── Sidebar toggle button — always visible ──────────────
-    # Must be called INSIDE main() after the page is rendered,
-    # with height=1 (not 0) so the iframe actually executes.
-    # The JS polls window.parent every 300 ms to keep the
-    # reopen-arrow styled and visible at all times.
     import streamlit.components.v1 as _stc
     _stc.html("""
 <script>
 (function go() {
     function fix() {
         try {
-            var d   = window.parent.document;
-            // The arrow that reopens the sidebar when it is collapsed
-            var btn = d.querySelector('[data-testid="collapsedControl"]');
-            if (btn) {
-                btn.style.setProperty('display',         'flex',                        'important');
-                btn.style.setProperty('visibility',      'visible',                     'important');
-                btn.style.setProperty('opacity',         '1',                           'important');
-                btn.style.setProperty('background',      '#166534',                     'important');
-                btn.style.setProperty('border',          'none',                        'important');
-                btn.style.setProperty('border-radius',   '0 8px 8px 0',                 'important');
-                btn.style.setProperty('cursor',          'pointer',                     'important');
-                btn.style.setProperty('box-shadow',      '3px 0 10px rgba(0,0,0,0.3)', 'important');
-                btn.style.setProperty('width',           '28px',                        'important');
-                btn.style.setProperty('min-width',       '28px',                        'important');
-                btn.style.setProperty('height',          '56px',                        'important');
-                btn.style.setProperty('align-items',     'center',                      'important');
-                btn.style.setProperty('justify-content', 'center',                      'important');
-                btn.style.setProperty('z-index',         '9999999',                     'important');
-                btn.querySelectorAll('svg,path,polyline,line,circle,rect').forEach(function(el){
-                    el.style.setProperty('fill',   'white', 'important');
-                    el.style.setProperty('stroke', 'white', 'important');
-                    el.style.setProperty('color',  'white', 'important');
+            var d = window.parent.document;
+
+            // All selectors that Streamlit has used across versions
+            var selectors = [
+                '[data-testid="collapsedControl"]',
+                '[data-testid="collapsedControl"] > button',
+                '[data-testid="stSidebarCollapseButton"]',
+                '[data-testid="stSidebarCollapseButton"] > button',
+                '[data-testid="stSidebar"] [data-testid="baseButton-header"]',
+                '[data-testid="stSidebar"] button[kind="header"]',
+            ];
+
+            selectors.forEach(function(sel) {
+                var btns = d.querySelectorAll(sel);
+                btns.forEach(function(btn) {
+                    btn.style.setProperty('display',     'flex',    'important');
+                    btn.style.setProperty('visibility',  'visible', 'important');
+                    btn.style.setProperty('opacity',     '1',       'important');
+                    btn.style.setProperty('background',  '#166534', 'important');
+                    btn.style.setProperty('border',      'none',    'important');
+                    btn.style.setProperty('cursor',      'pointer', 'important');
+                    btn.style.setProperty('min-width',   '28px',    'important');
+                    btn.style.setProperty('width',       '28px',    'important');
+                    btn.style.setProperty('height',      '56px',    'important');
+                    btn.style.setProperty('z-index',     '9999999', 'important');
+                    btn.querySelectorAll('svg,path,polyline,line,circle,rect').forEach(function(el){
+                        el.style.setProperty('fill',   'white', 'important');
+                        el.style.setProperty('stroke', 'white', 'important');
+                        el.style.setProperty('color',  'white', 'important');
+                    });
                 });
-            }
+            });
         } catch(e) {}
     }
-    // Run immediately then every 300 ms
     fix();
     setInterval(fix, 300);
-    // Also trigger on any DOM change (sidebar open/close swaps the button)
     try {
         new MutationObserver(fix).observe(
             window.parent.document.body,
