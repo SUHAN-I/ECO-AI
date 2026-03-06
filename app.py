@@ -62,83 +62,68 @@ h1,h2,h3,h4,h5 {
     color       : var(--text-1) !important;
     line-height : 1.2 !important;
 }
-/* Base text — only applies to streamlit-generated markdown, not custom HTML */
-.stMarkdown > div > p,
-.stMarkdown > div > ul > li,
-.stMarkdown > div > ol > li { color: var(--text-2); }
-small, caption, .caption { color: var(--text-3) !important; }
-/* strong/b: only in markdown, not inside custom inline-styled HTML */
-.stMarkdown strong, .stMarkdown b { color: var(--text-1) !important; font-weight: 600 !important; }
-a { color: var(--green-mid) !important; }
-code {
-    background    : var(--green-bg) !important;
-    color         : var(--green) !important;
-    padding       : 0.1rem 0.4rem !important;
-    border-radius : 5px !important;
-    font-size     : 0.85em !important;
-}
+/* ── Text always readable — strong targeted rules, no bleed into custom HTML ── */
+/* Streamlit markdown containers */
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] li { color: var(--text-2) !important; }
+[data-testid="stMarkdownContainer"] strong,
+[data-testid="stMarkdownContainer"] b   { color: var(--text-1) !important; font-weight:600 !important; }
+[data-testid="stMarkdownContainer"] h1,
+[data-testid="stMarkdownContainer"] h2,
+[data-testid="stMarkdownContainer"] h3,
+[data-testid="stMarkdownContainer"] h4  { color: var(--text-1) !important; }
+/* Widget labels (radio, checkbox, text inputs etc.) */
+[data-testid="stWidgetLabel"] p,
+[data-testid="stWidgetLabel"] span      { color: var(--text-2) !important; }
+/* Captions */
+small, caption, .caption                { color: var(--text-3) !important; }
+/* inline code */
+code { background:var(--green-bg) !important; color:var(--green) !important;
+       padding:0.1rem 0.4rem !important; border-radius:5px !important; font-size:0.85em !important; }
+a    { color: var(--green-mid) !important; }
+/* Expander header text */
+[data-testid="stExpander"] summary p,
+[data-testid="stExpander"] summary span { color: var(--text-1) !important; }
 
 /* ── Sidebar ── */
 [data-testid="stSidebar"] {
     background   : var(--white) !important;
     border-right : 1px solid var(--border) !important;
 }
-/* Main content area always fills available width */
-[data-testid="stAppViewContainer"] > section:last-child,
-[data-testid="stMain"] {
-    width          : 100% !important;
-    min-width      : 0 !important;
-    flex           : 1 1 0% !important;
-    overflow-x     : hidden !important;
-}
 
-/* ── Sidebar: open/close button INSIDE the sidebar ── */
-[data-testid="stSidebar"] button[kind="header"],
-[data-testid="stSidebarCollapseButton"] button {
+/* ── Sidebar: collapse button inside open sidebar ── */
+[data-testid="stSidebarCollapseButton"] button,
+[data-testid="stSidebar"] button[kind="header"] {
     background    : var(--green) !important;
     border        : none !important;
     border-radius : 50% !important;
-    color         : #fff !important;
 }
-[data-testid="stSidebar"] button[kind="header"] svg,
-[data-testid="stSidebarCollapseButton"] button svg {
-    fill  : #fff !important;
-    color : #fff !important;
-}
+[data-testid="stSidebarCollapseButton"] button svg,
+[data-testid="stSidebar"] button[kind="header"] svg { fill:#fff !important; color:#fff !important; }
 
-/* ── Sidebar EXPAND tab — visible green pull-tab when sidebar is closed ──
-   Targets every testid Streamlit has ever used for this element           */
+/* ── Sidebar: expand tab when sidebar is CLOSED ──
+   Streamlit positions this naturally at the left edge.
+   Do NOT use position:fixed — it creates a second ghost tab on the right. */
 [data-testid="collapsedControl"],
-[data-testid="stSidebarCollapsedControl"],
-section[data-testid="stSidebar"][aria-expanded="false"] ~ div button,
-div[data-testid="collapsedControl"] {
-    display          : flex !important;
-    visibility       : visible !important;
-    opacity          : 1 !important;
-    background       : var(--green) !important;
-    border-radius    : 0 10px 10px 0 !important;
-    width            : 32px !important;
-    min-height       : 60px !important;
-    padding          : 0 !important;
-    align-items      : center !important;
-    justify-content  : center !important;
-    box-shadow       : 3px 0 10px rgba(22,101,52,0.3) !important;
-    cursor           : pointer !important;
-    transition       : background 0.15s !important;
-    border           : none !important;
-    z-index          : 9998 !important;
+[data-testid="stSidebarCollapsedControl"] {
+    background    : var(--green) !important;
+    border-radius : 0 10px 10px 0 !important;
+    width         : 32px !important;
+    min-height    : 60px !important;
+    display       : flex !important;
+    visibility    : visible !important;
+    opacity       : 1 !important;
+    align-items   : center !important;
+    justify-content: center !important;
+    box-shadow    : 2px 0 8px rgba(22,101,52,0.25) !important;
+    border        : none !important;
+    cursor        : pointer !important;
 }
 [data-testid="collapsedControl"]:hover,
-[data-testid="stSidebarCollapsedControl"]:hover {
-    background : #14532d !important;
-}
+[data-testid="stSidebarCollapsedControl"]:hover { background: #14532d !important; }
 [data-testid="collapsedControl"] svg,
-[data-testid="stSidebarCollapsedControl"] svg,
-[data-testid="collapsedControl"] button svg {
-    fill  : #fff !important;
-    color : #fff !important;
-    width : 18px !important;
-    height: 18px !important;
+[data-testid="stSidebarCollapsedControl"] svg {
+    fill:#fff !important; color:#fff !important; width:16px !important; height:16px !important;
 }
 
 /* ── Remove X close button from dialogs/modals ── */
