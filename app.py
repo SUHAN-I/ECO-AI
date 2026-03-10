@@ -62,79 +62,87 @@ h1,h2,h3,h4,h5 {
     color       : var(--text-1) !important;
     line-height : 1.2 !important;
 }
-/* ── Text always readable — strong targeted rules, no bleed into custom HTML ── */
-/* Streamlit markdown containers */
-[data-testid="stMarkdownContainer"] p,
-[data-testid="stMarkdownContainer"] li { color: var(--text-2) !important; }
-[data-testid="stMarkdownContainer"] strong,
-[data-testid="stMarkdownContainer"] b   { color: var(--text-1) !important; font-weight:600 !important; }
-[data-testid="stMarkdownContainer"] h1,
-[data-testid="stMarkdownContainer"] h2,
-[data-testid="stMarkdownContainer"] h3,
-[data-testid="stMarkdownContainer"] h4  { color: var(--text-1) !important; }
-/* Widget labels (radio, checkbox, text inputs etc.) */
-[data-testid="stWidgetLabel"] p,
-[data-testid="stWidgetLabel"] span      { color: var(--text-2) !important; }
-/* Captions */
-small, caption, .caption                { color: var(--text-3) !important; }
-/* inline code */
-code { background:var(--green-bg) !important; color:var(--green) !important;
-       padding:0.1rem 0.4rem !important; border-radius:5px !important; font-size:0.85em !important; }
-a    { color: var(--green-mid) !important; }
-/* Expander header text */
-[data-testid="stExpander"] summary p,
-[data-testid="stExpander"] summary span { color: var(--text-1) !important; }
-
-/* ── Sidebar — style only, never fight Streamlit's own flex layout ── */
-[data-testid="stSidebar"] {
-    background   : var(--white) !important;
-    border-right : 1.5px solid var(--border) !important;
-    /* NO width/min-width/position here — let Streamlit control sizing */
+.stMarkdown > div > p,
+.stMarkdown > div > ul > li,
+.stMarkdown > div > ol > li { color: var(--text-2); }
+small, caption, .caption { color: var(--text-3) !important; }
+.stMarkdown strong, .stMarkdown b { color: var(--text-1) !important; font-weight: 600 !important; }
+a { color: var(--green-mid) !important; }
+code {
+    background    : var(--green-bg) !important;
+    color         : var(--green) !important;
+    padding       : 0.1rem 0.4rem !important;
+    border-radius : 5px !important;
+    font-size     : 0.85em !important;
 }
 
-/* Collapse button (inside open sidebar) */
+/* ── Sidebar ── */
+[data-testid="stSidebar"] {
+    background   : var(--white) !important;
+    border-right : 1px solid var(--border) !important;
+}
+[data-testid="stAppViewContainer"] > section:last-child,
+[data-testid="stMain"] {
+    width          : 100% !important;
+    min-width      : 0 !important;
+    flex           : 1 1 0% !important;
+    overflow-x     : hidden !important;
+}
+
+/* ── Sidebar: open/close button INSIDE the sidebar ── */
+[data-testid="stSidebar"] button[kind="header"],
 [data-testid="stSidebarCollapseButton"] button {
     background    : var(--green) !important;
     border        : none !important;
     border-radius : 50% !important;
+    color         : #fff !important;
 }
-[data-testid="stSidebarCollapseButton"] button svg { fill:#fff !important; color:#fff !important; }
+[data-testid="stSidebar"] button[kind="header"] svg,
+[data-testid="stSidebarCollapseButton"] button svg {
+    fill  : #fff !important;
+    color : #fff !important;
+}
 
-/* Expand tab (when sidebar is CLOSED) — style only, Streamlit positions it */
+/* ── Sidebar EXPAND tab — visible green pull-tab when sidebar is closed ── */
 [data-testid="collapsedControl"],
-[data-testid="stSidebarCollapsedControl"] {
-    background     : var(--green) !important;
-    border-radius  : 0 10px 10px 0 !important;
-    min-height     : 60px !important;
-    display        : flex !important;
-    visibility     : visible !important;
-    opacity        : 1 !important;
-    align-items    : center !important;
-    justify-content: center !important;
-    box-shadow     : 2px 0 8px rgba(22,101,52,0.25) !important;
-    border         : none !important;
-    cursor         : pointer !important;
+[data-testid="stSidebarCollapsedControl"],
+section[data-testid="stSidebar"][aria-expanded="false"] ~ div button,
+div[data-testid="collapsedControl"] {
+    display          : flex !important;
+    visibility       : visible !important;
+    opacity          : 1 !important;
+    background       : var(--green) !important;
+    border-radius    : 0 10px 10px 0 !important;
+    width            : 32px !important;
+    min-height       : 60px !important;
+    padding          : 0 !important;
+    align-items      : center !important;
+    justify-content  : center !important;
+    box-shadow       : 3px 0 10px rgba(22,101,52,0.3) !important;
+    cursor           : pointer !important;
+    transition       : background 0.15s !important;
+    border           : none !important;
+    z-index          : 9998 !important;
 }
 [data-testid="collapsedControl"]:hover,
-[data-testid="stSidebarCollapsedControl"]:hover { background: #14532d !important; }
+[data-testid="stSidebarCollapsedControl"]:hover {
+    background : #14532d !important;
+}
 [data-testid="collapsedControl"] svg,
-[data-testid="stSidebarCollapsedControl"] svg {
-    fill:#fff !important; color:#fff !important; width:16px !important; height:16px !important;
+[data-testid="stSidebarCollapsedControl"] svg,
+[data-testid="collapsedControl"] button svg {
+    fill  : #fff !important;
+    color : #fff !important;
+    width : 18px !important;
+    height: 18px !important;
 }
 
-/* ── Main content block — comfortable readable width, no forced margins ── */
-.main .block-container {
-    max-width    : 860px !important;
-    padding-left : 2rem !important;
-    padding-right: 2rem !important;
-    /* NO margin-left/margin-right — let Streamlit flex handle centering */
-}
-
-/* ── Remove X ONLY from modal dialogs — never from sidebar ── */
-[data-testid="stModal"] button[aria-label="Close"],
-[data-testid="stModal"] button[aria-label="close"],
-[data-baseweb="modal"] button[aria-label="Close"],
-[data-baseweb="modal"] button[aria-label="close"] {
+/* ── Remove X close button from dialogs/modals ── */
+[data-testid="stModal"] > div > div > div:first-child button,
+[data-testid="stBaseButton-header"],
+button[aria-label="Close"],
+[data-baseweb="modal"] button[aria-label="close"],
+.stModal [data-testid="stHeaderActionElements"] button {
     display : none !important;
 }
 
@@ -146,7 +154,6 @@ a    { color: var(--green-mid) !important; }
     font-size     : 0.88rem !important;
     transition    : all 0.15s !important;
 }
-/* Primary button — white text, must target inner elements too */
 .stButton > button[kind="primary"] {
     background : var(--green) !important;
     border     : none !important;
@@ -160,7 +167,6 @@ a    { color: var(--green-mid) !important; }
 }
 .stButton > button[kind="primary"]:hover { background : #14532d !important; }
 
-/* Secondary button — green text */
 .stButton > button[kind="secondary"] {
     background : var(--white) !important;
     border     : 1.5px solid var(--green) !important;
@@ -174,7 +180,6 @@ a    { color: var(--green-mid) !important; }
 }
 .stButton > button[kind="secondary"]:hover { background : var(--green-bg) !important; }
 
-/* Tertiary / any other button kind — dark text */
 .stButton > button:not([kind="primary"]):not([kind="secondary"]) {
     color : var(--text-1) !important;
 }
@@ -231,10 +236,17 @@ label, .stRadio label, .stCheckbox label {
     border-radius : var(--r-sm) !important;
 }
 .stAlert { border-radius: var(--r-sm) !important; }
-#MainMenu, footer, header { visibility: hidden !important; }
 
-/* ── High-contrast text — always readable in every condition ── */
-/* Streamlit applies generic color rules that can clash — override explicitly */
+/* ── Hide Streamlit chrome WITHOUT hiding sidebar buttons ──
+   header contains the sidebar toggle buttons — never hide it.
+   Instead, hide only specific chrome elements inside it.      */
+#MainMenu { visibility: hidden !important; }
+footer     { visibility: hidden !important; }
+[data-testid="stToolbar"]      { visibility: hidden !important; }
+[data-testid="stDecoration"]   { visibility: hidden !important; }
+[data-testid="stStatusWidget"] { visibility: hidden !important; }
+
+/* ── High-contrast text ── */
 .stMarkdown p, .stMarkdown li,
 [data-testid="stMarkdownContainer"] p { color: var(--text-2) !important; }
 .stMarkdown strong, .stMarkdown b,
@@ -242,10 +254,8 @@ label, .stRadio label, .stCheckbox label {
 .stMarkdown h1,.stMarkdown h2,.stMarkdown h3,.stMarkdown h4 { color: var(--text-1) !important; }
 .stMarkdown a { color: var(--green-mid) !important; }
 .stMarkdown code { color: var(--green) !important; background: var(--green-bg) !important; }
-/* NOTE: Do NOT override span/div colors globally — inline styles in custom HTML
-   (e.g. white text on dark-green About section) must be respected. */
 
-/* ── Dialog / Modal — all text must be readable ── */
+/* ── Dialog / Modal ── */
 [data-testid="stModal"] p,
 [data-testid="stModal"] span,
 [data-testid="stModal"] label,
@@ -255,7 +265,6 @@ label, .stRadio label, .stCheckbox label {
 [data-testid="stModal"] h1,
 [data-testid="stModal"] h2,
 [data-testid="stModal"] h3 { color: var(--text-1) !important; }
-/* Dialog button text — must always show */
 [data-testid="stModal"] .stButton > button[kind="primary"] {
     background : var(--green) !important;
     color      : #ffffff !important;
@@ -268,19 +277,16 @@ label, .stRadio label, .stCheckbox label {
     font-weight: 600 !important;
 }
 [data-testid="stModal"] .stButton > button {
-    color : var(--text-1) !important; /* fallback for any other button kind */
+    color : var(--text-1) !important;
 }
-/* Captions and small text in dialogs */
 [data-testid="stModal"] .stCaption,
 [data-testid="stModal"] small { color: var(--text-3) !important; }
-/* Radio and checkbox labels inside dialogs */
 [data-testid="stModal"] .stRadio label,
 [data-testid="stModal"] .stCheckbox label { color: var(--text-2) !important; }
-/* Inputs inside dialogs */
 [data-testid="stModal"] input,
 [data-testid="stModal"] textarea { color: var(--text-1) !important; background: var(--white) !important; }
 
-/* ── Sidebar text always readable ── */
+/* ── Sidebar text ── */
 [data-testid="stSidebar"] p,
 [data-testid="stSidebar"] div,
 [data-testid="stSidebar"] span { color: var(--text-2) !important; }
@@ -328,7 +334,6 @@ label, .stRadio label, .stCheckbox label {
     border-radius : var(--r-md);
     padding       : 1.6rem;
     box-shadow    : var(--shadow-sm);
-    border-top    : 3px solid var(--green-mid);
     border        : 1px solid var(--border);
     border-top    : 3px solid var(--green-mid);
     line-height   : 1.85;
@@ -506,55 +511,32 @@ label, .stRadio label, .stCheckbox label {
    MOBILE — max-width 768px
 ══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-    /* Sidebar: just style, let Streamlit handle show/hide natively */
     [data-testid="stSidebar"] {
-        max-width : 85vw !important;
-        box-shadow: 4px 0 20px rgba(0,0,0,0.12) !important;
+        position  : absolute !important;
+        z-index   : 1000 !important;
+        width     : 85vw !important;
+        max-width : 320px !important;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.15) !important;
     }
-
-    /* Header — compact */
     .eco-header { padding:1rem 0.9rem; border-radius:var(--r-md); }
     .eco-header h1 { font-size:1.2rem !important; }
     .eco-header p  { font-size:0.8rem; }
     .eco-header::after { display:none; }
-
-    /* Cards & boxes — tighter padding */
     .card, .ai-box, .review-box { padding:0.9rem; }
     .ai-box { font-size:0.87rem; line-height:1.75; }
-
-    /* Team cards — 2 per row via Streamlit columns */
     .team-card { padding:1rem 0.75rem; }
     .t-avatar  { width:54px; height:54px; font-size:1.3rem; }
     .t-name    { font-size:0.82rem !important; }
     .t-links   { flex-direction:column; align-items:center; }
     .t-link    { font-size:0.7rem !important; padding:0.2rem 0.5rem !important; }
-
-    /* Result card grid: 2x2 on mobile */
     .res-grid { grid-template-columns: repeat(2,1fr) !important; }
-
-    /* Metrics */
     [data-testid="column"] { padding:0.1rem !important; }
-
-    /* Tabs */
     .stTabs [data-baseweb="tab"] { font-size:0.76rem !important; padding:0.35rem 0.4rem !important; }
-
-    /* Market table */
     .mkt-row { font-size:0.8rem; }
-
-    /* User bar — stack vertically */
     .user-bar { flex-direction:column; align-items:flex-start; gap:0.3rem; }
     .user-bar .sep { display:none; }
-
-    /* Buttons — bigger touch targets */
     .stButton > button { min-height:42px !important; font-size:0.82rem !important; }
-
-    /* Demo images — 2 per row */
-    .demo-grid-2col [data-testid="column"]:nth-child(n+3) { display:none; }
-
-    /* Input elements — full width */
     .stTextInput, .stTextArea { width:100% !important; }
-
-    /* Navigation map buttons */
     .nav-btn { font-size:0.74rem !important; padding:0.35rem 0.65rem !important; }
 }
 
@@ -569,7 +551,6 @@ label, .stRadio label, .stCheckbox label {
     .team-card     { padding: 2rem 1.4rem; }
     .t-avatar      { width: 80px; height: 80px; font-size: 2rem; }
     .stButton > button { font-size: 0.9rem !important; }
-    /* Wider content area on large screens */
     .block-container { max-width: 1200px !important; padding: 1.5rem 2rem !important; }
 }
 
@@ -587,7 +568,6 @@ label, .stRadio label, .stCheckbox label {
     .eco-header p  { font-size:0.76rem; }
     .stButton > button { font-size:0.78rem !important; padding:0.35rem 0.5rem !important; min-height:40px !important; }
     .badge { font-size:0.7rem !important; padding:0.12rem 0.5rem !important; }
-    /* Stack result card grid to 1 col on very small screens */
     .res-grid { grid-template-columns: repeat(2,1fr) !important; gap:0.4rem !important; }
 }
 </style>
@@ -615,8 +595,6 @@ DEMO_IMAGES = [
     {"label":"Mix Waste","emoji":"🗑","category":"trash",
      "url":"https://img.freepik.com/free-photo/old-rusty-junk-garbage-steel-rubber_1150-10991.jpg","hint":"Recyclable · Low"},
 ]
-# To add more demo images later, simply append a dict to DEMO_IMAGES above.
-# Grid auto-adjusts to any number of images (4 per row).
 
 TEAM = [
     {"name":"Suhani","initials":"S","role":"Team Leader",
@@ -624,17 +602,28 @@ TEAM = [
      "linkedin":"https://www.linkedin.com/in/suhan-i/",
      "github":"https://github.com/SUHAN-I",
      "contact":"https://wa.me/923359997679"},
+
     {"name":"Muhammad Haroon ul Hasnain","initials":"H","role":"Team Member",
      "academic":"MPhil BA & DA",
      "linkedin":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain",
      "github":"https://github.com/hasnain1669",
      "contact":"https://www.linkedin.com/in/muhammad-haroon-ul-hasnain"},
-    # ── Add new members below — links optional, use "" if not yet available ──
-    # {"name":"Ali Raza","initials":"A","role":"Team Member","academic":"BS CS",
-    #  "linkedin":"","github":"","contact":""},
-    None, None, None,   # placeholders — replace None with a member dict when ready
+
+    {"name":"Yashfa Arooj Gill","initials":"Y","role":"Team Member",
+     "academic":"M.Phil Chemistry",
+     "linkedin":"https://www.linkedin.com/in/yashfa-arooj-gill-71187839b",
+     "github":"https://github.com/hammadgill7809-lang"},
+
+    {"name":"Daniya Khadija Anwar","initials":"D","role":"Team Member",
+     "academic":"MS in Biochemistry",
+     "linkedin":"https://www.linkedin.com/in/daniya-anwar",
+     "github":"https://github.com/daniyakhadija-0814"},
+
+    {"name":"Hasnain Ahmad","initials":"H","role":"Team Member",
+     "academic":"BS Computer Science (Student)",
+     "linkedin":"https://www.linkedin.com/in/hasnain-ahmad-047210349/",
+     "github":"https://github.com/HasnainAhmad67"},
 ]
-# Grid auto-adjusts: just append more member dicts above and remove a None.
 
 MARKET = {
     "Plastic"  :("PKR 60–140/kg",   "پلاسٹک"),
@@ -733,45 +722,37 @@ def gmaps(lat,lng): return f"https://www.google.com/maps/dir/?api=1&destination=
 def osm(lat,lng):   return f"https://www.openstreetmap.org/directions?to={lat},{lng}"
 
 def fmt(text):
-    """
-    Convert plain AI text with basic markdown into readable HTML.
-    Handles: ## headings, **bold**, bullet lines (- / •), paragraphs.
-    """
+    """Convert plain AI text with markdown into readable HTML."""
     import re
     lines   = text.split("\n")
     out     = []
     in_list = False
     for raw in lines:
         line = raw.rstrip()
-        # Heading ##
         if re.match(r"^#{1,3}\s+", line):
             if in_list: out.append("</ul>"); in_list = False
             htext = re.sub(r"^#{1,3}\s+","",line)
             htext = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", htext)
             out.append(f'<h4 style="font-family:Syne,sans-serif;color:#0f172a;'
                        f'font-size:0.97rem;margin:1rem 0 0.3rem;font-weight:700">{htext}</h4>')
-        # Bullet line
         elif re.match(r"^[-•*]\s+", line):
             if not in_list: out.append('<ul style="margin:0.3rem 0 0.3rem 1.2rem;padding:0">'); in_list = True
             item = re.sub(r"^[-•*]\s+","",line)
             item = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", item)
             out.append(f"<li style='margin-bottom:0.2rem;color:#334155'>{item}</li>")
-        # Numbered line
         elif re.match(r"^\d+\.\s+", line):
             if in_list: out.append("</ul>"); in_list = False
             item = re.sub(r"^\d+\.\s+","",line)
             item = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", item)
+            num  = re.match(r"^\d+",raw).group()
             out.append(f'<p style="margin:0.15rem 0;color:#334155"><strong style="color:#166534">'
-                       f'{re.match(r"^\d+",raw).group()}.</strong> {item}</p>')
-        # Horizontal rule
+                       f'{num}.</strong> {item}</p>')
         elif line.startswith("---") or line.startswith("==="):
             if in_list: out.append("</ul>"); in_list = False
             out.append('<hr style="border:none;border-top:1px solid #e2e8f0;margin:0.7rem 0">')
-        # Empty line — paragraph break
         elif line == "":
             if in_list: out.append("</ul>"); in_list = False
             out.append('<div style="height:0.4rem"></div>')
-        # Normal text
         else:
             if in_list: out.append("</ul>"); in_list = False
             para = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", line)
@@ -820,7 +801,7 @@ def init_state():
     defaults = {
         "show_nearby":False,"show_history":False,"show_market":False,
         "show_stats":False,"show_demo_images":False,"show_chat_hist":False,
-        "review_submitted":False,  # legacy key kept for safety
+        "review_submitted":False,
         "review_submitted_scan":False,"review_submitted_scan2":False,"review_submitted_sb":False,
         "last_vision":None,"rag_result":None,
         "input_mode":"image","session_id":str(uuid.uuid4())[:8],
@@ -849,13 +830,8 @@ def save_chat(db, role, message, waste_type=""):
 
 
 # ════════════════════════════════════════════════════════════
-# USER MODAL
+# DIALOGS
 # ════════════════════════════════════════════════════════════
-# ════════════════════════════════════════════════════════════
-# DIALOGS  (Streamlit ≥ 1.35 native modal — buttons render
-#            inside the dialog automatically, no CSS hacks)
-# ════════════════════════════════════════════════════════════
-
 @st.dialog("♻️ Welcome to Eco AI!")
 def _dialog_save_pref():
     st.markdown(
@@ -887,7 +863,6 @@ def _dialog_register(db):
 
     st.markdown("<div style='height:0.3rem'></div>", unsafe_allow_html=True)
 
-    # ── NEW USER ──────────────────────────────────────────────
     if is_new == "new":
         nm = st.text_input("Your Name *", placeholder="e.g. Ahmed, Sara…", key="new_nm")
         ct = st.text_input("Your City *", placeholder="e.g. Lahore, Karachi…", key="new_ct")
@@ -915,8 +890,6 @@ def _dialog_register(db):
                     st.error("Registration failed. Try again.")
             else:
                 st.warning("Please fill in name and city.")
-
-    # ── RETURNING USER ────────────────────────────────────────
     else:
         rn = st.text_input("Your Name *", placeholder="Your registered name", key="ret_nm")
         ri = st.text_input("Your Unique ID",
@@ -978,16 +951,10 @@ def _dialog_id_popup():
 
 
 def render_user_modal(db):
-    """Opens the correct native dialog based on session state."""
     if st.session_state.get("current_user"): return
-
-    # If user dismissed modal via native X (no button clicked),
-    # treat as guest after 1 dismissal to avoid looping.
     dismissed = st.session_state.get("modal_dismissed_count", 0)
-
     if st.session_state["save_preference"] is None:
         if dismissed >= 1:
-            # They closed via X — treat as guest, don't loop
             st.session_state["save_preference"] = False
             st.session_state["current_user"] = {
                 "user_id":"GUEST","name":"Guest","city":"—","is_new":False}
@@ -1061,8 +1028,7 @@ def render_result_card(v, lang):
 # REVIEW
 # ════════════════════════════════════════════════════════════
 def render_review(db, v, lang, context="main"):
-    """context = unique string per call site, prevents duplicate widget keys."""
-    k = context   # short alias
+    k = context
     st.markdown("---")
     st.markdown(f"""<div class="review-box">
         <div style="font-family:Syne,sans-serif;font-weight:700;font-size:0.97rem;
@@ -1247,7 +1213,6 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
     st.session_state.update({"last_vision":v,"rag_result":None,
                               "review_submitted_scan":False,"review_submitted_scan2":False})
 
-    # Save scan + increment count
     if db and image_bytes:
         try:
             from database import save_scan
@@ -1263,11 +1228,9 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
 
     save_chat(db,"user", text_input or "Image uploaded", v.get("waste_type",""))
 
-    # Result card
     st.markdown("---")
     render_result_card(v, lang)
 
-    # RAG guide
     with st.spinner("🤖 Generating guide…"):
         from rag_engine import run_rag_pipeline
         rag = run_rag_pipeline(components=components, vision_result=v, language=lang)
@@ -1332,7 +1295,7 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
         </div>""", unsafe_allow_html=True)
         save_chat(db, "assistant", fr["answer"][:800], v.get("waste_type", ""))
 
-    # ── Explore More — always visible as tabs ──────────────────
+    # Explore More tabs
     st.markdown("---")
     st.markdown("### 🔽 " + ("Explore More" if lang == "english" else "مزید دیکھیں"))
     exp_tabs = st.tabs([
@@ -1345,12 +1308,14 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
     with exp_tabs[3]: section_stats(db, lang)
     with exp_tabs[4]: section_chat_history(db, lang)
 
+    # Rating at the very end
+    render_review(db, v, lang, context="main")
+
 
 # ════════════════════════════════════════════════════════════
 # TAB: SCAN
 # ════════════════════════════════════════════════════════════
 def render_scan_tab(lang, city, lat, lng, vclient, components, db):
-    # Input mode selector
     st.markdown(f"**{t('inp_q',lang)}**")
     m1,m2,m3 = st.columns(3)
     for col,mode,lbl,icon in [
@@ -1422,6 +1387,7 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
                     try:
                         with st.spinner("🎤 Transcribing…"):
                             from voice import speech_to_text
+                            # speech_to_text expects raw bytes — handles temp file internally
                             text = speech_to_text(whisper, audio.getvalue(), lang)
                         st.session_state["voice_transcribed"] = text or ""
                         if not text:
@@ -1430,7 +1396,7 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
                         st.error(f"STT error: {e}")
                         st.session_state["voice_transcribed"] = ""
                 else:
-                    st.warning("⚠️ Whisper model unavailable — type your message in Text mode instead.")
+                    st.warning("⚠️ Whisper model unavailable — use Text mode instead.")
                     st.session_state["voice_transcribed"] = ""
 
             txt = st.session_state.get("voice_transcribed", "")
@@ -1442,14 +1408,6 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
                     run_analysis(lang, city, lat, lng, db, vclient, components, text_input=txt)
         else:
             st.info("Record your voice above, then click **Transcribe** to see the text before submitting.")
-
-    else:
-        st.markdown("""<div style="text-align:center;padding:2.5rem;color:#94a3b8">
-            <div style="font-size:3.5rem;margin-bottom:0.8rem">📸</div>
-            <div style="font-family:Syne,sans-serif;font-size:0.95rem;color:#64748b">
-                Choose an input method above to get started</div>
-            <div style="margin-top:0.4rem;font-size:0.83rem">اوپر سے ان پٹ کا طریقہ منتخب کریں</div>
-        </div>""", unsafe_allow_html=True)
 
 
 # ════════════════════════════════════════════════════════════
@@ -1490,19 +1448,18 @@ def render_demo_tab(lang, vclient, components, db):
                      image_bytes=da["image_bytes"])
         return
 
-    # ── Image grid — auto-wraps any number of images, 4 per row ──
+    # ── Image grid ──
     COLS_PER_ROW = 4
     st.markdown(f"**{t('demo_try',lang)}**")
     st.markdown("---")
     sel = None
     for row_start in range(0, len(DEMO_IMAGES), COLS_PER_ROW):
         row_items = DEMO_IMAGES[row_start : row_start + COLS_PER_ROW]
-        # Fill last row with empty slots so grid stays uniform
         padded    = row_items + [None] * (COLS_PER_ROW - len(row_items))
         cols      = st.columns(COLS_PER_ROW)
         for col, demo in zip(cols, padded):
             if demo is None:
-                continue          # empty slot — skip
+                continue
             with col:
                 try: st.image(demo["url"], use_container_width=True)
                 except: st.markdown(
@@ -1522,7 +1479,6 @@ def render_demo_tab(lang, vclient, components, db):
         import requests
         try:
             r = requests.get(sel["url"], timeout=10)
-            # Store in session so feedback/re-renders don't reset to grid
             st.session_state["demo_active_result"] = {
                 "label"      : sel["label"],
                 "image_bytes": r.content,
@@ -1547,34 +1503,50 @@ def render_team_tab(lang):
 
     TEAM_COLS = 5
     real_members = [m for m in TEAM if m is not None]
-    placeholders  = [m for m in TEAM if m is None]
-    all_slots     = real_members + placeholders  # real first, then placeholders
-
-    for row_start in range(0, len(all_slots), TEAM_COLS):
-        row = all_slots[row_start : row_start + TEAM_COLS]
+    for row_start in range(0, len(real_members), TEAM_COLS):
+        row = real_members[row_start : row_start + TEAM_COLS]
+        # Pad last row with None so columns stay uniform
+        padded = row + [None] * (TEAM_COLS - len(row))
         cols = st.columns(TEAM_COLS)
-        for ci, member in enumerate(row):
+
+        for ci, member in enumerate(padded):
             with cols[ci]:
                 if member:
-                    li = member.get("linkedin",""); gh = member.get("github","")
-                    ac = member.get("academic",""); ct = member.get("contact","")
+                    li = member.get("linkedin","")
+                    gh = member.get("github","")
+                    ac = member.get("academic","")
+                    ct = member.get("contact","")
+
                     links = ""
                     if li: links += f'<a href="{li}" target="_blank" class="t-link">in LinkedIn</a>'
                     if gh: links += f'<a href="{gh}" target="_blank" class="t-link">⌥ GitHub</a>'
                     if ct: links += f'<a href="{ct}" target="_blank" class="t-link">📞 Contact</a>'
+
+                    img_path = member.get("image","")
+                    if img_path:
+                        avatar = (f'<img src="{img_path}" style="width:90px;height:90px;'
+                                  f'border-radius:50%;object-fit:cover;margin:0 auto 0.6rem;display:block;">')
+                    else:
+                        avatar = (f'<div style="width:90px;height:90px;border-radius:50%;'
+                                  f'background:linear-gradient(135deg,#14532d,#22c55e);'
+                                  f'display:flex;align-items:center;justify-content:center;'
+                                  f'margin:0 auto 0.9rem;color:white;font-family:Syne,sans-serif;'
+                                  f'font-weight:800;font-size:1.7rem;'
+                                  f'box-shadow:0 4px 12px rgba(22,163,74,0.35)">'
+                                  f'{member["initials"]}</div>')
+
                     st.markdown(f"""<div class="team-card">
-                        <div class="t-avatar">{member['initials']}</div>
+                        {avatar}
                         <div class="t-name">{member['name']}</div>
                         <div class="t-role">{member['role']}</div>
                         {"<div class='t-acad'>"+ac+"</div>" if ac else ""}
-                        <div class="t-links">{links if links else '<span style=\"color:#94a3b8;font-size:0.75rem\">Links coming soon</span>'}</div>
+                        <div class="t-links">{links if links else '<span style="color:#94a3b8;font-size:0.75rem;font-style:italic">🔗 Links coming soon</span>'}</div>
                     </div>""", unsafe_allow_html=True)
                 else:
-                    slot_n = row_start + ci + 1
+                    # Coming-soon placeholder
                     st.markdown(f"""<div class="t-ph">
                         <div style="font-size:1.8rem;margin-bottom:0.4rem">👤</div>
                         <div style="font-weight:600;font-size:0.85rem">{t('coming',lang)}</div>
-                        <div style="font-size:0.75rem;margin-top:0.2rem;color:#cbd5e1">Slot {slot_n}</div>
                     </div>""", unsafe_allow_html=True)
 
     st.markdown("---")
@@ -1615,7 +1587,6 @@ def render_sidebar():
         with c1: lat = st.number_input(t("lat",language),value=31.5204,format="%.4f",step=0.0001)
         with c2: lng = st.number_input(t("lng",language),value=74.3587,format="%.4f",step=0.0001)
 
-        # Auto GPS via streamlit-js-eval
         try:
             from streamlit_js_eval import get_geolocation
             if st.button("📡 Auto-Detect GPS", use_container_width=True, key="gps_btn"):
@@ -1686,7 +1657,8 @@ def render_sidebar():
                 if st.button("📤 Submit Review", type="primary",
                              use_container_width=True, key="rv_sub_sb"):
                     try:
-                        sheet = db.get("sheet")
+                        db_obj = get_db()
+                        sheet = db_obj.get("sheet") if db_obj else None
                         if sheet:
                             try: ws = sheet.worksheet("reviews")
                             except:
@@ -1711,12 +1683,63 @@ def main():
     init_state()
     db = get_db()
 
-    # Show modal first — blocks until complete
     render_user_modal(db)
     render_id_popup()
     if not st.session_state.get("current_user"): return
 
     language, city, lat, lng = render_sidebar()
+
+    # ── Sidebar toggle buttons — always visible ──────────────
+    # Injected here (inside main, after page is rendered) so
+    # the DOM actually exists when the JS runs.
+    # height=1 ensures the iframe executes (height=0 can be skipped by browsers).
+    # The JS targets BOTH buttons: collapse (inside sidebar) + expand (when closed).
+    import streamlit.components.v1 as _stc
+    _stc.html("""
+<script>
+(function go() {
+    var SELECTORS = [
+        '[data-testid="collapsedControl"]',
+        '[data-testid="stSidebarCollapsedControl"]',
+        '[data-testid="stSidebarCollapseButton"]',
+        '[data-testid="stSidebarCollapseButton"] > button',
+        '[data-testid="stSidebar"] button[kind="header"]',
+        '[data-testid="stSidebar"] [data-testid="baseButton-header"]',
+    ];
+    function styleBtn(btn) {
+        if (!btn) return;
+        btn.style.setProperty('display',     'flex',    'important');
+        btn.style.setProperty('visibility',  'visible', 'important');
+        btn.style.setProperty('opacity',     '1',       'important');
+        btn.style.setProperty('background',  '#166534', 'important');
+        btn.style.setProperty('border',      'none',    'important');
+        btn.style.setProperty('cursor',      'pointer', 'important');
+        btn.style.setProperty('z-index',     '9999999', 'important');
+        btn.querySelectorAll('svg,path,polyline,line,circle,rect').forEach(function(el) {
+            el.style.setProperty('fill',   'white', 'important');
+            el.style.setProperty('stroke', 'white', 'important');
+            el.style.setProperty('color',  'white', 'important');
+        });
+    }
+    function fix() {
+        try {
+            var d = window.parent.document;
+            SELECTORS.forEach(function(sel) {
+                d.querySelectorAll(sel).forEach(styleBtn);
+            });
+        } catch(e) {}
+    }
+    fix();
+    setInterval(fix, 300);
+    try {
+        new MutationObserver(fix).observe(
+            window.parent.document.body,
+            { childList: true, subtree: true }
+        );
+    } catch(e) {}
+})();
+</script>
+""", height=1, scrolling=False)
 
     # Header
     st.markdown(f"""<div class="eco-header">
