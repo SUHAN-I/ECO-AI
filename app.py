@@ -54,9 +54,11 @@ st.markdown("""
 html, body, [class*="css"] {
     font-family : 'Inter', sans-serif !important;
     background  : var(--bg) !important;
-    color       : var(--text-1) !important;
     -webkit-font-smoothing: antialiased;
 }
+/* Only set dark text on Streamlit-generated markdown, NOT globally on all divs
+   (custom HTML uses inline styles like color:white which must not be overridden) */
+.stMarkdown, .stMarkdown * { color: var(--text-2); }
 h1,h2,h3,h4,h5 {
     font-family : 'Syne', sans-serif !important;
     color       : var(--text-1) !important;
@@ -81,12 +83,29 @@ code {
     background   : var(--white) !important;
     border-right : 1px solid var(--border) !important;
 }
+
+/* ── Main content: always fills ALL remaining width ──────────
+   Streamlit flex-row: sidebar | main. When sidebar collapses,
+   main must grow. Never set a hard width — only flex-grow.   */
+[data-testid="stMain"],
 [data-testid="stAppViewContainer"] > section:last-child,
-[data-testid="stMain"] {
-    width          : 100% !important;
-    min-width      : 0 !important;
-    flex           : 1 1 0% !important;
-    overflow-x     : hidden !important;
+[data-testid="stAppViewContainer"] > div:last-child {
+    flex       : 1 1 auto !important;
+    min-width  : 0 !important;
+    overflow-x : hidden !important;
+}
+.block-container,
+[data-testid="block-container"] {
+    width      : 100% !important;
+    max-width  : 100% !important;
+    min-width  : 0 !important;
+    padding    : 1.2rem 1.5rem 2rem !important;
+    box-sizing : border-box !important;
+}
+[data-testid="stAppViewContainer"] {
+    display   : flex !important;
+    flex-wrap : nowrap !important;
+    width     : 100% !important;
 }
 
 /* ── Sidebar: open/close button INSIDE the sidebar ── */
@@ -137,7 +156,42 @@ div[data-testid="collapsedControl"] {
     height: 18px !important;
 }
 
-/* ── Remove X close button from dialogs/modals ── */
+/* ── Professional polish ── */
+/* Section headers */
+.stMarkdown h3 { 
+    font-size: 1.05rem !important;
+    margin: 0.5rem 0 0.6rem !important;
+    border-bottom: 2px solid var(--green-bg);
+    padding-bottom: 0.3rem;
+}
+/* Input labels always dark */
+.stTextInput label, .stTextArea label,
+.stSelectbox label, .stNumberInput label,
+.stFileUploader label, .stAudioInput label {
+    color       : var(--text-2) !important;
+    font-weight : 600 !important;
+    font-size   : 0.83rem !important;
+}
+/* Spinner text */
+[data-testid="stSpinner"] p { color: var(--text-2) !important; }
+/* Success/info/warning/error visible text */
+.stSuccess, .stInfo, .stWarning, .stError { color: inherit !important; }
+/* Horizontal rule */
+hr { border-color: var(--border) !important; margin: 0.75rem 0 !important; }
+/* Camera and audio input */
+[data-testid="stCameraInput"], [data-testid="stAudioInput"] {
+    border-radius: var(--r-md) !important;
+    overflow: hidden !important;
+}
+/* File uploader */
+[data-testid="stFileUploadDropzone"] {
+    border-radius: var(--r-md) !important;
+    border: 2px dashed var(--border) !important;
+    background: var(--green-bg) !important;
+}
+[data-testid="stFileUploadDropzone"]:hover {
+    border-color: var(--green-mid) !important;
+}
 [data-testid="stModal"] > div > div > div:first-child button,
 [data-testid="stBaseButton-header"],
 button[aria-label="Close"],
@@ -212,10 +266,17 @@ label, .stRadio label, .stCheckbox label {
     font-weight : 600 !important;
     font-size   : 0.88rem !important;
     color       : var(--text-3) !important;
+    padding     : 0.6rem 1.1rem !important;
+    white-space : nowrap !important;
 }
 .stTabs [aria-selected="true"] {
     color            : var(--green) !important;
     border-bottom    : 2px solid var(--green) !important;
+}
+/* Tab strip: scrollable on small screens */
+[data-baseweb="tab-list"] {
+    overflow-x : auto !important;
+    flex-wrap  : nowrap !important;
 }
 .stMetric {
     background    : var(--white) !important;
@@ -246,14 +307,24 @@ footer     { visibility: hidden !important; }
 [data-testid="stDecoration"]   { visibility: hidden !important; }
 [data-testid="stStatusWidget"] { visibility: hidden !important; }
 
-/* ── High-contrast text ── */
+/* ── High-contrast text — explicit for every context ── */
 .stMarkdown p, .stMarkdown li,
 [data-testid="stMarkdownContainer"] p { color: var(--text-2) !important; }
 .stMarkdown strong, .stMarkdown b,
-[data-testid="stMarkdownContainer"] strong { color: var(--text-1) !important; }
+[data-testid="stMarkdownContainer"] strong { color: var(--text-1) !important; font-weight:600 !important; }
 .stMarkdown h1,.stMarkdown h2,.stMarkdown h3,.stMarkdown h4 { color: var(--text-1) !important; }
 .stMarkdown a { color: var(--green-mid) !important; }
 .stMarkdown code { color: var(--green) !important; background: var(--green-bg) !important; }
+/* Captions */
+[data-testid="stCaptionContainer"] p,
+.stCaption, caption { color: var(--text-3) !important; font-size: 0.82rem !important; }
+/* Ensure all interactive labels have visible text */
+label, .stRadio label, .stCheckbox label,
+[data-testid="stWidgetLabel"] { color: var(--text-2) !important; font-weight:500 !important; }
+/* Toast / status */
+[data-testid="stNotification"] { color: var(--text-1) !important; }
+/* Info / warning / error boxes */
+.stAlert > div { color: var(--text-1) !important; }
 
 /* ── Dialog / Modal ── */
 [data-testid="stModal"] p,
@@ -286,13 +357,16 @@ footer     { visibility: hidden !important; }
 [data-testid="stModal"] input,
 [data-testid="stModal"] textarea { color: var(--text-1) !important; background: var(--white) !important; }
 
-/* ── Sidebar text ── */
-[data-testid="stSidebar"] p,
-[data-testid="stSidebar"] div,
-[data-testid="stSidebar"] span { color: var(--text-2) !important; }
-[data-testid="stSidebar"] strong,
-[data-testid="stSidebar"] b { color: var(--text-1) !important; }
+/* ── Sidebar text — only target markdown/label text, NOT custom HTML ── */
+[data-testid="stSidebar"] .stMarkdown p,
+[data-testid="stSidebar"] .stMarkdown li,
+[data-testid="stSidebar"] .stMarkdown span { color: var(--text-2) !important; }
+[data-testid="stSidebar"] .stMarkdown strong,
+[data-testid="stSidebar"] .stMarkdown b { color: var(--text-1) !important; }
 [data-testid="stSidebar"] label { color: var(--text-2) !important; }
+/* Metric labels in sidebar */
+[data-testid="stSidebar"] [data-testid="stMetricLabel"] { color: var(--text-3) !important; }
+[data-testid="stSidebar"] [data-testid="stMetricValue"] { color: var(--green) !important; }
 
 /* ── Header banner ── */
 .eco-header {
@@ -551,7 +625,7 @@ footer     { visibility: hidden !important; }
     .team-card     { padding: 2rem 1.4rem; }
     .t-avatar      { width: 80px; height: 80px; font-size: 2rem; }
     .stButton > button { font-size: 0.9rem !important; }
-    .block-container { max-width: 1200px !important; padding: 1.5rem 2rem !important; }
+    /* Do NOT set block-container max-width here — it breaks sidebar-collapse layout */
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -674,8 +748,8 @@ UI = {
     "fup_ph"    :{"en":"💬 Ask a follow-up question…","ur":"💬 مزید سوال پوچھیں…"},
     "ask"       :{"en":"Ask","ur":"پوچھیں"},
     "speak_btn" :{"en":"🔊 Listen to AI Response","ur":"🔊 جواب سنیں"},
-    "yes"       :{"en":"YES ✅","ur":"ہاں ✅"},
-    "no"        :{"en":"NO ❌","ur":"نہیں ❌"},
+    "yes"       :{"en":"✅ YES","ur":"✅ ہاں"},
+    "no"        :{"en":"❌ NO","ur":"❌ نہیں"},
     "cat"       :{"en":"Category","ur":"کیٹیگری"},
     "recyc"     :{"en":"Recyclable","ur":"قابل ری سائیکل"},
     "harm"      :{"en":"Harm","ur":"نقصان"},
@@ -710,6 +784,58 @@ UI = {
     "coming"    :{"en":"Coming Soon","ur":"جلد آ رہا ہے"},
     "voice_hint":{"en":"Speak now — describe the waste or ask a question",
                   "ur":"اب بولیں — فضلے کو بیان کریں یا سوال پوچھیں"},
+    # ── Demo tab ──
+    "demo_title"   :{"en":"🎯 Judge Demo Panel","ur":"🎯 جج ڈیمو پینل"},
+    "demo_sub"     :{"en":"Pre-loaded waste images — click any to run full AI analysis instantly",
+                     "ur":"پہلے سے لوڈ تصاویر — فوری AI تجزیے کے لیے کسی پر بھی کلک کریں"},
+    "demo_new"     :{"en":"🔄 New Demo","ur":"🔄 نیا ڈیمو"},
+    "demo_result"  :{"en":"Showing result for","ur":"نتیجہ دکھا رہے ہیں"},
+    "demo_ph"      :{"en":"Click \"Show Demo Images\" to reveal pre-loaded test images",
+                     "ur":"\"ڈیمو تصاویر دکھائیں\" پر کلک کریں"},
+    "explore_more" :{"en":"🔽 Explore More","ur":"🔽 مزید دیکھیں"},
+    # ── Voice tab ──
+    "voice_steps"  :{"en":"Record → Transcribe → Submit","ur":"ریکارڈ ← تحریر ← جمع کریں"},
+    "transcribe"   :{"en":"🔍 Transcribe","ur":"🔍 تحریر کریں"},
+    "submit_voice" :{"en":"🚀 Submit & Analyse","ur":"🚀 جمع اور تجزیہ"},
+    "voice_rec_hint":{"en":"Record your voice above, then click Transcribe to see the text before submitting.",
+                      "ur":"اوپر آواز ریکارڈ کریں، پھر جمع کرنے سے پہلے تحریر کریں۔"},
+    "whisper_na"   :{"en":"⚠️ Whisper model unavailable — use Text mode instead.",
+                     "ur":"⚠️ وائس ماڈل دستیاب نہیں — متن موڈ استعمال کریں۔"},
+    # ── Sidebar ──
+    "sb_language"  :{"en":"🌐 Language","ur":"🌐 زبان"},
+    "sb_location"  :{"en":"📍 Location","ur":"📍 مقام"},
+    "sb_stats"     :{"en":"📊 Stats","ur":"📊 اعداد"},
+    "sb_about"     :{"en":"ℹ️ About","ur":"ℹ️ تعارف"},
+    "sb_gps"       :{"en":"📡 Auto-Detect GPS","ur":"📡 GPS خودکار"},
+    "sb_today"     :{"en":"Today","ur":"آج"},
+    "sb_total"     :{"en":"Total","ur":"کل"},
+    "sb_switch"    :{"en":"🚪 Switch User","ur":"🚪 صارف بدلیں"},
+    "sb_rate"      :{"en":"⭐ Rate This Result","ur":"⭐ نتیجے کو ریٹ کریں"},
+    "sb_thanks"    :{"en":"✅ Thank you for your feedback!","ur":"✅ آپ کی رائے کا شکریہ!"},
+    "rv_edit_lbl"  :{"en":"✏️ Edit Review","ur":"✏️ جائزہ ترمیم"},
+    "rv_rating_lbl":{"en":"Rating","ur":"ریٹنگ"},
+    "rv_correct_q" :{"en":"Correct?","ur":"درست ہے؟"},
+    "rv_cor_type"  :{"en":"Correct type?","ur":"درست قسم؟"},
+    "rv_fb_ph"     :{"en":"Any feedback…","ur":"کوئی رائے…"},
+    "rv_submit_sb" :{"en":"📤 Submit Review","ur":"📤 جائزہ جمع کریں"},
+    # ── Market ──
+    "mkt_cap"      :{"en":"Misri Shah Lahore & Karachi scrap markets",
+                     "ur":"مصری شاہ لاہور اور کراچی اسکریپ مارکیٹ"},
+    "mkt_warn"     :{"en":"⚠️ Approximate — verify with local dealers.",
+                     "ur":"⚠️ تقریبی قیمتیں — مقامی ڈیلروں سے تصدیق کریں۔"},
+    # ── Chat ──
+    "chat_login"   :{"en":"Log in to view your chat history.",
+                     "ur":"گفتگو دیکھنے کے لیے لاگ ان کریں۔"},
+    # ── Team ──
+    "about_proj"   :{"en":"🌿 About This Project","ur":"🌿 اس پروجیکٹ کے بارے میں"},
+    "abt_mission"  :{"en":"🎯 Mission","ur":"🎯 مشن"},
+    "abt_mission_t":{"en":"Turn Pakistan's waste into economic opportunity using AI",
+                     "ur":"AI سے پاکستان کا کچرہ معاشی موقع میں بدلنا"},
+    "abt_tech"     :{"en":"🛠️ Tech Stack","ur":"🛠️ ٹیکنالوجی"},
+    "abt_data"     :{"en":"🗄️ Data Layer","ur":"🗄️ ڈیٹا لیئر"},
+    "abt_impact"   :{"en":"🌍 Impact","ur":"🌍 اثر"},
+    "abt_impact_t" :{"en":"Helping kabariwalas access real market intelligence",
+                     "ur":"کباڑیوں کو حقیقی مارکیٹ معلومات تک رسائی"},
 }
 
 def t(k, lang): return UI.get(k,{}).get("ur" if lang=="urdu" else "en", k)
@@ -1051,8 +1177,7 @@ def render_review(db, v, lang, context="main"):
     with rc2:
         st.markdown(f"**{t('rv_q',lang)}**")
         correct = st.radio(f"rv_c_r_{k}",["yes","no"],
-            format_func=lambda x:("✅ Yes" if lang=="english" else "✅ ہاں") if x=="yes"
-                                 else("❌ No" if lang=="english" else "❌ نہیں"),
+            format_func=lambda x: t("yes",lang) if x=="yes" else t("no",lang),
             horizontal=True, index=0, label_visibility="collapsed", key=f"rv_c_{k}")
     correction = ""
     if correct == "no":
@@ -1122,7 +1247,7 @@ def section_history(db, lang):
 
 def section_market(lang):
     st.markdown(f"#### {t('market',lang)}")
-    st.caption("Misri Shah Lahore & Karachi scrap markets")
+    st.caption(t("mkt_cap",lang))
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     for cat,(rate,urdu) in MARKET.items():
         label = urdu if lang=="urdu" else cat
@@ -1131,7 +1256,7 @@ def section_market(lang):
             <span class="mkt-price">{rate}</span>
         </div>""", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
-    st.caption("⚠️ Approximate — verify with local dealers.")
+    st.caption(t("mkt_warn",lang))
 
 
 def section_stats(db, lang):
@@ -1148,8 +1273,10 @@ def section_stats(db, lang):
             if row.get("recyclable","").lower()=="true": rc+=1
         total = len(rows)
         m1,m2,m3,m4 = st.columns(4)
-        m1.metric("Total",total); m2.metric("Recyclable",rc)
-        m3.metric("Non-Recyclable",total-rc); m4.metric("Categories",len(cats))
+        m1.metric(t("sb_total",lang),total)
+        m2.metric(t("recyc",lang),rc)
+        m3.metric("✗" if lang=="urdu" else "Non-Recyclable", total-rc)
+        m4.metric(t("cat",lang),len(cats))
         if cats:
             import pandas as pd
             df = pd.DataFrame(list(cats.items()),columns=["Category","Count"]).sort_values("Count",ascending=False)
@@ -1163,7 +1290,7 @@ def section_chat_history(db, lang):
         st.info("📡 Database unavailable in demo mode."); return
     user = st.session_state.get("current_user")
     if not user or user.get("user_id")=="GUEST":
-        st.info("Log in to view your chat history."); return
+        st.info(t("chat_login",lang)); return
     try:
         from user_manager import get_user_chat_history
         msgs = get_user_chat_history(db, user["user_id"], limit=30)
@@ -1297,7 +1424,7 @@ def run_analysis(lang, city, lat, lng, db, vclient, components,
 
     # Explore More tabs
     st.markdown("---")
-    st.markdown("### 🔽 " + ("Explore More" if lang == "english" else "مزید دیکھیں"))
+    st.markdown(f"### {t('explore_more',lang)}")
     exp_tabs = st.tabs([
         t("nearby", lang), t("history", lang),
         t("market", lang), t("stats", lang), t("chat_hist", lang),
@@ -1371,7 +1498,7 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
             <div style="color:#0f172a;font-weight:600;font-size:0.9rem">
                 {t('voice_hint',lang)}</div>
             <div style="color:#64748b;font-size:0.78rem;margin-top:0.25rem">
-                Record → Transcribe → Submit</div>
+                {t('voice_steps',lang)}</div>
         </div>""", unsafe_allow_html=True)
 
         audio = st.audio_input("🎙️ Tap to record", label_visibility="collapsed")
@@ -1380,14 +1507,13 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
             if "voice_transcribed" not in st.session_state:
                 st.session_state["voice_transcribed"] = ""
 
-            if st.button("🔍 Transcribe", type="secondary",
+            if st.button(t("transcribe",lang), type="secondary",
                          use_container_width=True, key="voice_transcribe_btn"):
                 whisper = get_whisper()
                 if whisper:
                     try:
                         with st.spinner("🎤 Transcribing…"):
                             from voice import speech_to_text
-                            # speech_to_text expects raw bytes — handles temp file internally
                             text = speech_to_text(whisper, audio.getvalue(), lang)
                         st.session_state["voice_transcribed"] = text or ""
                         if not text:
@@ -1396,18 +1522,18 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
                         st.error(f"STT error: {e}")
                         st.session_state["voice_transcribed"] = ""
                 else:
-                    st.warning("⚠️ Whisper model unavailable — use Text mode instead.")
+                    st.warning(t("whisper_na", lang))
                     st.session_state["voice_transcribed"] = ""
 
             txt = st.session_state.get("voice_transcribed", "")
             if txt:
                 st.success(f"📝 Transcribed: *{txt}*")
-                if st.button("🚀 Submit & Analyse", type="primary",
+                if st.button(t("submit_voice",lang), type="primary",
                              use_container_width=True, key="voice_submit_btn"):
                     st.session_state["voice_transcribed"] = ""
                     run_analysis(lang, city, lat, lng, db, vclient, components, text_input=txt)
         else:
-            st.info("Record your voice above, then click **Transcribe** to see the text before submitting.")
+            st.info(t("voice_rec_hint", lang))
 
 
 # ════════════════════════════════════════════════════════════
@@ -1416,9 +1542,9 @@ def render_scan_tab(lang, city, lat, lng, vclient, components, db):
 def render_demo_tab(lang, vclient, components, db):
     st.markdown(f"""<div style="background:linear-gradient(135deg,#14532d,#16a34a);
         border-radius:var(--r-lg);padding:1.4rem 1.8rem;margin-bottom:1.2rem">
-        <h3 style="color:white;margin:0;font-family:Syne,sans-serif">🎯 Judge Demo Panel</h3>
+        <h3 style="color:white;margin:0;font-family:Syne,sans-serif">{t('demo_title',lang)}</h3>
         <p style="margin:0.3rem 0 0;color:#dcfce7;font-size:0.87rem">
-            Pre-loaded waste images — click any to run full AI analysis instantly</p>
+            {t('demo_sub',lang)}</p>
     </div>""", unsafe_allow_html=True)
 
     active = st.session_state.get(tk("demo_images"), False)
@@ -1427,19 +1553,19 @@ def render_demo_tab(lang, vclient, components, db):
         st.session_state[tk("demo_images")] = not active; st.rerun()
 
     if not active:
-        st.markdown("""<div style="text-align:center;padding:2rem;background:white;
+        st.markdown(f"""<div style="text-align:center;padding:2rem;background:white;
             border-radius:var(--r-md);border:1px solid var(--border);color:#94a3b8;margin-top:1rem">
             <div style="font-size:2.5rem">🎯</div>
             <div style="font-family:Syne,sans-serif;font-size:0.92rem;margin-top:0.5rem">
-                Click "Show Demo Images" to reveal pre-loaded test images</div>
+                {t('demo_ph',lang)}</div>
         </div>""", unsafe_allow_html=True)
         return
 
     # ── If a demo result is already loaded, show it with a "New Demo" button ──
     if st.session_state.get("demo_active_result"):
         da = st.session_state["demo_active_result"]
-        st.info(f"🔍 Showing result for: **{da['label']}**")
-        if st.button("🔄  New Demo", type="secondary", key="demo_new_btn"):
+        st.info(f"🔍 {t('demo_result',lang)}: **{da['label']}**")
+        if st.button(t("demo_new",lang), type="secondary", key="demo_new_btn"):
             st.session_state["demo_active_result"] = None
             st.session_state["review_submitted_scan"] = False
             st.rerun()
@@ -1550,18 +1676,18 @@ def render_team_tab(lang):
                     </div>""", unsafe_allow_html=True)
 
     st.markdown("---")
-    st.markdown("""<div style="background:linear-gradient(135deg,#14532d,#166534);
+    st.markdown(f"""<div style="background:linear-gradient(135deg,#14532d,#166534);
         border-radius:var(--r-lg);padding:1.5rem 2rem">
-        <h4 style="color:white;margin:0 0 0.9rem;font-family:Syne,sans-serif">🌿 About This Project</h4>
+        <h4 style="color:white;margin:0 0 0.9rem;font-family:Syne,sans-serif">{t('about_proj',lang)}</h4>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;font-size:0.87rem">
-            <div><strong style="color:#86efac">🎯 Mission</strong><br>
-                <span style="color:rgba(255,255,255,0.82)">Turn Pakistan's waste into economic opportunity using AI</span></div>
-            <div><strong style="color:#86efac">🛠️ Tech Stack</strong><br>
+            <div><strong style="color:#86efac">{t('abt_mission',lang)}</strong><br>
+                <span style="color:rgba(255,255,255,0.82)">{t('abt_mission_t',lang)}</span></div>
+            <div><strong style="color:#86efac">{t('abt_tech',lang)}</strong><br>
                 <span style="color:rgba(255,255,255,0.82)">Llama 4 Vision · Llama 3.3-70B · FAISS · Streamlit</span></div>
-            <div><strong style="color:#86efac">🗄️ Data Layer</strong><br>
+            <div><strong style="color:#86efac">{t('abt_data',lang)}</strong><br>
                 <span style="color:rgba(255,255,255,0.82)">Google Sheets · Qdrant GPS · Cloudinary</span></div>
-            <div><strong style="color:#86efac">🌍 Impact</strong><br>
-                <span style="color:rgba(255,255,255,0.82)">Helping kabariwalas access real market intelligence</span></div>
+            <div><strong style="color:#86efac">{t('abt_impact',lang)}</strong><br>
+                <span style="color:rgba(255,255,255,0.82)">{t('abt_impact_t',lang)}</span></div>
         </div>
     </div>""", unsafe_allow_html=True)
 
@@ -1574,13 +1700,13 @@ def render_sidebar():
         st.markdown("## ♻️ Eco AI")
         st.markdown("---")
 
-        st.markdown("### 🌐 Language")
+        st.markdown(f"### {t('sb_language','english')}")
         language = st.radio("lang_r",["english","urdu"],
             format_func=lambda x:"🇬🇧 English" if x=="english" else "🇵🇰 اردو",
             horizontal=True, label_visibility="collapsed")
         st.markdown("---")
 
-        st.markdown("### 📍 Location")
+        st.markdown(f"### {t('sb_location',language)}")
         city = st.text_input(t("city",language), value="Lahore",
                              placeholder="Lahore, Karachi…")
         c1,c2 = st.columns(2)
@@ -1589,7 +1715,7 @@ def render_sidebar():
 
         try:
             from streamlit_js_eval import get_geolocation
-            if st.button("📡 Auto-Detect GPS", use_container_width=True, key="gps_btn"):
+            if st.button(t("sb_gps",language), use_container_width=True, key="gps_btn"):
                 loc = get_geolocation()
                 if loc and loc.get("coords"):
                     lat = loc["coords"]["latitude"]
@@ -1598,31 +1724,33 @@ def render_sidebar():
         except: pass
         st.markdown("---")
 
-        st.markdown("### 📊 Stats")
+        st.markdown(f"### {t('sb_stats',language)}")
         try:
             db = get_db()
             from database import get_recent_scans
             recent  = get_recent_scans(db, limit=100)
             today   = datetime.now().strftime("%Y-%m-%d")
             today_n = sum(1 for s in recent if s.get("timestamp","").startswith(today))
-            st.metric("Today", today_n); st.metric("Total", len(recent))
+            st.metric(t("sb_today",language), today_n)
+            st.metric(t("sb_total",language), len(recent))
         except:
-            st.metric("Today","—"); st.metric("Total","—")
+            st.metric(t("sb_today",language),"—")
+            st.metric(t("sb_total",language),"—")
         st.markdown("---")
 
         user = st.session_state.get("current_user")
         if user and user.get("user_id")!="GUEST":
             st.markdown(f"**👤 {user.get('name','')}**\n\n`{user.get('user_id','')}`")
-            if st.button("🚪 Switch User", key="sw_u"):
+            if st.button(t("sb_switch",language), key="sw_u"):
                 for k in ["current_user","save_preference","last_vision","rag_result",
                           "review_submitted","show_id_popup"]:
                     st.session_state[k] = None
                 st.rerun()
             st.markdown("---")
 
-        with st.expander("ℹ️ About"):
-            st.markdown("""
-**Eco AI** turns Pakistan's waste into wealth.
+        with st.expander(t("sb_about",language)):
+            st.markdown(f"""
+**Eco AI** {'پاکستان کا کچرہ دولت میں بدلتا ہے۔' if language=='urdu' else "turns Pakistan's waste into wealth."}
 - 🦙 Llama 4 Scout Vision (Groq)
 - 🤖 Llama 3.3-70B RAG (Groq)
 - 🔍 FAISS vector search
@@ -1634,27 +1762,27 @@ def render_sidebar():
         v = st.session_state.get("last_vision")
         if v:
             st.markdown("---")
-            st.markdown("### ⭐ Rate This Result")
+            st.markdown(f"### {t('sb_rate',language)}")
             if st.session_state.get("review_submitted_sb"):
-                st.success("✅ Thank you for your feedback!")
-                if st.button("✏️ Edit Review", key="rv_edit_sb"):
+                st.success(t("sb_thanks",language))
+                if st.button(t("rv_edit_lbl",language), key="rv_edit_sb"):
                     st.session_state["review_submitted_sb"] = False; st.rerun()
             else:
-                stars = st.select_slider("Rating", [1,2,3,4,5], 5,
+                stars = st.select_slider(t("rv_stars",language), [1,2,3,4,5], 5,
                             format_func=lambda x:"⭐"*x,
                             label_visibility="collapsed", key="rv_s_sb")
                 st.markdown(f"{'⭐'*stars}{'☆'*(5-stars)}")
-                correct = st.radio("Correct?", ["yes","no"],
-                    format_func=lambda x:"✅ Yes" if x=="yes" else "❌ No",
+                correct = st.radio(t("rv_correct_q",language), ["yes","no"],
+                    format_func=lambda x: t("yes",language) if x=="yes" else t("no",language),
                     horizontal=True, label_visibility="collapsed", key="rv_c_sb")
                 correction = ""
                 if correct == "no":
-                    correction = st.text_input("Correct type?",
+                    correction = st.text_input(t("rv_cor_type",language),
                                                placeholder="e.g. metal can", key="rv_cor_sb")
-                feedback = st.text_area("Feedback (optional)", height=70,
+                feedback = st.text_area(t("rv_fb",language), height=70,
                                         label_visibility="collapsed",
-                                        placeholder="Any feedback…", key="rv_fb_sb")
-                if st.button("📤 Submit Review", type="primary",
+                                        placeholder=t("rv_fb_ph",language), key="rv_fb_sb")
+                if st.button(t("rv_submit_sb",language), type="primary",
                              use_container_width=True, key="rv_sub_sb"):
                     try:
                         db_obj = get_db()
