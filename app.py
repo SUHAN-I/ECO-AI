@@ -50,375 +50,103 @@ st.markdown("""
     --r-xl       : 28px;
 }
 
-/* ══════════════════════════════════════════════════════════
-   BASE — fonts and global color
-   Strategy: set color on body WITHOUT !important so our custom
-   HTML's inline styles (color:white etc.) still win naturally.
-   Then use !important ONLY on specific Streamlit-generated
-   elements that need it to beat Streamlit's own stylesheet.
-══════════════════════════════════════════════════════════ */
-html, body {
-    font-family            : 'Inter', sans-serif !important;
-    background             : var(--bg) !important;
-    color                  : var(--text-2);   /* NO !important — inline styles must win */
-    -webkit-font-smoothing : antialiased;
-}
-/* Streamlit applies its own color:inherit chains — force dark text
-   on every Streamlit-generated container without touching our HTML */
-[class*="css"],
-[data-testid="stApp"],
-[data-testid="stMain"],
-[data-testid="stVerticalBlock"],
-[data-testid="stHorizontalBlock"],
-[data-testid="column"],
-[data-testid="stMarkdownContainer"] {
-    color : var(--text-2) !important;
-}
-h1,h2,h3,h4,h5 {
-    font-family : 'Syne', sans-serif !important;
-    color       : var(--text-1) !important;
-    line-height : 1.2 !important;
-}
-/* Markdown text */
-.stMarkdown p, .stMarkdown li, .stMarkdown span,
-[data-testid="stMarkdownContainer"] p { color: var(--text-2) !important; }
-.stMarkdown strong, .stMarkdown b,
-[data-testid="stMarkdownContainer"] strong { color: var(--text-1) !important; font-weight: 600 !important; }
-.stMarkdown h1,.stMarkdown h2,.stMarkdown h3,.stMarkdown h4 { color: var(--text-1) !important; }
-.stMarkdown a { color: var(--green-mid) !important; }
-.stMarkdown code { color: var(--green) !important; background: var(--green-bg) !important; }
-small, .stCaption p { color: var(--text-3) !important; }
+/* ── Typography ── */
+html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; }
+h1,h2,h3,h4,h5 { font-family: 'Syne', sans-serif !important; line-height: 1.2 !important; }
 a { color: var(--green-mid) !important; }
 code {
-    background    : var(--green-bg) !important;
-    color         : var(--green) !important;
-    padding       : 0.1rem 0.4rem !important;
-    border-radius : 5px !important;
-    font-size     : 0.85em !important;
+    background: var(--green-bg) !important; color: var(--green) !important;
+    padding: 0.1rem 0.4rem !important; border-radius: 5px !important; font-size: 0.85em !important;
 }
 
-/* ══════════════════════════════════════════════════════════
-   LAYOUT — main content always fills all remaining width
-   Streamlit structure (wide layout):
-     stAppViewContainer (flex row)
-       └─ stSidebar   (fixed width, slides out on collapse)
-       └─ stMainBlockContainer  ← THIS needs to grow
-            └─ stMain
-                 └─ block-container  ← padding/width here
-   We must target BOTH stMainBlockContainer AND stMain.
-══════════════════════════════════════════════════════════ */
-[data-testid="stAppViewContainer"] {
-    display        : flex !important;
-    flex-direction : row !important;
-    flex-wrap      : nowrap !important;
-    align-items    : flex-start !important;
-    width          : 100vw !important;
-    min-width      : 0 !important;
-}
-/* Sidebar: never grow, never shrink beyond its own width */
-[data-testid="stSidebar"] {
-    flex       : 0 0 auto !important;
-    background : var(--white) !important;
-    border-right: 1px solid var(--border) !important;
-}
-/* Main block container: grows to fill all remaining space */
-[data-testid="stMainBlockContainer"],
-[data-testid="stAppViewContainer"] > section:not([data-testid="stSidebar"]),
-[data-testid="stAppViewContainer"] > div:not([data-testid="stSidebar"]) {
-    flex      : 1 1 0% !important;
-    min-width : 0 !important;
-    width     : 0 !important; /* flex will override this, but prevents initial sizing bug */
-    overflow-x: hidden !important;
-    transition: flex 0.3s ease !important;
-}
-/* Inner main + block-container: full width of parent */
-[data-testid="stMain"] {
-    width     : 100% !important;
-    min-width : 0 !important;
-}
-.block-container,
-[data-testid="block-container"] {
-    width      : 100% !important;
-    max-width  : 100% !important;
-    min-width  : 0 !important;
-    padding    : 1.2rem 2rem 2.5rem !important;
-    box-sizing : border-box !important;
-}
+/* ── Hide Streamlit chrome ── */
+#MainMenu, footer, [data-testid="stToolbar"],
+[data-testid="stDecoration"], [data-testid="stStatusWidget"] { visibility: hidden !important; }
 
-/* ── Sidebar: open/close button INSIDE the sidebar ── */
-[data-testid="stSidebar"] button[kind="header"],
-[data-testid="stSidebarCollapseButton"] button {
-    background    : var(--green) !important;
-    border        : none !important;
-    border-radius : 50% !important;
-    color         : #fff !important;
-}
-[data-testid="stSidebar"] button[kind="header"] svg,
-[data-testid="stSidebarCollapseButton"] button svg {
-    fill  : #fff !important;
-    color : #fff !important;
-}
-
-/* ── Sidebar EXPAND tab — visible green pull-tab when sidebar is closed ── */
-[data-testid="collapsedControl"],
-[data-testid="stSidebarCollapsedControl"],
-section[data-testid="stSidebar"][aria-expanded="false"] ~ div button,
-div[data-testid="collapsedControl"] {
-    display          : flex !important;
-    visibility       : visible !important;
-    opacity          : 1 !important;
-    background       : var(--green) !important;
-    border-radius    : 0 10px 10px 0 !important;
-    width            : 32px !important;
-    min-height       : 60px !important;
-    padding          : 0 !important;
-    align-items      : center !important;
-    justify-content  : center !important;
-    box-shadow       : 3px 0 10px rgba(22,101,52,0.3) !important;
-    cursor           : pointer !important;
-    transition       : background 0.15s !important;
-    border           : none !important;
-    z-index          : 9998 !important;
-}
-[data-testid="collapsedControl"]:hover,
-[data-testid="stSidebarCollapsedControl"]:hover {
-    background : #14532d !important;
-}
-[data-testid="collapsedControl"] svg,
-[data-testid="stSidebarCollapsedControl"] svg,
-[data-testid="collapsedControl"] button svg {
-    fill  : #fff !important;
-    color : #fff !important;
-    width : 18px !important;
-    height: 18px !important;
-}
-
-/* ── Professional polish ── */
-/* Section headers */
-.stMarkdown h3 { 
-    font-size: 1.05rem !important;
-    margin: 0.5rem 0 0.6rem !important;
-    border-bottom: 2px solid var(--green-bg);
-    padding-bottom: 0.3rem;
-}
-/* Input labels always dark */
-.stTextInput label, .stTextArea label,
-.stSelectbox label, .stNumberInput label,
-.stFileUploader label, .stAudioInput label {
-    color       : var(--text-2) !important;
-    font-weight : 600 !important;
-    font-size   : 0.83rem !important;
-}
-/* Spinner text */
-[data-testid="stSpinner"] p { color: var(--text-2) !important; }
-/* Success/info/warning/error visible text */
-.stSuccess, .stInfo, .stWarning, .stError { color: inherit !important; }
-/* Horizontal rule */
-hr { border-color: var(--border) !important; margin: 0.75rem 0 !important; }
-/* Camera and audio input */
-[data-testid="stCameraInput"], [data-testid="stAudioInput"] {
-    border-radius: var(--r-md) !important;
-    overflow: hidden !important;
-}
-/* File uploader */
-[data-testid="stFileUploadDropzone"] {
-    border-radius: var(--r-md) !important;
-    border: 2px dashed var(--border) !important;
-    background: var(--green-bg) !important;
-}
-[data-testid="stFileUploadDropzone"]:hover {
-    border-color: var(--green-mid) !important;
-}
+/* ── Remove X from dialogs ── */
 [data-testid="stModal"] > div > div > div:first-child button,
 [data-testid="stBaseButton-header"],
 button[aria-label="Close"],
-[data-baseweb="modal"] button[aria-label="close"],
-.stModal [data-testid="stHeaderActionElements"] button {
-    display : none !important;
-}
+[data-baseweb="modal"] button[aria-label="close"] { display: none !important; }
 
-/* ── Streamlit overrides ── */
+/* ── Buttons ── */
 .stButton > button {
-    font-family   : 'Inter', sans-serif !important;
-    font-weight   : 600 !important;
-    border-radius : var(--r-sm) !important;
-    font-size     : 0.88rem !important;
-    transition    : all 0.15s !important;
+    font-family: 'Inter', sans-serif !important; font-weight: 600 !important;
+    border-radius: var(--r-sm) !important; font-size: 0.88rem !important;
+    transition: all 0.15s !important;
 }
 .stButton > button[kind="primary"] {
-    background : var(--green) !important;
-    border     : none !important;
-    color      : #ffffff !important;
+    background: var(--green) !important; border: none !important; color: #fff !important;
 }
-.stButton > button[kind="primary"] p,
-.stButton > button[kind="primary"] span,
-.stButton > button[kind="primary"] div,
-.stButton > button[kind="primary"] * {
-    color : #ffffff !important;
-}
-.stButton > button[kind="primary"]:hover { background : #14532d !important; }
-
+.stButton > button[kind="primary"] * { color: #fff !important; }
+.stButton > button[kind="primary"]:hover { background: #14532d !important; }
 .stButton > button[kind="secondary"] {
-    background : var(--white) !important;
-    border     : 1.5px solid var(--green) !important;
-    color      : var(--green) !important;
+    background: var(--white) !important; border: 1.5px solid var(--green) !important;
+    color: var(--green) !important;
 }
-.stButton > button[kind="secondary"] p,
-.stButton > button[kind="secondary"] span,
-.stButton > button[kind="secondary"] div,
-.stButton > button[kind="secondary"] * {
-    color : var(--green) !important;
-}
-.stButton > button[kind="secondary"]:hover { background : var(--green-bg) !important; }
+.stButton > button[kind="secondary"] * { color: var(--green) !important; }
+.stButton > button[kind="secondary"]:hover { background: var(--green-bg) !important; }
 
-.stButton > button:not([kind="primary"]):not([kind="secondary"]) {
-    color : var(--text-1) !important;
-}
-.stButton > button:not([kind="primary"]):not([kind="secondary"]) * {
-    color : var(--text-1) !important;
-}
+/* ── Inputs ── */
 .stTextInput > div > div > input,
 .stTextArea  > div > div > textarea,
 .stSelectbox > div > div {
-    font-family   : 'Inter', sans-serif !important;
-    font-size     : 0.9rem !important;
-    color         : var(--text-1) !important;
-    background    : var(--white) !important;
-    border        : 1.5px solid var(--border) !important;
-    border-radius : var(--r-sm) !important;
+    font-family: 'Inter', sans-serif !important; font-size: 0.9rem !important;
+    color: var(--text-1) !important; background: var(--white) !important;
+    border: 1.5px solid var(--border) !important; border-radius: var(--r-sm) !important;
 }
 .stTextInput > div > div > input:focus,
 .stTextArea  > div > div > textarea:focus {
-    border-color : var(--green-mid) !important;
-    box-shadow   : 0 0 0 3px rgba(22,163,74,0.12) !important;
-    outline      : none !important;
+    border-color: var(--green-mid) !important;
+    box-shadow: 0 0 0 3px rgba(22,163,74,0.12) !important; outline: none !important;
 }
 label, .stRadio label, .stCheckbox label {
-    color       : var(--text-2) !important;
-    font-weight : 500 !important;
-    font-size   : 0.88rem !important;
+    color: var(--text-2) !important; font-weight: 500 !important; font-size: 0.88rem !important;
 }
+
+/* ── Tabs ── */
 .stTabs [data-baseweb="tab"] {
-    font-family : 'Inter', sans-serif !important;
-    font-weight : 600 !important;
-    font-size   : 0.88rem !important;
-    color       : var(--text-3) !important;
-    padding     : 0.6rem 1.1rem !important;
-    white-space : nowrap !important;
+    font-family: 'Inter', sans-serif !important; font-weight: 600 !important;
+    font-size: 0.88rem !important; color: var(--text-3) !important;
+    padding: 0.6rem 1.1rem !important; white-space: nowrap !important;
 }
-.stTabs [aria-selected="true"] {
-    color            : var(--green) !important;
-    border-bottom    : 2px solid var(--green) !important;
-}
-/* Tab strip: scrollable on small screens */
-[data-baseweb="tab-list"] {
-    overflow-x : auto !important;
-    flex-wrap  : nowrap !important;
-}
+.stTabs [aria-selected="true"] { color: var(--green) !important; border-bottom: 2px solid var(--green) !important; }
+[data-baseweb="tab-list"] { overflow-x: auto !important; flex-wrap: nowrap !important; }
+
+/* ── Metrics ── */
 .stMetric {
-    background    : var(--white) !important;
-    border        : 1px solid var(--border) !important;
-    border-radius : var(--r-sm) !important;
-    padding       : 0.8rem !important;
-    box-shadow    : var(--shadow-xs) !important;
+    background: var(--white) !important; border: 1px solid var(--border) !important;
+    border-radius: var(--r-sm) !important; padding: 0.8rem !important;
+    box-shadow: var(--shadow-xs) !important;
 }
-.stMetric label { color: var(--text-3) !important; font-size:0.78rem !important; }
-[data-testid="metric-value"] {
-    color       : var(--green) !important;
-    font-family : 'Syne', sans-serif !important;
-    font-weight : 700 !important;
-}
+.stMetric label { color: var(--text-3) !important; font-size: 0.78rem !important; }
+[data-testid="metric-value"] { color: var(--green) !important; font-family: 'Syne', sans-serif !important; font-weight: 700 !important; }
+
+/* ── Misc ── */
 [data-testid="stExpander"] {
-    background    : var(--white) !important;
-    border        : 1px solid var(--border) !important;
-    border-radius : var(--r-sm) !important;
+    background: var(--white) !important; border: 1px solid var(--border) !important;
+    border-radius: var(--r-sm) !important;
 }
 .stAlert { border-radius: var(--r-sm) !important; }
-
-/* ── Hide Streamlit chrome WITHOUT hiding sidebar buttons ──
-   header contains the sidebar toggle buttons — never hide it.
-   Instead, hide only specific chrome elements inside it.      */
-#MainMenu { visibility: hidden !important; }
-footer     { visibility: hidden !important; }
-[data-testid="stToolbar"]      { visibility: hidden !important; }
-[data-testid="stDecoration"]   { visibility: hidden !important; }
-[data-testid="stStatusWidget"] { visibility: hidden !important; }
-
-/* ── Dialog / Modal ── */
-[data-testid="stModal"] p,
-[data-testid="stModal"] span,
-[data-testid="stModal"] label,
-[data-testid="stModal"] div { color: var(--text-2) !important; }
-[data-testid="stModal"] strong,
-[data-testid="stModal"] b { color: var(--text-1) !important; }
-[data-testid="stModal"] h1,
-[data-testid="stModal"] h2,
-[data-testid="stModal"] h3 { color: var(--text-1) !important; }
-[data-testid="stModal"] .stButton > button[kind="primary"] {
-    background : var(--green) !important;
-    color      : #ffffff !important;
-    font-weight: 700 !important;
-}
-[data-testid="stModal"] .stButton > button[kind="secondary"] {
-    background : var(--white) !important;
-    color      : var(--green) !important;
-    border     : 1.5px solid var(--green) !important;
-    font-weight: 600 !important;
-}
-[data-testid="stModal"] .stButton > button {
-    color : var(--text-1) !important;
-}
-[data-testid="stModal"] .stCaption,
-[data-testid="stModal"] small { color: var(--text-3) !important; }
-[data-testid="stModal"] .stRadio label,
-[data-testid="stModal"] .stCheckbox label { color: var(--text-2) !important; }
-[data-testid="stModal"] input,
-[data-testid="stModal"] textarea { color: var(--text-1) !important; background: var(--white) !important; }
-
-/* ── Sidebar text ── */
-/* Sidebar uses white background — ensure all text is dark.
-   We use !important here because the sidebar context is known. */
-[data-testid="stSidebar"] p,
-[data-testid="stSidebar"] span,
-[data-testid="stSidebar"] li { color: var(--text-2) !important; }
-[data-testid="stSidebar"] strong,
-[data-testid="stSidebar"] b   { color: var(--text-1) !important; }
-[data-testid="stSidebar"] label { color: var(--text-2) !important; }
-[data-testid="stSidebar"] [data-testid="stMetricLabel"] { color: var(--text-3) !important; }
-[data-testid="stSidebar"] [data-testid="stMetricValue"] { color: var(--green) !important; }
-
-/* ── White-text protection for dark-background custom HTML ──
-   These elements use dark green backgrounds and need white text.
-   We declare them explicitly so the stMain/stVerticalBlock rules
-   (which use !important) don't leak in and make them invisible. */
-.eco-header, .eco-header * { color: inherit; }
-.eco-header h1 { color: #ffffff !important; }
-.eco-header p  { color: #dcfce7 !important; }
+hr { border-color: var(--border) !important; margin: 0.75rem 0 !important; }
 
 /* ── Header banner ── */
 .eco-header {
-    background    : linear-gradient(135deg, #14532d 0%, #166534 45%, #16a34a 100%);
-    border-radius : var(--r-lg);
-    padding       : 1.8rem 2rem;
-    margin-bottom : 1.2rem;
-    position      : relative;
-    overflow      : hidden;
+    background: linear-gradient(135deg, #14532d 0%, #166534 45%, #16a34a 100%);
+    border-radius: var(--r-lg); padding: 1.8rem 2rem; margin-bottom: 1.2rem;
+    position: relative; overflow: hidden;
 }
 .eco-header::after {
-    content    : '♻';
-    position   : absolute; right: 1.5rem; top: 50%;
-    transform  : translateY(-50%);
-    font-size  : 5rem; opacity: 0.08; line-height:1;
+    content: '♻'; position: absolute; right: 1.5rem; top: 50%;
+    transform: translateY(-50%); font-size: 5rem; opacity: 0.08;
 }
+.eco-header h1 { font-size: 1.8rem !important; margin: 0 !important; color: #ffffff !important; }
+.eco-header p  { margin: 0.3rem 0 0; font-size: 0.88rem; color: #dcfce7 !important; }
 
 /* ── Cards ── */
 .card {
-    background    : var(--white);
-    border-radius : var(--r-md);
-    padding       : 1.4rem;
-    box-shadow    : var(--shadow-sm);
-    border        : 1px solid var(--border);
-    margin-bottom : 1rem;
+    background: var(--white); border-radius: var(--r-md); padding: 1.4rem;
+    box-shadow: var(--shadow-sm); border: 1px solid var(--border); margin-bottom: 1rem;
 }
 .card-green  { border-left: 4px solid var(--green-mid); }
 .card-danger { border-left: 4px solid var(--danger); background: var(--danger-bg); }
@@ -426,245 +154,168 @@ footer     { visibility: hidden !important; }
 
 /* ── AI response box ── */
 .ai-box {
-    background    : var(--white);
-    border-radius : var(--r-md);
-    padding       : 1.6rem;
-    box-shadow    : var(--shadow-sm);
-    border        : 1px solid var(--border);
-    border-top    : 3px solid var(--green-mid);
-    line-height   : 1.85;
-    font-size     : 0.93rem;
-    color         : var(--text-2) !important;
-    margin-bottom : 1rem;
+    background: var(--white); border-radius: var(--r-md); padding: 1.6rem;
+    box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+    border-top: 3px solid var(--green-mid); line-height: 1.85;
+    font-size: 0.93rem; color: var(--text-2) !important; margin-bottom: 1rem;
 }
 
 /* ── Badges ── */
-.badge { border-radius:20px; padding:0.2rem 0.8rem; font-size:0.79rem; font-weight:600; display:inline-block; }
-.b-yes   { background:#dcfce7; color:#14532d; }
-.b-no    { background:#fee2e2; color:#991b1b; }
-.b-demo  { background:#fef3c7; color:#92400e; border:1px solid #fde68a; }
-.b-info  { background:#eff6ff; color:#1d4ed8; }
+.badge { border-radius: 20px; padding: 0.2rem 0.8rem; font-size: 0.79rem; font-weight: 600; display: inline-block; }
+.b-yes { background: #dcfce7; color: #14532d; }
+.b-no  { background: #fee2e2; color: #991b1b; }
+.b-demo{ background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.b-info{ background: #eff6ff; color: #1d4ed8; }
 
-/* ── Harm level colours ── */
-.h-low  { color:#15803d; font-weight:600; }
-.h-med  { color:#b45309; font-weight:600; }
-.h-high { color:#c2410c; font-weight:600; }
-.h-vhi  { color:#dc2626; font-weight:600; }
-
-/* ── Input mode selector ── */
-.mode-btn {
-    background    : var(--white);
-    border        : 1.5px solid var(--border);
-    border-radius : var(--r-md);
-    padding       : 1.1rem 0.8rem;
-    text-align    : center;
-    cursor        : pointer;
-    transition    : all 0.18s;
-}
-.mode-btn.active { border-color: var(--green-mid); background: var(--green-bg); }
-.mode-btn .icon  { font-size: 1.8rem; display:block; margin-bottom:0.4rem; }
-.mode-btn .lbl   { font-weight:600; font-size:0.85rem; color:var(--text-1) !important; }
+/* ── Harm colours ── */
+.h-low  { color: #15803d; font-weight: 600; }
+.h-med  { color: #b45309; font-weight: 600; }
+.h-high { color: #c2410c; font-weight: 600; }
+.h-vhi  { color: #dc2626; font-weight: 600; }
 
 /* ── Voice box ── */
 .voice-box {
-    background    : var(--green-bg);
-    border        : 2px dashed var(--green-mid);
-    border-radius : var(--r-md);
-    padding       : 1.5rem;
-    text-align    : center;
-    margin-bottom : 0.8rem;
+    background: var(--green-bg); border: 2px dashed var(--green-mid);
+    border-radius: var(--r-md); padding: 1.5rem; text-align: center; margin-bottom: 0.8rem;
 }
 
 /* ── Nearby card ── */
 .nearby-card {
-    background    : var(--white);
-    border-left   : 3px solid var(--green-mid);
-    border-radius : var(--r-sm);
-    padding       : 0.85rem 1rem;
-    margin-bottom : 0.5rem;
-    box-shadow    : var(--shadow-xs);
+    background: var(--white); border-left: 3px solid var(--green-mid);
+    border-radius: var(--r-sm); padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem; box-shadow: var(--shadow-xs);
 }
 
 /* ── Market table ── */
 .mkt-row {
-    display          : flex;
-    justify-content  : space-between;
-    align-items      : center;
-    padding          : 0.5rem 0;
-    border-bottom    : 1px solid var(--border);
-    font-size        : 0.88rem;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.88rem;
 }
-.mkt-row:last-child { border-bottom:none; }
-.mkt-price { color: var(--green) !important; font-weight:700; }
+.mkt-row:last-child { border-bottom: none; }
+.mkt-price { color: var(--green) !important; font-weight: 700; }
 
 /* ── Chat bubbles ── */
-.bubble-user { background:#dcfce7; border-radius:14px 14px 3px 14px; padding:0.65rem 1rem; margin-bottom:0.4rem; }
-.bubble-ai   {
-    background    : var(--white);
-    border        : 1px solid var(--border);
-    border-radius : 14px 14px 14px 3px;
-    padding       : 0.65rem 1rem;
-    margin-bottom : 0.4rem;
-    box-shadow    : var(--shadow-xs);
-}
+.bubble-user { background: #dcfce7; border-radius: 14px 14px 3px 14px; padding: 0.65rem 1rem; margin-bottom: 0.4rem; }
+.bubble-ai   { background: var(--white); border: 1px solid var(--border); border-radius: 14px 14px 14px 3px; padding: 0.65rem 1rem; margin-bottom: 0.4rem; box-shadow: var(--shadow-xs); }
 
 /* ── Review box ── */
 .review-box {
-    background    : var(--white);
-    border-radius : var(--r-md);
-    border        : 1px solid var(--border);
-    border-top    : 3px solid #f59e0b;
-    padding       : 1.3rem;
-    margin-bottom : 1rem;
-    box-shadow    : var(--shadow-xs);
+    background: var(--white); border-radius: var(--r-md); border: 1px solid var(--border);
+    border-top: 3px solid #f59e0b; padding: 1.3rem; margin-bottom: 1rem; box-shadow: var(--shadow-xs);
 }
-.review-done {
-    background    : #dcfce7;
-    border-radius : var(--r-sm);
-    padding       : 0.9rem;
-    text-align    : center;
-    color         : #14532d !important;
-    font-weight   : 600;
-}
+.review-done { background: #dcfce7; border-radius: var(--r-sm); padding: 0.9rem; text-align: center; color: #14532d !important; font-weight: 600; }
 
-/* ── Demo grid card ── */
-.demo-card {
-    background    : var(--white);
-    border        : 1.5px solid var(--border);
-    border-radius : var(--r-md);
-    padding       : 0.75rem;
-    text-align    : center;
-    transition    : all 0.18s;
-    box-shadow    : var(--shadow-xs);
-}
-.demo-card:hover { border-color: var(--green-mid); transform:translateY(-2px); box-shadow:var(--shadow-md); }
+/* ── Demo card ── */
+.demo-card { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--r-md); padding: 0.75rem; text-align: center; transition: all 0.18s; box-shadow: var(--shadow-xs); }
+.demo-card:hover { border-color: var(--green-mid); transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
 /* ── Team card ── */
 .team-card {
-    background    : var(--white);
-    border-radius : var(--r-lg);
-    padding       : 1.6rem 1.2rem;
-    box-shadow    : var(--shadow-sm);
-    border        : 1px solid var(--border);
-    border-top    : 4px solid var(--green-mid);
-    text-align    : center;
-    transition    : transform 0.2s, box-shadow 0.2s;
-    height        : 100%;
+    background: var(--white); border-radius: var(--r-lg); padding: 1.6rem 1.2rem;
+    box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+    border-top: 4px solid var(--green-mid); text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s; height: 100%;
 }
-.team-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); }
+.team-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
 .t-avatar {
-    width:72px; height:72px; border-radius:50%;
-    background:linear-gradient(135deg,#14532d,#22c55e);
-    display:flex; align-items:center; justify-content:center;
-    font-size:1.7rem; margin:0 auto 0.9rem;
-    color:white; font-family:'Syne',sans-serif; font-weight:800;
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg,#14532d,#22c55e);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.7rem; margin: 0 auto 0.9rem; color: white;
+    font-family: 'Syne',sans-serif; font-weight: 800;
     box-shadow: 0 4px 12px rgba(22,163,74,0.35);
 }
-.t-name { font-family:'Syne',sans-serif; font-weight:700; font-size:0.95rem; color:var(--text-1) !important; }
-.t-role { color:var(--green) !important; font-weight:600; font-size:0.8rem; margin:0.2rem 0; }
-.t-acad { color:var(--text-3) !important; font-size:0.76rem; font-style:italic; margin-bottom:0.7rem; }
-.t-links { display:flex; justify-content:center; gap:0.4rem; flex-wrap:wrap; margin-top:0.6rem; }
-.t-link  {
-    display:inline-flex; align-items:center; gap:0.3rem;
-    background:var(--green-bg); color:var(--green) !important;
-    border-radius:20px; padding:0.25rem 0.75rem;
-    font-size:0.76rem; font-weight:600; text-decoration:none;
-    border:1px solid var(--green-bdr); transition:background 0.15s;
+.t-name { font-family: 'Syne',sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--text-1) !important; }
+.t-role { color: var(--green) !important; font-weight: 600; font-size: 0.8rem; margin: 0.2rem 0; }
+.t-acad { color: var(--text-3) !important; font-size: 0.76rem; font-style: italic; margin-bottom: 0.7rem; }
+.t-links { display: flex; justify-content: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.6rem; }
+.t-link {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    background: var(--green-bg); color: var(--green) !important;
+    border-radius: 20px; padding: 0.25rem 0.75rem; font-size: 0.76rem;
+    font-weight: 600; text-decoration: none; border: 1px solid var(--green-bdr);
 }
-.t-link:hover { background:var(--green-bdr); }
-.t-ph {
-    background:var(--bg); border-radius:var(--r-lg);
-    border:2px dashed var(--border); padding:1.6rem 1rem;
-    text-align:center; color:var(--text-4) !important; height:100%;
-}
+.t-link:hover { background: var(--green-bdr); }
+.t-ph { background: var(--bg); border-radius: var(--r-lg); border: 2px dashed var(--border); padding: 1.6rem 1rem; text-align: center; height: 100%; }
 
 /* ── Nav button ── */
 .nav-btn {
-    display:inline-block; background:var(--green); color:#ffffff !important;
-    border-radius:var(--r-sm); padding:0.45rem 0.9rem; font-weight:600;
-    font-size:0.8rem; text-decoration:none; margin-top:0.4rem;
-    transition:background 0.15s; white-space:nowrap;
+    display: inline-block; background: var(--green); color: #fff !important;
+    border-radius: var(--r-sm); padding: 0.45rem 0.9rem; font-weight: 600;
+    font-size: 0.8rem; text-decoration: none; margin-top: 0.4rem; white-space: nowrap;
 }
-.nav-btn:hover { background:#14532d; }
+.nav-btn:hover { background: #14532d; }
 
 /* ── User bar ── */
 .user-bar {
-    background    : var(--green-bg);
-    border        : 1px solid var(--green-bdr);
-    border-radius : var(--r-sm);
-    padding       : 0.5rem 1rem;
-    margin-bottom : 1rem;
-    display       : flex;
-    align-items   : center;
-    gap           : 0.7rem;
-    flex-wrap     : wrap;
-    font-size     : 0.83rem;
+    background: var(--green-bg); border: 1px solid var(--green-bdr);
+    border-radius: var(--r-sm); padding: 0.5rem 1rem; margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; font-size: 0.83rem;
 }
 .user-bar span { color: var(--text-2) !important; }
 .user-bar .sep { color: var(--border) !important; }
 
-/* ══════════════════════════════════════════════════════════
-   MOBILE — max-width 768px
-══════════════════════════════════════════════════════════ */
+/* ── Modal text readable ── */
+[data-testid="stModal"] p, [data-testid="stModal"] label,
+[data-testid="stModal"] span:not([style]) { color: var(--text-2) !important; }
+[data-testid="stModal"] strong, [data-testid="stModal"] b { color: var(--text-1) !important; }
+[data-testid="stModal"] input, [data-testid="stModal"] textarea { color: var(--text-1) !important; }
+
+/* ── Sidebar open/close pill buttons ── */
+[data-testid="stSidebar"] button[kind="header"],
+[data-testid="stSidebarCollapseButton"] button {
+    background: var(--green) !important; border: none !important;
+    border-radius: 50% !important; color: #fff !important;
+}
+[data-testid="stSidebar"] button[kind="header"] svg,
+[data-testid="stSidebarCollapseButton"] button svg { fill: #fff !important; }
+
+/* ── Sidebar expand pull-tab ── */
+[data-testid="collapsedControl"],
+[data-testid="stSidebarCollapsedControl"] {
+    display: flex !important; visibility: visible !important; opacity: 1 !important;
+    background: var(--green) !important; border-radius: 0 10px 10px 0 !important;
+    width: 32px !important; min-height: 60px !important;
+    align-items: center !important; justify-content: center !important;
+    box-shadow: 3px 0 10px rgba(22,101,52,0.3) !important;
+    cursor: pointer !important; z-index: 9998 !important;
+}
+[data-testid="collapsedControl"] svg,
+[data-testid="stSidebarCollapsedControl"] svg { fill: #fff !important; width: 18px !important; height: 18px !important; }
+
+/* ── Mobile ── */
 @media (max-width: 768px) {
-    [data-testid="stSidebar"] {
-        position  : absolute !important;
-        z-index   : 1000 !important;
-        width     : 85vw !important;
-        max-width : 320px !important;
-        box-shadow: 4px 0 20px rgba(0,0,0,0.15) !important;
-    }
-    .eco-header { padding:1rem 0.9rem; border-radius:var(--r-md); }
-    .eco-header h1 { font-size:1.2rem !important; }
-    .eco-header p  { font-size:0.8rem; }
-    .eco-header::after { display:none; }
-    .card, .ai-box, .review-box { padding:0.9rem; }
-    .ai-box { font-size:0.87rem; line-height:1.75; }
-    .team-card { padding:1rem 0.75rem; }
-    .t-avatar  { width:54px; height:54px; font-size:1.3rem; }
-    .t-name    { font-size:0.82rem !important; }
-    .t-links   { flex-direction:column; align-items:center; }
-    .t-link    { font-size:0.7rem !important; padding:0.2rem 0.5rem !important; }
-    .res-grid { grid-template-columns: repeat(2,1fr) !important; }
-    [data-testid="column"] { padding:0.1rem !important; }
-    .stTabs [data-baseweb="tab"] { font-size:0.76rem !important; padding:0.35rem 0.4rem !important; }
-    .mkt-row { font-size:0.8rem; }
-    .user-bar { flex-direction:column; align-items:flex-start; gap:0.3rem; }
-    .user-bar .sep { display:none; }
-    .stButton > button { min-height:42px !important; font-size:0.82rem !important; }
-    .stTextInput, .stTextArea { width:100% !important; }
-    .nav-btn { font-size:0.74rem !important; padding:0.35rem 0.65rem !important; }
+    .eco-header { padding: 1rem 0.9rem; border-radius: var(--r-md); }
+    .eco-header h1 { font-size: 1.2rem !important; }
+    .eco-header::after { display: none; }
+    .card, .ai-box, .review-box { padding: 0.9rem; }
+    .team-card { padding: 1rem 0.75rem; }
+    .t-avatar  { width: 54px; height: 54px; font-size: 1.3rem; }
+    .t-links   { flex-direction: column; align-items: center; }
+    .stTabs [data-baseweb="tab"] { font-size: 0.76rem !important; padding: 0.35rem 0.4rem !important; }
+    .mkt-row { font-size: 0.8rem; }
+    .user-bar { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+    .stButton > button { min-height: 42px !important; font-size: 0.82rem !important; }
 }
 
-/* ══════════════════════════════════════════════════════════
-   DESKTOP / WEB — min-width 1024px
-══════════════════════════════════════════════════════════ */
+/* ── Desktop ── */
 @media (min-width: 1024px) {
-    .eco-header    { padding: 2rem 2.5rem; }
+    .eco-header { padding: 2rem 2.5rem; }
     .eco-header h1 { font-size: 2rem !important; }
-    .card          { padding: 1.6rem; }
-    .ai-box        { padding: 1.8rem; font-size: 0.95rem; }
-    .team-card     { padding: 2rem 1.4rem; }
-    .t-avatar      { width: 80px; height: 80px; font-size: 2rem; }
+    .card { padding: 1.6rem; }
+    .ai-box { padding: 1.8rem; font-size: 0.95rem; }
+    .team-card { padding: 2rem 1.4rem; }
     .stButton > button { font-size: 0.9rem !important; }
-    /* Do NOT set block-container max-width here — it breaks sidebar-collapse layout */
 }
 
-/* ══════════════════════════════════════════════════════════
-   TABLET — 769px to 1023px
-══════════════════════════════════════════════════════════ */
+/* ── Tablet ── */
 @media (min-width: 769px) and (max-width: 1023px) {
     .eco-header h1 { font-size: 1.5rem !important; }
-    .team-card     { padding: 1.3rem 0.9rem; }
-    .t-avatar      { width: 64px; height: 64px; }
-    .block-container { padding: 1rem 1.2rem !important; }
+    .team-card { padding: 1.3rem 0.9rem; }
 }
 @media (max-width: 480px) {
-    .eco-header h1 { font-size:1rem !important; }
-    .eco-header p  { font-size:0.76rem; }
-    .stButton > button { font-size:0.78rem !important; padding:0.35rem 0.5rem !important; min-height:40px !important; }
-    .badge { font-size:0.7rem !important; padding:0.12rem 0.5rem !important; }
-    .res-grid { grid-template-columns: repeat(2,1fr) !important; gap:0.4rem !important; }
+    .eco-header h1 { font-size: 1rem !important; }
+    .stButton > button { min-height: 40px !important; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -1839,53 +1490,175 @@ def main():
 
     language, city, lat, lng = render_sidebar()
 
-    # ── Sidebar toggle buttons — always visible ──────────────
-    # Injected here (inside main, after page is rendered) so
-    # the DOM actually exists when the JS runs.
-    # height=1 ensures the iframe executes (height=0 can be skipped by browsers).
-    # The JS targets BOTH buttons: collapse (inside sidebar) + expand (when closed).
+    # ── Master fix: inject <style> + sidebar JS into parent document ────────────
+    # st.markdown CSS goes into Streamlit's shadow/scoped context.
+    # The ONLY reliable way to fix Streamlit's own layout elements is to inject
+    # a <style> tag directly into window.parent.document from a components.html iframe.
     import streamlit.components.v1 as _stc
     _stc.html("""
 <script>
-(function go() {
-    var SELECTORS = [
-        '[data-testid="collapsedControl"]',
-        '[data-testid="stSidebarCollapsedControl"]',
-        '[data-testid="stSidebarCollapseButton"]',
-        '[data-testid="stSidebarCollapseButton"] > button',
-        '[data-testid="stSidebar"] button[kind="header"]',
-        '[data-testid="stSidebar"] [data-testid="baseButton-header"]',
-    ];
-    function styleBtn(btn) {
-        if (!btn) return;
-        btn.style.setProperty('display',     'flex',    'important');
-        btn.style.setProperty('visibility',  'visible', 'important');
-        btn.style.setProperty('opacity',     '1',       'important');
-        btn.style.setProperty('background',  '#166534', 'important');
-        btn.style.setProperty('border',      'none',    'important');
-        btn.style.setProperty('cursor',      'pointer', 'important');
-        btn.style.setProperty('z-index',     '9999999', 'important');
-        btn.querySelectorAll('svg,path,polyline,line,circle,rect').forEach(function(el) {
-            el.style.setProperty('fill',   'white', 'important');
-            el.style.setProperty('stroke', 'white', 'important');
-            el.style.setProperty('color',  'white', 'important');
-        });
+(function() {
+    var d = window.parent.document;
+
+    // ── 1. Inject master CSS into parent <head> ──────────────────────────────
+    if (!d.getElementById('eco-ai-master-css')) {
+        var s = d.createElement('style');
+        s.id = 'eco-ai-master-css';
+        s.textContent = `
+            /* LAYOUT: main area grows when sidebar collapses */
+            [data-testid="stAppViewContainer"] {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+            [data-testid="stSidebar"] {
+                flex: 0 0 auto !important;
+            }
+            [data-testid="stMainBlockContainer"] {
+                flex: 1 1 0% !important;
+                min-width: 0 !important;
+                width: 0 !important;
+                overflow-x: hidden !important;
+            }
+            [data-testid="stMain"] {
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+            .block-container {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding-left: 2rem !important;
+                padding-right: 2rem !important;
+                box-sizing: border-box !important;
+            }
+
+            /* COLORS: set base text color on body so all text is visible */
+            body, [data-testid="stApp"] {
+                color: #334155 !important;
+                background: #f8fafc !important;
+            }
+            /* Streamlit wraps content in these — force dark text */
+            [data-testid="stMarkdownContainer"],
+            [data-testid="stVerticalBlock"],
+            [data-testid="stHorizontalBlock"] {
+                color: #334155 !important;
+            }
+            /* Markdown specifics */
+            [data-testid="stMarkdownContainer"] p,
+            [data-testid="stMarkdownContainer"] li,
+            [data-testid="stMarkdownContainer"] span {
+                color: #334155 !important;
+            }
+            [data-testid="stMarkdownContainer"] h1,
+            [data-testid="stMarkdownContainer"] h2,
+            [data-testid="stMarkdownContainer"] h3,
+            [data-testid="stMarkdownContainer"] h4,
+            [data-testid="stMarkdownContainer"] strong,
+            [data-testid="stMarkdownContainer"] b {
+                color: #0f172a !important;
+            }
+            /* Widget labels */
+            [data-testid="stWidgetLabel"] p,
+            label { color: #334155 !important; }
+            /* Captions */
+            [data-testid="stCaptionContainer"] p { color: #64748b !important; }
+            /* Alert/info boxes */
+            [data-testid="stAlert"] p,
+            [data-testid="stAlert"] div { color: inherit !important; }
+            /* White text on dark-green banners must be preserved */
+            .eco-header h1 { color: #ffffff !important; }
+            .eco-header p  { color: #dcfce7 !important; }
+
+            /* SIDEBAR: keep sidebar text dark (white background) */
+            [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
+            [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] span,
+            [data-testid="stSidebar"] label { color: #334155 !important; }
+
+            /* SIDEBAR BUTTONS: always visible green */
+            [data-testid="collapsedControl"],
+            [data-testid="stSidebarCollapsedControl"] {
+                display: flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                background: #166534 !important;
+                border-radius: 0 10px 10px 0 !important;
+                width: 32px !important;
+                min-height: 60px !important;
+                z-index: 9999 !important;
+                cursor: pointer !important;
+            }
+            [data-testid="collapsedControl"] svg,
+            [data-testid="stSidebarCollapsedControl"] svg {
+                fill: white !important; color: white !important;
+                width: 18px !important; height: 18px !important;
+            }
+            [data-testid="stSidebarCollapseButton"] button,
+            [data-testid="stSidebar"] button[kind="header"] {
+                background: #166534 !important;
+                border-radius: 50% !important;
+                border: none !important;
+            }
+            [data-testid="stSidebarCollapseButton"] button svg,
+            [data-testid="stSidebar"] button[kind="header"] svg {
+                fill: white !important; color: white !important;
+            }
+        `;
+        d.head.appendChild(s);
     }
-    function fix() {
+
+    // ── 2. Also force layout via inline styles (belt-and-suspenders) ─────────
+    function fixLayout() {
         try {
-            var d = window.parent.document;
-            SELECTORS.forEach(function(sel) {
-                d.querySelectorAll(sel).forEach(styleBtn);
+            var container = d.querySelector('[data-testid="stMainBlockContainer"]');
+            if (container) {
+                container.style.setProperty('flex', '1 1 0%', 'important');
+                container.style.setProperty('min-width', '0', 'important');
+                container.style.setProperty('overflow-x', 'hidden', 'important');
+            }
+            var appView = d.querySelector('[data-testid="stAppViewContainer"]');
+            if (appView) {
+                appView.style.setProperty('display', 'flex', 'important');
+                appView.style.setProperty('flex-direction', 'row', 'important');
+                appView.style.setProperty('width', '100%', 'important');
+            }
+            var sidebar = d.querySelector('[data-testid="stSidebar"]');
+            if (sidebar) {
+                sidebar.style.setProperty('flex', '0 0 auto', 'important');
+            }
+        } catch(e) {}
+    }
+
+    // ── 3. Sidebar buttons visible ───────────────────────────────────────────
+    function fixBtns() {
+        try {
+            var SELS = [
+                '[data-testid="collapsedControl"]',
+                '[data-testid="stSidebarCollapsedControl"]',
+                '[data-testid="stSidebarCollapseButton"] > button',
+                '[data-testid="stSidebar"] button[kind="header"]',
+            ];
+            SELS.forEach(function(sel) {
+                d.querySelectorAll(sel).forEach(function(btn) {
+                    btn.style.setProperty('visibility', 'visible', 'important');
+                    btn.style.setProperty('opacity', '1', 'important');
+                    btn.style.setProperty('background', '#166534', 'important');
+                    btn.style.setProperty('display', 'flex', 'important');
+                    btn.querySelectorAll('svg,path').forEach(function(el) {
+                        el.style.setProperty('fill', 'white', 'important');
+                    });
+                });
             });
         } catch(e) {}
     }
-    fix();
-    setInterval(fix, 300);
+
+    fixLayout();
+    fixBtns();
+    setInterval(function(){ fixLayout(); fixBtns(); }, 400);
     try {
-        new MutationObserver(fix).observe(
-            window.parent.document.body,
-            { childList: true, subtree: true }
-        );
+        new MutationObserver(function(){ fixLayout(); fixBtns(); })
+            .observe(d.body, { childList: true, subtree: true });
     } catch(e) {}
 })();
 </script>
@@ -1915,3 +1688,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
