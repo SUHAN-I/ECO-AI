@@ -50,25 +50,44 @@ st.markdown("""
     --r-xl       : 28px;
 }
 
-/* ── Base ── */
-html, body, [class*="css"] {
-    font-family : 'Inter', sans-serif !important;
-    background  : var(--bg) !important;
-    -webkit-font-smoothing: antialiased;
+/* ══════════════════════════════════════════════════════════
+   BASE — fonts and global color
+   Strategy: set color on body WITHOUT !important so our custom
+   HTML's inline styles (color:white etc.) still win naturally.
+   Then use !important ONLY on specific Streamlit-generated
+   elements that need it to beat Streamlit's own stylesheet.
+══════════════════════════════════════════════════════════ */
+html, body {
+    font-family            : 'Inter', sans-serif !important;
+    background             : var(--bg) !important;
+    color                  : var(--text-2);   /* NO !important — inline styles must win */
+    -webkit-font-smoothing : antialiased;
 }
-/* Only set dark text on Streamlit-generated markdown, NOT globally on all divs
-   (custom HTML uses inline styles like color:white which must not be overridden) */
-.stMarkdown, .stMarkdown * { color: var(--text-2); }
+/* Streamlit applies its own color:inherit chains — force dark text
+   on every Streamlit-generated container without touching our HTML */
+[class*="css"],
+[data-testid="stApp"],
+[data-testid="stMain"],
+[data-testid="stVerticalBlock"],
+[data-testid="stHorizontalBlock"],
+[data-testid="column"],
+[data-testid="stMarkdownContainer"] {
+    color : var(--text-2) !important;
+}
 h1,h2,h3,h4,h5 {
     font-family : 'Syne', sans-serif !important;
     color       : var(--text-1) !important;
     line-height : 1.2 !important;
 }
-.stMarkdown > div > p,
-.stMarkdown > div > ul > li,
-.stMarkdown > div > ol > li { color: var(--text-2); }
-small, caption, .caption { color: var(--text-3) !important; }
-.stMarkdown strong, .stMarkdown b { color: var(--text-1) !important; font-weight: 600 !important; }
+/* Markdown text */
+.stMarkdown p, .stMarkdown li, .stMarkdown span,
+[data-testid="stMarkdownContainer"] p { color: var(--text-2) !important; }
+.stMarkdown strong, .stMarkdown b,
+[data-testid="stMarkdownContainer"] strong { color: var(--text-1) !important; font-weight: 600 !important; }
+.stMarkdown h1,.stMarkdown h2,.stMarkdown h3,.stMarkdown h4 { color: var(--text-1) !important; }
+.stMarkdown a { color: var(--green-mid) !important; }
+.stMarkdown code { color: var(--green) !important; background: var(--green-bg) !important; }
+small, .stCaption p { color: var(--text-3) !important; }
 a { color: var(--green-mid) !important; }
 code {
     background    : var(--green-bg) !important;
@@ -78,34 +97,52 @@ code {
     font-size     : 0.85em !important;
 }
 
-/* ── Sidebar ── */
-[data-testid="stSidebar"] {
-    background   : var(--white) !important;
-    border-right : 1px solid var(--border) !important;
+/* ══════════════════════════════════════════════════════════
+   LAYOUT — main content always fills all remaining width
+   Streamlit structure (wide layout):
+     stAppViewContainer (flex row)
+       └─ stSidebar   (fixed width, slides out on collapse)
+       └─ stMainBlockContainer  ← THIS needs to grow
+            └─ stMain
+                 └─ block-container  ← padding/width here
+   We must target BOTH stMainBlockContainer AND stMain.
+══════════════════════════════════════════════════════════ */
+[data-testid="stAppViewContainer"] {
+    display        : flex !important;
+    flex-direction : row !important;
+    flex-wrap      : nowrap !important;
+    align-items    : flex-start !important;
+    width          : 100vw !important;
+    min-width      : 0 !important;
 }
-
-/* ── Main content: always fills ALL remaining width ──────────
-   Streamlit flex-row: sidebar | main. When sidebar collapses,
-   main must grow. Never set a hard width — only flex-grow.   */
-[data-testid="stMain"],
-[data-testid="stAppViewContainer"] > section:last-child,
-[data-testid="stAppViewContainer"] > div:last-child {
-    flex       : 1 1 auto !important;
-    min-width  : 0 !important;
-    overflow-x : hidden !important;
+/* Sidebar: never grow, never shrink beyond its own width */
+[data-testid="stSidebar"] {
+    flex       : 0 0 auto !important;
+    background : var(--white) !important;
+    border-right: 1px solid var(--border) !important;
+}
+/* Main block container: grows to fill all remaining space */
+[data-testid="stMainBlockContainer"],
+[data-testid="stAppViewContainer"] > section:not([data-testid="stSidebar"]),
+[data-testid="stAppViewContainer"] > div:not([data-testid="stSidebar"]) {
+    flex      : 1 1 0% !important;
+    min-width : 0 !important;
+    width     : 0 !important; /* flex will override this, but prevents initial sizing bug */
+    overflow-x: hidden !important;
+    transition: flex 0.3s ease !important;
+}
+/* Inner main + block-container: full width of parent */
+[data-testid="stMain"] {
+    width     : 100% !important;
+    min-width : 0 !important;
 }
 .block-container,
 [data-testid="block-container"] {
     width      : 100% !important;
     max-width  : 100% !important;
     min-width  : 0 !important;
-    padding    : 1.2rem 1.5rem 2rem !important;
+    padding    : 1.2rem 2rem 2.5rem !important;
     box-sizing : border-box !important;
-}
-[data-testid="stAppViewContainer"] {
-    display   : flex !important;
-    flex-wrap : nowrap !important;
-    width     : 100% !important;
 }
 
 /* ── Sidebar: open/close button INSIDE the sidebar ── */
@@ -307,25 +344,6 @@ footer     { visibility: hidden !important; }
 [data-testid="stDecoration"]   { visibility: hidden !important; }
 [data-testid="stStatusWidget"] { visibility: hidden !important; }
 
-/* ── High-contrast text — explicit for every context ── */
-.stMarkdown p, .stMarkdown li,
-[data-testid="stMarkdownContainer"] p { color: var(--text-2) !important; }
-.stMarkdown strong, .stMarkdown b,
-[data-testid="stMarkdownContainer"] strong { color: var(--text-1) !important; font-weight:600 !important; }
-.stMarkdown h1,.stMarkdown h2,.stMarkdown h3,.stMarkdown h4 { color: var(--text-1) !important; }
-.stMarkdown a { color: var(--green-mid) !important; }
-.stMarkdown code { color: var(--green) !important; background: var(--green-bg) !important; }
-/* Captions */
-[data-testid="stCaptionContainer"] p,
-.stCaption, caption { color: var(--text-3) !important; font-size: 0.82rem !important; }
-/* Ensure all interactive labels have visible text */
-label, .stRadio label, .stCheckbox label,
-[data-testid="stWidgetLabel"] { color: var(--text-2) !important; font-weight:500 !important; }
-/* Toast / status */
-[data-testid="stNotification"] { color: var(--text-1) !important; }
-/* Info / warning / error boxes */
-.stAlert > div { color: var(--text-1) !important; }
-
 /* ── Dialog / Modal ── */
 [data-testid="stModal"] p,
 [data-testid="stModal"] span,
@@ -357,16 +375,25 @@ label, .stRadio label, .stCheckbox label,
 [data-testid="stModal"] input,
 [data-testid="stModal"] textarea { color: var(--text-1) !important; background: var(--white) !important; }
 
-/* ── Sidebar text — only target markdown/label text, NOT custom HTML ── */
-[data-testid="stSidebar"] .stMarkdown p,
-[data-testid="stSidebar"] .stMarkdown li,
-[data-testid="stSidebar"] .stMarkdown span { color: var(--text-2) !important; }
-[data-testid="stSidebar"] .stMarkdown strong,
-[data-testid="stSidebar"] .stMarkdown b { color: var(--text-1) !important; }
+/* ── Sidebar text ── */
+/* Sidebar uses white background — ensure all text is dark.
+   We use !important here because the sidebar context is known. */
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] li { color: var(--text-2) !important; }
+[data-testid="stSidebar"] strong,
+[data-testid="stSidebar"] b   { color: var(--text-1) !important; }
 [data-testid="stSidebar"] label { color: var(--text-2) !important; }
-/* Metric labels in sidebar */
 [data-testid="stSidebar"] [data-testid="stMetricLabel"] { color: var(--text-3) !important; }
 [data-testid="stSidebar"] [data-testid="stMetricValue"] { color: var(--green) !important; }
+
+/* ── White-text protection for dark-background custom HTML ──
+   These elements use dark green backgrounds and need white text.
+   We declare them explicitly so the stMain/stVerticalBlock rules
+   (which use !important) don't leak in and make them invisible. */
+.eco-header, .eco-header * { color: inherit; }
+.eco-header h1 { color: #ffffff !important; }
+.eco-header p  { color: #dcfce7 !important; }
 
 /* ── Header banner ── */
 .eco-header {
@@ -383,11 +410,6 @@ label, .stRadio label, .stCheckbox label,
     transform  : translateY(-50%);
     font-size  : 5rem; opacity: 0.08; line-height:1;
 }
-.eco-header h1 {
-    font-size   : 1.8rem !important; margin: 0 !important;
-    color       : #ffffff !important; letter-spacing: -0.3px;
-}
-.eco-header p { margin: 0.3rem 0 0; opacity: 0.88; font-size:0.88rem; color: #dcfce7 !important; }
 
 /* ── Cards ── */
 .card {
