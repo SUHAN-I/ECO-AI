@@ -85,39 +85,35 @@ a    { color: var(--green-mid) !important; }
 [data-testid="stExpander"] summary p,
 [data-testid="stExpander"] summary span { color: var(--text-1) !important; }
 
-/* ── Sidebar ── */
+/* ── Sidebar — style only, never fight Streamlit's own flex layout ── */
 [data-testid="stSidebar"] {
     background   : var(--white) !important;
-    border-right : 1px solid var(--border) !important;
+    border-right : 1.5px solid var(--border) !important;
+    /* NO width/min-width/position here — let Streamlit control sizing */
 }
 
-/* ── Sidebar: collapse button inside open sidebar ── */
-[data-testid="stSidebarCollapseButton"] button,
-[data-testid="stSidebar"] button[kind="header"] {
+/* Collapse button (inside open sidebar) */
+[data-testid="stSidebarCollapseButton"] button {
     background    : var(--green) !important;
     border        : none !important;
     border-radius : 50% !important;
 }
-[data-testid="stSidebarCollapseButton"] button svg,
-[data-testid="stSidebar"] button[kind="header"] svg { fill:#fff !important; color:#fff !important; }
+[data-testid="stSidebarCollapseButton"] button svg { fill:#fff !important; color:#fff !important; }
 
-/* ── Sidebar: expand tab when sidebar is CLOSED ──
-   Streamlit positions this naturally at the left edge.
-   Do NOT use position:fixed — it creates a second ghost tab on the right. */
+/* Expand tab (when sidebar is CLOSED) — style only, Streamlit positions it */
 [data-testid="collapsedControl"],
 [data-testid="stSidebarCollapsedControl"] {
-    background    : var(--green) !important;
-    border-radius : 0 10px 10px 0 !important;
-    width         : 32px !important;
-    min-height    : 60px !important;
-    display       : flex !important;
-    visibility    : visible !important;
-    opacity       : 1 !important;
-    align-items   : center !important;
+    background     : var(--green) !important;
+    border-radius  : 0 10px 10px 0 !important;
+    min-height     : 60px !important;
+    display        : flex !important;
+    visibility     : visible !important;
+    opacity        : 1 !important;
+    align-items    : center !important;
     justify-content: center !important;
-    box-shadow    : 2px 0 8px rgba(22,101,52,0.25) !important;
-    border        : none !important;
-    cursor        : pointer !important;
+    box-shadow     : 2px 0 8px rgba(22,101,52,0.25) !important;
+    border         : none !important;
+    cursor         : pointer !important;
 }
 [data-testid="collapsedControl"]:hover,
 [data-testid="stSidebarCollapsedControl"]:hover { background: #14532d !important; }
@@ -126,12 +122,19 @@ a    { color: var(--green-mid) !important; }
     fill:#fff !important; color:#fff !important; width:16px !important; height:16px !important;
 }
 
-/* ── Remove X close button from dialogs/modals ── */
-[data-testid="stModal"] > div > div > div:first-child button,
-[data-testid="stBaseButton-header"],
-button[aria-label="Close"],
-[data-baseweb="modal"] button[aria-label="close"],
-.stModal [data-testid="stHeaderActionElements"] button {
+/* ── Main content block — comfortable readable width, no forced margins ── */
+.main .block-container {
+    max-width    : 860px !important;
+    padding-left : 2rem !important;
+    padding-right: 2rem !important;
+    /* NO margin-left/margin-right — let Streamlit flex handle centering */
+}
+
+/* ── Remove X ONLY from modal dialogs — never from sidebar ── */
+[data-testid="stModal"] button[aria-label="Close"],
+[data-testid="stModal"] button[aria-label="close"],
+[data-baseweb="modal"] button[aria-label="Close"],
+[data-baseweb="modal"] button[aria-label="close"] {
     display : none !important;
 }
 
@@ -503,13 +506,10 @@ label, .stRadio label, .stCheckbox label {
    MOBILE — max-width 768px
 ══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-    /* Sidebar: start collapsed on mobile, full-width when open */
+    /* Sidebar: just style, let Streamlit handle show/hide natively */
     [data-testid="stSidebar"] {
-        position  : absolute !important;
-        z-index   : 1000 !important;
-        width     : 85vw !important;
-        max-width : 320px !important;
-        box-shadow: 4px 0 20px rgba(0,0,0,0.15) !important;
+        max-width : 85vw !important;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.12) !important;
     }
 
     /* Header — compact */
