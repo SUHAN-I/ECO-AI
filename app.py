@@ -15,9 +15,6 @@ st.set_page_config(
     initial_sidebar_state = "expanded"
 )
 
-# ════════════════════════════════════════════════════════════
-# CSS — Light Professional Theme + Mobile-First
-# ════════════════════════════════════════════════════════════
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
@@ -52,19 +49,13 @@ st.markdown("""
 
 /* ══════════════════════════════════════════════════════════
    BASE — fonts and global color
-   Strategy: set color on body WITHOUT !important so our custom
-   HTML's inline styles (color:white etc.) still win naturally.
-   Then use !important ONLY on specific Streamlit-generated
-   elements that need it to beat Streamlit's own stylesheet.
 ══════════════════════════════════════════════════════════ */
 html, body {
     font-family            : 'Inter', sans-serif !important;
     background             : var(--bg) !important;
-    color                  : var(--text-2);   /* NO !important — inline styles must win */
+    color                  : var(--text-2);
     -webkit-font-smoothing : antialiased;
 }
-/* Streamlit applies its own color:inherit chains — force dark text
-   on every Streamlit-generated container without touching our HTML */
 [class*="css"],
 [data-testid="stApp"],
 [data-testid="stMain"],
@@ -79,7 +70,6 @@ h1,h2,h3,h4,h5 {
     color       : var(--text-1) !important;
     line-height : 1.2 !important;
 }
-/* Markdown text */
 .stMarkdown p, .stMarkdown li, .stMarkdown span,
 [data-testid="stMarkdownContainer"] p { color: var(--text-2) !important; }
 .stMarkdown strong, .stMarkdown b,
@@ -98,14 +88,7 @@ code {
 }
 
 /* ══════════════════════════════════════════════════════════
-   LAYOUT — main content always fills all remaining width
-   Streamlit structure (wide layout):
-     stAppViewContainer (flex row)
-       └─ stSidebar   (fixed width, slides out on collapse)
-       └─ stMainBlockContainer  ← THIS needs to grow
-            └─ stMain
-                 └─ block-container  ← padding/width here
-   We must target BOTH stMainBlockContainer AND stMain.
+   LAYOUT — FIXED: Removed width:0 that was breaking UI
 ══════════════════════════════════════════════════════════ */
 [data-testid="stAppViewContainer"] {
     display        : flex !important;
@@ -121,15 +104,11 @@ code {
     background : var(--white) !important;
     border-right: 1px solid var(--border) !important;
 }
-/* Main block container: grows to fill all remaining space */
-[data-testid="stMainBlockContainer"],
-[data-testid="stAppViewContainer"] > section:not([data-testid="stSidebar"]),
-[data-testid="stAppViewContainer"] > div:not([data-testid="stSidebar"]) {
-    flex      : 1 1 0% !important;
+/* FIXED: Main container ab safe hai - width:0 hataya */
+[data-testid="stMainBlockContainer"] {
+    flex      : 1 1 auto !important;
     min-width : 0 !important;
-    width     : 0 !important; /* flex will override this, but prevents initial sizing bug */
     overflow-x: hidden !important;
-    transition: flex 0.3s ease !important;
 }
 /* Inner main + block-container: full width of parent */
 [data-testid="stMain"] {
@@ -194,14 +173,12 @@ div[data-testid="collapsedControl"] {
 }
 
 /* ── Professional polish ── */
-/* Section headers */
 .stMarkdown h3 { 
     font-size: 1.05rem !important;
     margin: 0.5rem 0 0.6rem !important;
     border-bottom: 2px solid var(--green-bg);
     padding-bottom: 0.3rem;
 }
-/* Input labels always dark */
 .stTextInput label, .stTextArea label,
 .stSelectbox label, .stNumberInput label,
 .stFileUploader label, .stAudioInput label {
@@ -209,18 +186,13 @@ div[data-testid="collapsedControl"] {
     font-weight : 600 !important;
     font-size   : 0.83rem !important;
 }
-/* Spinner text */
 [data-testid="stSpinner"] p { color: var(--text-2) !important; }
-/* Success/info/warning/error visible text */
 .stSuccess, .stInfo, .stWarning, .stError { color: inherit !important; }
-/* Horizontal rule */
 hr { border-color: var(--border) !important; margin: 0.75rem 0 !important; }
-/* Camera and audio input */
 [data-testid="stCameraInput"], [data-testid="stAudioInput"] {
     border-radius: var(--r-md) !important;
     overflow: hidden !important;
 }
-/* File uploader */
 [data-testid="stFileUploadDropzone"] {
     border-radius: var(--r-md) !important;
     border: 2px dashed var(--border) !important;
@@ -310,7 +282,6 @@ label, .stRadio label, .stCheckbox label {
     color            : var(--green) !important;
     border-bottom    : 2px solid var(--green) !important;
 }
-/* Tab strip: scrollable on small screens */
 [data-baseweb="tab-list"] {
     overflow-x : auto !important;
     flex-wrap  : nowrap !important;
@@ -335,9 +306,6 @@ label, .stRadio label, .stCheckbox label {
 }
 .stAlert { border-radius: var(--r-sm) !important; }
 
-/* ── Hide Streamlit chrome WITHOUT hiding sidebar buttons ──
-   header contains the sidebar toggle buttons — never hide it.
-   Instead, hide only specific chrome elements inside it.      */
 #MainMenu { visibility: hidden !important; }
 footer     { visibility: hidden !important; }
 [data-testid="stToolbar"]      { visibility: hidden !important; }
@@ -376,8 +344,6 @@ footer     { visibility: hidden !important; }
 [data-testid="stModal"] textarea { color: var(--text-1) !important; background: var(--white) !important; }
 
 /* ── Sidebar text ── */
-/* Sidebar uses white background — ensure all text is dark.
-   We use !important here because the sidebar context is known. */
 [data-testid="stSidebar"] p,
 [data-testid="stSidebar"] span,
 [data-testid="stSidebar"] li { color: var(--text-2) !important; }
@@ -387,10 +353,7 @@ footer     { visibility: hidden !important; }
 [data-testid="stSidebar"] [data-testid="stMetricLabel"] { color: var(--text-3) !important; }
 [data-testid="stSidebar"] [data-testid="stMetricValue"] { color: var(--green) !important; }
 
-/* ── White-text protection for dark-background custom HTML ──
-   These elements use dark green backgrounds and need white text.
-   We declare them explicitly so the stMain/stVerticalBlock rules
-   (which use !important) don't leak in and make them invisible. */
+/* ── White-text protection for dark-background custom HTML ── */
 .eco-header, .eco-header * { color: inherit; }
 .eco-header h1 { color: #ffffff !important; }
 .eco-header p  { color: #dcfce7 !important; }
@@ -647,7 +610,6 @@ footer     { visibility: hidden !important; }
     .team-card     { padding: 2rem 1.4rem; }
     .t-avatar      { width: 80px; height: 80px; font-size: 2rem; }
     .stButton > button { font-size: 0.9rem !important; }
-    /* Do NOT set block-container max-width here — it breaks sidebar-collapse layout */
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -668,7 +630,6 @@ footer     { visibility: hidden !important; }
 }
 </style>
 """, unsafe_allow_html=True)
-
 
 # ════════════════════════════════════════════════════════════
 # CONSTANTS
