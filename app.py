@@ -121,12 +121,7 @@ a    { color: var(--green-mid) !important; }
     fill:#fff !important; color:#fff !important; width:16px !important; height:16px !important;
 }
 
-/* ── Main content padding only — NO width overrides, Streamlit wide layout controls sizing ── */
-.main .block-container {
-    padding-left : 2rem !important;
-    padding-right: 2rem !important;
-    padding-top  : 1.2rem !important;
-}
+
 
 /* ── Remove X ONLY from modal dialogs — never from sidebar ── */
 [data-testid="stModal"] button[aria-label="Close"],
@@ -567,8 +562,6 @@ label, .stRadio label, .stCheckbox label {
     .team-card     { padding: 2rem 1.4rem; }
     .t-avatar      { width: 80px; height: 80px; font-size: 2rem; }
     .stButton > button { font-size: 0.9rem !important; }
-    /* Desktop: slightly more generous padding, no width override */
-    .block-container { padding: 1.5rem 2.5rem !important; }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -578,7 +571,6 @@ label, .stRadio label, .stCheckbox label {
     .eco-header h1 { font-size: 1.5rem !important; }
     .team-card     { padding: 1.3rem 0.9rem; }
     .t-avatar      { width: 64px; height: 64px; }
-    .block-container { padding: 1rem 1.2rem !important; }
 }
 @media (max-width: 480px) {
     .eco-header h1 { font-size:1rem !important; }
@@ -1715,6 +1707,52 @@ def main():
     if not st.session_state.get("current_user"): return
 
     language, city, lat, lng = render_sidebar()
+
+    # ── JS: fix layout on sidebar collapse/expand ──────────────
+    # Streamlit's wide layout uses an internal CSS grid. When the
+    # sidebar toggles, the grid column sizes don't always update.
+    # This JS forcibly resets the main section's width every 200ms
+    # so it always fills 100% of available space.
+    st.components.v1.html("""
+<script>
+(function fixLayout() {
+    function apply() {
+        try {
+            var doc = window.parent.document;
+            // Force main block to fill all available width
+            var main = doc.querySelector('[data-testid="stMain"]');
+            if (main) {
+                main.style.setProperty('width', '100%', 'important');
+                main.style.setProperty('min-width', '0', 'important');
+                main.style.setProperty('flex', '1 1 0%', 'important');
+            }
+            var bc = doc.querySelector('.main .block-container');
+            if (bc) {
+                bc.style.setProperty('width', '100%', 'important');
+                bc.style.setProperty('max-width', '100%', 'important');
+                bc.style.setProperty('min-width', '0', 'important');
+                bc.style.setProperty('box-sizing', 'border-box', 'important');
+            }
+            // Also fix the app view container flex
+            var app = doc.querySelector('[data-testid="stAppViewContainer"]');
+            if (app) {
+                app.style.setProperty('display', 'flex', 'important');
+                app.style.setProperty('flex-direction', 'row', 'important');
+                app.style.setProperty('width', '100%', 'important');
+            }
+        } catch(e) {}
+    }
+    apply();
+    setInterval(apply, 200);
+    try {
+        new MutationObserver(apply).observe(
+            window.parent.document.body,
+            {childList: true, subtree: true, attributes: true}
+        );
+    } catch(e) {}
+})();
+</script>
+""", height=0, scrolling=False)
 
     # Header
     st.markdown(f"""<div class="eco-header">
