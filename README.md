@@ -1,5 +1,4 @@
 # ECO-AI
-...
 <div align="center">
 
 <img src="https://img.shields.io/badge/♻️-ECO%20AI-1a4d1a?style=for-the-badge&labelColor=2d7a2d&color=1a4d1a" height="60"/>
