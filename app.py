@@ -88,40 +88,14 @@ code {
 }
 
 /* ══════════════════════════════════════════════════════════
-   LAYOUT — FIXED: Removed width:0 that was breaking UI
+   LAYOUT — SUPER SIMPLE: No flex, no breakage
 ══════════════════════════════════════════════════════════ */
-[data-testid="stAppViewContainer"] {
-    display        : flex !important;
-    flex-direction : row !important;
-    flex-wrap      : nowrap !important;
-    align-items    : flex-start !important;
-    width          : 100vw !important;
-    min-width      : 0 !important;
-}
-/* Sidebar: never grow, never shrink beyond its own width */
 [data-testid="stSidebar"] {
-    flex       : 0 0 auto !important;
     background : var(--white) !important;
     border-right: 1px solid var(--border) !important;
 }
-/* FIXED: Main container ab safe hai - width:0 hataya */
-[data-testid="stMainBlockContainer"] {
-    flex      : 1 1 auto !important;
-    min-width : 0 !important;
-    overflow-x: hidden !important;
-}
-/* Inner main + block-container: full width of parent */
-[data-testid="stMain"] {
-    width     : 100% !important;
-    min-width : 0 !important;
-}
-.block-container,
-[data-testid="block-container"] {
-    width      : 100% !important;
-    max-width  : 100% !important;
-    min-width  : 0 !important;
-    padding    : 1.2rem 2rem 2.5rem !important;
-    box-sizing : border-box !important;
+.block-container {
+    padding: 1.2rem 2rem 2.5rem !important;
 }
 
 /* ── Sidebar: open/close button INSIDE the sidebar ── */
