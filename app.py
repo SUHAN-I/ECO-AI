@@ -85,43 +85,99 @@ a    { color: var(--green-mid) !important; }
 [data-testid="stExpander"] summary p,
 [data-testid="stExpander"] summary span { color: var(--text-1) !important; }
 
-/* ── Sidebar — visual styling only, zero layout interference ── */
+/* ══════════════════════════════════════════════════════════
+   LAYOUT — main content always fills all remaining width
+   Streamlit structure (wide layout):
+     stAppViewContainer (flex row)
+       └─ stSidebar   (fixed width, slides out on collapse)
+       └─ stMainBlockContainer  ← THIS needs to grow
+            └─ stMain
+                 └─ block-container  ← padding/width here
+   We must target BOTH stMainBlockContainer AND stMain.
+══════════════════════════════════════════════════════════ */
+[data-testid="stAppViewContainer"] {
+    display        : flex !important;
+    flex-direction : row !important;
+    flex-wrap      : nowrap !important;
+    align-items    : flex-start !important;
+    width          : 100vw !important;
+    min-width      : 0 !important;
+}
+/* Sidebar: never grow, never shrink beyond its own width */
 [data-testid="stSidebar"] {
-    background   : var(--white) !important;
-    border-right : 1.5px solid var(--border) !important;
+    flex       : 0 0 auto !important;
+    background : var(--white) !important;
+    border-right: 1px solid var(--border) !important;
+}
+/* Main block container: grows to fill all remaining space */
+[data-testid="stMainBlockContainer"],
+[data-testid="stAppViewContainer"] > section:not([data-testid="stSidebar"]),
+[data-testid="stAppViewContainer"] > div:not([data-testid="stSidebar"]) {
+    flex      : 1 1 0% !important;
+    min-width : 0 !important;
+    width     : 0 !important;
+    overflow-x: hidden !important;
+    transition: flex 0.3s ease !important;
+}
+/* Inner main + block-container: full width of parent */
+[data-testid="stMain"] {
+    width     : 100% !important;
+    min-width : 0 !important;
+}
+.block-container,
+[data-testid="block-container"] {
+    width      : 100% !important;
+    max-width  : 100% !important;
+    min-width  : 0 !important;
+    padding    : 1.2rem 2rem 2.5rem !important;
+    box-sizing : border-box !important;
 }
 
-/* Collapse button (inside open sidebar) */
+/* ── Sidebar: open/close button INSIDE the sidebar ── */
+[data-testid="stSidebar"] button[kind="header"],
 [data-testid="stSidebarCollapseButton"] button {
     background    : var(--green) !important;
     border        : none !important;
     border-radius : 50% !important;
+    color         : #fff !important;
 }
-[data-testid="stSidebarCollapseButton"] button svg { fill:#fff !important; color:#fff !important; }
+[data-testid="stSidebar"] button[kind="header"] svg,
+[data-testid="stSidebarCollapseButton"] button svg {
+    fill  : #fff !important;
+    color : #fff !important;
+}
 
-/* Expand tab (when sidebar is CLOSED) */
+/* ── Sidebar EXPAND tab — visible green pull-tab when sidebar is closed ── */
 [data-testid="collapsedControl"],
-[data-testid="stSidebarCollapsedControl"] {
-    background     : var(--green) !important;
-    border-radius  : 0 10px 10px 0 !important;
-    min-height     : 60px !important;
-    display        : flex !important;
-    visibility     : visible !important;
-    opacity        : 1 !important;
-    align-items    : center !important;
-    justify-content: center !important;
-    box-shadow     : 2px 0 8px rgba(22,101,52,0.25) !important;
-    border         : none !important;
-    cursor         : pointer !important;
+[data-testid="stSidebarCollapsedControl"],
+section[data-testid="stSidebar"][aria-expanded="false"] ~ div button,
+div[data-testid="collapsedControl"] {
+    display          : flex !important;
+    visibility       : visible !important;
+    opacity          : 1 !important;
+    background       : var(--green) !important;
+    border-radius    : 0 10px 10px 0 !important;
+    width            : 32px !important;
+    min-height       : 60px !important;
+    padding          : 0 !important;
+    align-items      : center !important;
+    justify-content  : center !important;
+    box-shadow       : 3px 0 10px rgba(22,101,52,0.3) !important;
+    cursor           : pointer !important;
+    transition       : background 0.15s !important;
+    border           : none !important;
+    z-index          : 9998 !important;
 }
 [data-testid="collapsedControl"]:hover,
-[data-testid="stSidebarCollapsedControl"]:hover { background: #14532d !important; }
+[data-testid="stSidebarCollapsedControl"]:hover { background : #14532d !important; }
 [data-testid="collapsedControl"] svg,
-[data-testid="stSidebarCollapsedControl"] svg {
-    fill:#fff !important; color:#fff !important; width:16px !important; height:16px !important;
+[data-testid="stSidebarCollapsedControl"] svg,
+[data-testid="collapsedControl"] button svg {
+    fill  : #fff !important;
+    color : #fff !important;
+    width : 18px !important;
+    height: 18px !important;
 }
-
-
 
 /* ── Remove X ONLY from modal dialogs — never from sidebar ── */
 [data-testid="stModal"] button[aria-label="Close"],
@@ -1707,52 +1763,6 @@ def main():
     if not st.session_state.get("current_user"): return
 
     language, city, lat, lng = render_sidebar()
-
-    # ── JS: fix layout on sidebar collapse/expand ──────────────
-    # Streamlit's wide layout uses an internal CSS grid. When the
-    # sidebar toggles, the grid column sizes don't always update.
-    # This JS forcibly resets the main section's width every 200ms
-    # so it always fills 100% of available space.
-    st.components.v1.html("""
-<script>
-(function fixLayout() {
-    function apply() {
-        try {
-            var doc = window.parent.document;
-            // Force main block to fill all available width
-            var main = doc.querySelector('[data-testid="stMain"]');
-            if (main) {
-                main.style.setProperty('width', '100%', 'important');
-                main.style.setProperty('min-width', '0', 'important');
-                main.style.setProperty('flex', '1 1 0%', 'important');
-            }
-            var bc = doc.querySelector('.main .block-container');
-            if (bc) {
-                bc.style.setProperty('width', '100%', 'important');
-                bc.style.setProperty('max-width', '100%', 'important');
-                bc.style.setProperty('min-width', '0', 'important');
-                bc.style.setProperty('box-sizing', 'border-box', 'important');
-            }
-            // Also fix the app view container flex
-            var app = doc.querySelector('[data-testid="stAppViewContainer"]');
-            if (app) {
-                app.style.setProperty('display', 'flex', 'important');
-                app.style.setProperty('flex-direction', 'row', 'important');
-                app.style.setProperty('width', '100%', 'important');
-            }
-        } catch(e) {}
-    }
-    apply();
-    setInterval(apply, 200);
-    try {
-        new MutationObserver(apply).observe(
-            window.parent.document.body,
-            {childList: true, subtree: true, attributes: true}
-        );
-    } catch(e) {}
-})();
-</script>
-""", height=0, scrolling=False)
 
     # Header
     st.markdown(f"""<div class="eco-header">
