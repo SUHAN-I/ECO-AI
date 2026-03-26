@@ -15,6 +15,9 @@ st.set_page_config(
     initial_sidebar_state = "expanded"
 )
 
+# ════════════════════════════════════════════════════════════
+# CSS — Light Professional Theme + Mobile-First
+# ════════════════════════════════════════════════════════════
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
@@ -49,13 +52,19 @@ st.markdown("""
 
 /* ══════════════════════════════════════════════════════════
    BASE — fonts and global color
+   Strategy: set color on body WITHOUT !important so our custom
+   HTML's inline styles (color:white etc.) still win naturally.
+   Then use !important ONLY on specific Streamlit-generated
+   elements that need it to beat Streamlit's own stylesheet.
 ══════════════════════════════════════════════════════════ */
 html, body {
     font-family            : 'Inter', sans-serif !important;
     background             : var(--bg) !important;
-    color                  : var(--text-2);
+    color                  : var(--text-2);   /* NO !important — inline styles must win */
     -webkit-font-smoothing : antialiased;
 }
+/* Streamlit applies its own color:inherit chains — force dark text
+   on every Streamlit-generated container without touching our HTML */
 [class*="css"],
 [data-testid="stApp"],
 [data-testid="stMain"],
@@ -70,6 +79,7 @@ h1,h2,h3,h4,h5 {
     color       : var(--text-1) !important;
     line-height : 1.2 !important;
 }
+/* Markdown text */
 .stMarkdown p, .stMarkdown li, .stMarkdown span,
 [data-testid="stMarkdownContainer"] p { color: var(--text-2) !important; }
 .stMarkdown strong, .stMarkdown b,
@@ -88,14 +98,49 @@ code {
 }
 
 /* ══════════════════════════════════════════════════════════
-   LAYOUT — SUPER SIMPLE: No flex, no breakage
+   LAYOUT — main content always fills all remaining width
+   Streamlit structure (wide layout):
+     stAppViewContainer (flex row)
+       └─ stSidebar   (fixed width, slides out on collapse)
+       └─ stMainBlockContainer  ← THIS needs to grow
+            └─ stMain
+                 └─ block-container  ← padding/width here
+   We must target BOTH stMainBlockContainer AND stMain.
 ══════════════════════════════════════════════════════════ */
+[data-testid="stAppViewContainer"] {
+    display        : flex !important;
+    flex-direction : row !important;
+    flex-wrap      : nowrap !important;
+    align-items    : flex-start !important;
+    width          : 100vw !important;
+    min-width      : 0 !important;
+}
+/* Sidebar: never grow, never shrink beyond its own width */
 [data-testid="stSidebar"] {
+    flex       : 0 0 auto !important;
     background : var(--white) !important;
     border-right: 1px solid var(--border) !important;
 }
-.block-container {
-    padding: 1.2rem 2rem 2.5rem !important;
+/* Main block container: grows to fill all remaining space */
+[data-testid="stMainBlockContainer"] {
+    flex      : 1 1 0% !important;
+    min-width : 0 !important;
+    width     : auto !important;
+    max-width : 100% !important;
+    overflow-x: hidden !important;
+}
+/* Inner main + block-container: full width of parent */
+[data-testid="stMain"] {
+    width     : 100% !important;
+    min-width : 0 !important;
+}
+.block-container,
+[data-testid="block-container"] {
+    width      : 100% !important;
+    max-width  : 100% !important;
+    min-width  : 0 !important;
+    padding    : 1.2rem 2rem 2.5rem !important;
+    box-sizing : border-box !important;
 }
 
 /* ── Sidebar: open/close button INSIDE the sidebar ── */
@@ -147,12 +192,14 @@ div[data-testid="collapsedControl"] {
 }
 
 /* ── Professional polish ── */
+/* Section headers */
 .stMarkdown h3 { 
     font-size: 1.05rem !important;
     margin: 0.5rem 0 0.6rem !important;
     border-bottom: 2px solid var(--green-bg);
     padding-bottom: 0.3rem;
 }
+/* Input labels always dark */
 .stTextInput label, .stTextArea label,
 .stSelectbox label, .stNumberInput label,
 .stFileUploader label, .stAudioInput label {
@@ -160,13 +207,18 @@ div[data-testid="collapsedControl"] {
     font-weight : 600 !important;
     font-size   : 0.83rem !important;
 }
+/* Spinner text */
 [data-testid="stSpinner"] p { color: var(--text-2) !important; }
+/* Success/info/warning/error visible text */
 .stSuccess, .stInfo, .stWarning, .stError { color: inherit !important; }
+/* Horizontal rule */
 hr { border-color: var(--border) !important; margin: 0.75rem 0 !important; }
+/* Camera and audio input */
 [data-testid="stCameraInput"], [data-testid="stAudioInput"] {
     border-radius: var(--r-md) !important;
     overflow: hidden !important;
 }
+/* File uploader */
 [data-testid="stFileUploadDropzone"] {
     border-radius: var(--r-md) !important;
     border: 2px dashed var(--border) !important;
@@ -256,6 +308,7 @@ label, .stRadio label, .stCheckbox label {
     color            : var(--green) !important;
     border-bottom    : 2px solid var(--green) !important;
 }
+/* Tab strip: scrollable on small screens */
 [data-baseweb="tab-list"] {
     overflow-x : auto !important;
     flex-wrap  : nowrap !important;
@@ -280,6 +333,9 @@ label, .stRadio label, .stCheckbox label {
 }
 .stAlert { border-radius: var(--r-sm) !important; }
 
+/* ── Hide Streamlit chrome WITHOUT hiding sidebar buttons ──
+   header contains the sidebar toggle buttons — never hide it.
+   Instead, hide only specific chrome elements inside it.      */
 #MainMenu { visibility: hidden !important; }
 footer     { visibility: hidden !important; }
 [data-testid="stToolbar"]      { visibility: hidden !important; }
@@ -318,6 +374,8 @@ footer     { visibility: hidden !important; }
 [data-testid="stModal"] textarea { color: var(--text-1) !important; background: var(--white) !important; }
 
 /* ── Sidebar text ── */
+/* Sidebar uses white background — ensure all text is dark.
+   We use !important here because the sidebar context is known. */
 [data-testid="stSidebar"] p,
 [data-testid="stSidebar"] span,
 [data-testid="stSidebar"] li { color: var(--text-2) !important; }
@@ -327,7 +385,10 @@ footer     { visibility: hidden !important; }
 [data-testid="stSidebar"] [data-testid="stMetricLabel"] { color: var(--text-3) !important; }
 [data-testid="stSidebar"] [data-testid="stMetricValue"] { color: var(--green) !important; }
 
-/* ── White-text protection for dark-background custom HTML ── */
+/* ── White-text protection for dark-background custom HTML ──
+   These elements use dark green backgrounds and need white text.
+   We declare them explicitly so the stMain/stVerticalBlock rules
+   (which use !important) don't leak in and make them invisible. */
 .eco-header, .eco-header * { color: inherit; }
 .eco-header h1 { color: #ffffff !important; }
 .eco-header p  { color: #dcfce7 !important; }
@@ -584,6 +645,7 @@ footer     { visibility: hidden !important; }
     .team-card     { padding: 2rem 1.4rem; }
     .t-avatar      { width: 80px; height: 80px; font-size: 2rem; }
     .stButton > button { font-size: 0.9rem !important; }
+    /* Do NOT set block-container max-width here — it breaks sidebar-collapse layout */
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -604,6 +666,7 @@ footer     { visibility: hidden !important; }
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 # ════════════════════════════════════════════════════════════
 # CONSTANTS
